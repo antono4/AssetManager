@@ -226,6 +226,19 @@ return [
     'in_progress'        => 'Proses',
     'skipped'            => 'Skip',
 
+    // Patch codes
+    'patch_code'         => 'Kode Patching',
+    'patch_code_placeholder' => 'mis: KB5079473',
+    'patch_code_hint'    => 'Masukkan kode patch/update (mis: KB5079473 untuk Windows Update)',
+    'patch_code_saved'   => 'Kode patching berhasil disimpan.',
+    'save_code'          => 'Simpan Kode',
+    'computer_patch_list' => 'Daftar Komputer Patching',
+    'computer'           => 'Komputer',
+    'patch_codes'        => 'Kode Patching',
+    'no_patch_codes'     => 'Belum ada kode patching tercatat.',
+    'view_patch_list'    => 'Lihat Daftar Patch',
+    'patched_items'      => 'Item Terpatch',
+
     // Misc
     'access_denied'      => 'Akses ditolak. Halaman khusus admin.',
     'page_not_found'     => '404 - Tidak Ditemukan',

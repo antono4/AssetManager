@@ -122,8 +122,10 @@ Router::post('/patching/{id}/generate',      fn($p) => $patchCtl->generate($p));
 Router::post('/patching/{id}/generate-all',  fn($p) => $patchCtl->generateAll($p));
 Router::get('/patching/checklist/{id}',      fn($p) => $patchCtl->checklist($p));
 Router::post('/patching/checklist/{id}/toggle',     fn($p) => $patchCtl->toggle($p));
+Router::post('/patching/checklist/{id}/save-code',  fn($p) => $patchCtl->saveCode($p));
 Router::post('/patching/checklist/{id}/status',     fn($p) => $patchCtl->setChecklistStatus($p));
 Router::post('/patching/checklist/{id}/delete',     fn($p) => $patchCtl->deleteChecklist($p));
+Router::get('/patching/{id}/computers',             fn($p) => $patchCtl->computers($p));
 
 // Dispatch
 Router::dispatch($path, $_SERVER['REQUEST_METHOD'] ?? 'GET');

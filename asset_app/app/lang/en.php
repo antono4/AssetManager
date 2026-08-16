@@ -226,6 +226,19 @@ return [
     'in_progress'        => 'In Progress',
     'skipped'            => 'Skipped',
 
+    // Patch codes
+    'patch_code'         => 'Patch Code',
+    'patch_code_placeholder' => 'e.g. KB5079473',
+    'patch_code_hint'    => 'Enter the patch/update code (e.g. KB5079473 for Windows Update)',
+    'patch_code_saved'   => 'Patch code saved successfully.',
+    'save_code'          => 'Save Code',
+    'computer_patch_list' => 'Computer Patch List',
+    'computer'           => 'Computer',
+    'patch_codes'        => 'Patch Codes',
+    'no_patch_codes'     => 'No patch codes recorded yet.',
+    'view_patch_list'    => 'View Patch List',
+    'patched_items'      => 'Patched Items',
+
     // Misc
     'access_denied'      => 'Access denied. Admin only page.',
     'page_not_found'     => '404 - Not Found',

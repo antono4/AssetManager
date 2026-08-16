@@ -73,25 +73,45 @@ $sch = $schedule;
                 <?php else: ?>
                 <div class="list-group">
                     <?php foreach ($items as $it): ?>
-                    <div class="list-group-item list-group-item-action d-flex align-items-start <?= (int)$it['is_checked']?'list-group-item-success':'' ?>">
-                        <div class="mr-3 pt-1">
-                            <form action="<?= url('patching/checklist/' . $c['id'] . '/toggle') ?>" method="post" class="d-inline toggle-form" data-item="<?= $it['item_id'] ?>">
-                                <input type="hidden" name="item_id" value="<?= $it['item_id'] ?>">
-                                <input type="hidden" name="checked" value="<?= (int)$it['is_checked'] ? '0' : '1' ?>">
-                                <button type="submit" class="btn btn-sm btn-toggle-<?= (int)$it['is_checked']?'success':'outline-secondary' ?>" style="font-size:1.1rem">
-                                    <i class="fas fa-<?= (int)$it['is_checked']?'check-square':'square' ?>"></i>
-                                </button>
-                            </form>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h6 class="mb-0 <?= (int)$it['is_checked']?'text-success':'' ?>">
-                                <?= e($it['item_name']) ?>
-                                <?php if ((int)$it['is_checked']): ?><i class="fas fa-check-circle text-success ml-1"></i><?php endif; ?>
-                            </h6>
-                            <small class="text-muted"><?= e($it['item_desc']) ?></small>
-                            <?php if ((int)$it['is_checked'] && !empty($it['checked_by_name'])): ?>
-                                <div class="text-muted small"><i class="far fa-clock"></i> <?= tglwaktu($it['checked_at']) ?> — <?= e($it['checked_by_name']) ?></div>
-                            <?php endif; ?>
+                    <div class="list-group-item list-group-item-action <?= (int)$it['is_checked']?'list-group-item-success':'' ?>">
+                        <div class="d-flex align-items-start">
+                            <div class="mr-3 pt-1">
+                                <form action="<?= url('patching/checklist/' . $c['id'] . '/toggle') ?>" method="post" class="d-inline toggle-form" data-item="<?= $it['item_id'] ?>">
+                                    <input type="hidden" name="item_id" value="<?= $it['item_id'] ?>">
+                                    <input type="hidden" name="checked" value="<?= (int)$it['is_checked'] ? '0' : '1' ?>">
+                                    <input type="hidden" name="patch_code" value="<?= e($it['patch_code'] ?? '') ?>">
+                                    <button type="submit" class="btn btn-sm btn-toggle-<?= (int)$it['is_checked']?'success':'outline-secondary' ?>" style="font-size:1.1rem">
+                                        <i class="fas fa-<?= (int)$it['is_checked']?'check-square':'square' ?>"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-0 <?= (int)$it['is_checked']?'text-success':'' ?>">
+                                            <?= e($it['item_name']) ?>
+                                            <?php if ((int)$it['is_checked']): ?><i class="fas fa-check-circle text-success ml-1"></i><?php endif; ?>
+                                        </h6>
+                                        <small class="text-muted"><?= e($it['item_desc']) ?></small>
+                                    </div>
+                                    <?php if (!empty($it['patch_code'])): ?>
+                                    <span class="badge badge-info ml-2" title="<?= t('patch_code') ?>"><i class="fas fa-tag mr-1"></i><?= e($it['patch_code']) ?></span>
+                                    <?php endif; ?>
+                                </div>
+                                <?php if ((int)$it['is_checked'] && !empty($it['checked_by_name'])): ?>
+                                    <div class="text-muted small"><i class="far fa-clock"></i> <?= tglwaktu($it['checked_at']) ?> — <?= e($it['checked_by_name']) ?></div>
+                                <?php endif; ?>
+                                <!-- Input kode patching -->
+                                <div class="input-group input-group-sm mt-2 patch-code-group" style="max-width:340px">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-code"></i> <?= t('patch_code') ?></span>
+                                    </div>
+                                    <input type="text" class="form-control patch-code-input" placeholder="<?= t('patch_code_placeholder') ?>" value="<?= e($it['patch_code'] ?? '') ?>" data-checklist="<?= $c['id'] ?>" data-item="<?= $it['item_id'] ?>">
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-primary btn-save-code" data-checklist="<?= $c['id'] ?>" data-item="<?= $it['item_id'] ?>"><i class="fas fa-save"></i></button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <?php endforeach; ?>
@@ -108,6 +128,10 @@ document.querySelectorAll('.toggle-form').forEach(function(form){
     form.addEventListener('submit', function(e){
         e.preventDefault();
         var fd = new FormData(form);
+        // Sertakan kode patching yang sedang diinput
+        var item = fd.get('item_id');
+        var codeInput = document.querySelector('.patch-code-input[data-item="' + item + '"]');
+        if (codeInput) { fd.set('patch_code', codeInput.value); }
         fetch(form.action, {
             method: 'POST',
             body: fd,
@@ -115,6 +139,34 @@ document.querySelectorAll('.toggle-form').forEach(function(form){
         }).then(function(r){return r.json();}).then(function(data){
             if(data.ok){ location.reload(); }
         }).catch(function(){ form.submit(); });
+    });
+});
+
+// Simpan kode patching via AJAX
+document.querySelectorAll('.btn-save-code').forEach(function(btn){
+    btn.addEventListener('click', function(){
+        var checklistId = btn.dataset.checklist;
+        var itemId = btn.dataset.item;
+        var input = document.querySelector('.patch-code-input[data-item="' + itemId + '"]');
+        var code = input ? input.value.trim() : '';
+        var fd = new FormData();
+        fd.append('item_id', itemId);
+        fd.append('patch_code', code);
+        fetch('<?= url('patching/checklist/' . $c['id'] . '/save-code') ?>', {
+            method: 'POST',
+            body: fd,
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        }).then(function(r){return r.json();}).then(function(data){
+            if(data.ok){
+                // feedback visual
+                btn.classList.remove('btn-outline-primary');
+                btn.classList.add('btn-success');
+                setTimeout(function(){
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-primary');
+                }, 1200);
+            }
+        }).catch(function(){ /* ignore */ });
     });
 });
 </script>

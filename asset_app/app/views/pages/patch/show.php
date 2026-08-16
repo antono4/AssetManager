@@ -105,7 +105,14 @@ $pct = $s['total_aset'] > 0 ? round(($s['done_aset'] / $s['total_aset']) * 100) 
 <?php endif; ?>
 
 <div class="card card-info card-outline">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-list-check mr-1"></i> Checklist Aset (<?= count($checklists) ?>)</h3></div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-list-check mr-1"></i> <?= t('checklists') ?> (<?= count($checklists) ?>)</h3>
+        <div class="card-tools">
+            <a href="<?= url('patching/' . $s['id'] . '/computers') ?>" class="btn btn-info btn-sm">
+                <i class="fas fa-laptop-code"></i> <?= t('view_patch_list') ?>
+            </a>
+        </div>
+    </div>
     <div class="card-body p-0">
         <?php if (empty($checklists)): ?>
             <div class="empty-state"><i class="fas fa-clipboard-list"></i><p class="mt-3">Belum ada checklist. <?= Auth::isAdmin() ? 'Generate dari aset IT di atas.' : 'Hubungi admin.' ?></p></div>

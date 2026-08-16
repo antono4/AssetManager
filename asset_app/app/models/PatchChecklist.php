@@ -89,28 +89,70 @@ class PatchChecklist
         );
     }
 
-    // Toggle / set status centang satu item
-    public static function toggleItem(int $checklistId, int $itemId, bool $checked): void
+    // Toggle / set status centang satu item (dengan optional patch_code)
+    public static function toggleItem(int $checklistId, int $itemId, bool $checked, string $patchCode = ''): void
     {
         $checkedAt = $checked ? date('Y-m-d H:i:s') : null;
         $checkedBy = $checked ? Auth::id() : null;
         // upsert
+        $exists = Database::fetch(
+            "SELECT id, patch_code FROM patch_checklist_items WHERE checklist_id=? AND item_id=?",
+            [$checklistId, $itemId]
+        );
+        if ($exists) {
+            // Jika uncheck, jangan hapus patch_code yang sudah ada (biarkan tersimpan)
+            Database::query(
+                "UPDATE patch_checklist_items SET is_checked=?, checked_by=?, checked_at=?, patch_code=? WHERE checklist_id=? AND item_id=?",
+                [(int)$checked, $checkedBy, $checkedAt, $patchCode !== '' ? $patchCode : $exists['patch_code'], $checklistId, $itemId]
+            );
+        } else {
+            Database::query(
+                "INSERT INTO patch_checklist_items (checklist_id, item_id, is_checked, checked_by, checked_at, patch_code) VALUES (?, ?, ?, ?, ?, ?)",
+                [$checklistId, $itemId, (int)$checked, $checkedBy, $checkedAt, $patchCode ?: null]
+            );
+        }
+        self::refreshChecklistStatus($checklistId);
+    }
+
+    // Simpan kode patching untuk satu item (tanpa ubah status centang)
+    public static function savePatchCode(int $checklistId, int $itemId, string $patchCode): void
+    {
         $exists = Database::fetch(
             "SELECT id FROM patch_checklist_items WHERE checklist_id=? AND item_id=?",
             [$checklistId, $itemId]
         );
         if ($exists) {
             Database::query(
-                "UPDATE patch_checklist_items SET is_checked=?, checked_by=?, checked_at=? WHERE checklist_id=? AND item_id=?",
-                [(int)$checked, $checkedBy, $checkedAt, $checklistId, $itemId]
+                "UPDATE patch_checklist_items SET patch_code=? WHERE checklist_id=? AND item_id=?",
+                [$patchCode !== '' ? $patchCode : null, $checklistId, $itemId]
             );
         } else {
             Database::query(
-                "INSERT INTO patch_checklist_items (checklist_id, item_id, is_checked, checked_by, checked_at) VALUES (?, ?, ?, ?, ?)",
-                [$checklistId, $itemId, (int)$checked, $checkedBy, $checkedAt]
+                "INSERT INTO patch_checklist_items (checklist_id, item_id, is_checked, patch_code) VALUES (?, ?, 0, ?)",
+                [$checklistId, $itemId, $patchCode !== '' ? $patchCode : null]
             );
         }
-        self::refreshChecklistStatus($checklistId);
+    }
+
+    // Ambil daftar komputer (checklist) beserta kode patching per item untuk sebuah jadwal
+    public static function computersWithPatchCodes(int $scheduleId): array
+    {
+        $checklists = self::forSchedule($scheduleId);
+        foreach ($checklists as &$cl) {
+            $items = Database::fetchAll(
+                "SELECT ci.patch_code, i.name AS item_name, ci.is_checked
+                 FROM patch_checklist_items ci
+                 LEFT JOIN patch_items i ON i.id = ci.item_id
+                 WHERE ci.checklist_id = ?
+                 ORDER BY i.sort_order, i.id",
+                [$cl['id']]
+            );
+            $cl['patch_codes'] = $items;
+            // Gabungkan semua kode patch yang sudah diisi
+            $codes = array_filter(array_map(fn($i) => $i['patch_code'], $items));
+            $cl['patch_codes_summary'] = $codes ? implode(', ', $codes) : '';
+        }
+        return $checklists;
     }
 
     // Update status checklist berdasarkan item yang tercentang

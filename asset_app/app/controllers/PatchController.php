@@ -187,7 +187,8 @@ class PatchController
         $cid = (int)$p['id'];
         $itemId = (int)$_POST['item_id'];
         $checked = ($_POST['checked'] ?? '') === '1';
-        PatchChecklist::toggleItem($cid, $itemId, $checked);
+        $patchCode = trim($_POST['patch_code'] ?? '');
+        PatchChecklist::toggleItem($cid, $itemId, $checked, $patchCode);
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
             header('Content-Type: application/json');
             $cl = PatchChecklist::find($cid);
@@ -203,6 +204,49 @@ class PatchController
         }
         Flash::set('success', t('item_updated'));
         Auth::redirect(BASE_URL . '/patching/checklist/' . $cid);
+    }
+
+    // Simpan kode patching untuk satu item (AJAX)
+    public function saveCode(array $p)
+    {
+        Auth::requireLogin();
+        $cid = (int)$p['id'];
+        $itemId = (int)($_POST['item_id'] ?? 0);
+        $patchCode = trim($_POST['patch_code'] ?? '');
+        if ($itemId <= 0) {
+            http_response_code(400);
+            echo json_encode(['ok' => false, 'error' => 'Invalid item']);
+            return;
+        }
+        PatchChecklist::savePatchCode($cid, $itemId, $patchCode);
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode(['ok' => true, 'patch_code' => $patchCode]);
+            return;
+        }
+        Flash::set('success', t('patch_code_saved'));
+        Auth::redirect(BASE_URL . '/patching/checklist/' . $cid);
+    }
+
+    // Daftar komputer beserta kode patching untuk sebuah jadwal
+    public function computers(array $p)
+    {
+        Auth::requireLogin();
+        $id = (int)$p['id'];
+        $schedule = PatchSchedule::findWithStats($id);
+        if (!$schedule) {
+            Flash::set('error', t('schedule_not_found'));
+            Auth::redirect(BASE_URL . '/patching');
+        }
+        $computers = PatchChecklist::computersWithPatchCodes($id);
+        $items = PatchChecklist::activeItems();
+
+        View::render('patch/computers', [
+            'pageTitle' => t('computer_patch_list') . ' — ' . $schedule['name'],
+            'schedule'  => $schedule,
+            'computers' => $computers,
+            'items'     => $items,
+        ]);
     }
 
     // Skip / reset checklist

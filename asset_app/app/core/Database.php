@@ -160,6 +160,19 @@ class Database
             @$db->exec('CREATE INDEX IF NOT EXISTS idx_pcli_checklist ON patch_checklist_items(checklist_id)');
         }
 
+        // Migrasi kolom patch_code pada patch_checklist_items (kode patching, mis: KB5079473)
+        if ($sqlite) {
+            $cols = $db->query("PRAGMA table_info(patch_checklist_items)")->fetchAll(PDO::FETCH_COLUMN, 1);
+            if (!in_array('patch_code', $cols, true)) {
+                $db->exec("ALTER TABLE patch_checklist_items ADD COLUMN patch_code VARCHAR(80) DEFAULT NULL");
+            }
+        } else {
+            $hasCol = $db->query("SHOW COLUMNS FROM patch_checklist_items LIKE 'patch_code'")->fetch();
+            if (!$hasCol) {
+                $db->exec("ALTER TABLE patch_checklist_items ADD COLUMN patch_code VARCHAR(80) DEFAULT NULL AFTER notes");
+            }
+        }
+
         // Seed template item patching bila kosong
         $cnt = (int)$db->query("SELECT COUNT(*) FROM patch_items")->fetchColumn();
         if ($cnt === 0) {
