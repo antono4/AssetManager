@@ -54,18 +54,128 @@ class Database
     {
         $db = self::conn();
         $check = $db->query("SELECT name FROM " . (self::isSqlite() ? "sqlite_master" : "information_schema.tables") . " WHERE name = 'users'");
-        if ($check && $check->fetch()) {
-            return; // sudah ada skema
+        if (!$check || !$check->fetch()) {
+            if (self::isSqlite()) {
+                self::createSqliteSchema($db);
+            } else {
+                $sql = file_get_contents(__DIR__ . '/../database/assets_app.sql');
+                $db->exec($sql);
+            }
+            self::seed($db);
+        }
+        // Migrasi tabel fitur baru (patching) — idempoten
+        self::migratePatching($db);
+    }
+
+    // Migrasi tabel patching (jadwal & checklist) untuk SQLite & MySQL
+    private static function migratePatching(PDO $db): void
+    {
+        $sqlite = self::isSqlite();
+        // SQLite: "id INTEGER PRIMARY KEY AUTOINCREMENT", tanpa baris KEY terpisah
+        // MySQL  : "id INT UNSIGNED NOT NULL AUTO_INCREMENT" + baris KEY/PRIMARY KEY
+        $idCol    = $sqlite ? 'id INTEGER PRIMARY KEY AUTOINCREMENT' : 'id INT UNSIGNED NOT NULL AUTO_INCREMENT';
+        $statusCol = function (array $vals, string $default) use ($sqlite) {
+            return $sqlite
+                ? "TEXT NOT NULL DEFAULT '" . $default . "'"
+                : "ENUM('" . implode("','", $vals) . "') NOT NULL DEFAULT '" . $default . "'";
+        };
+        $dt   = $sqlite ? 'TEXT' : 'DATETIME';
+        $dcol = $sqlite ? 'TEXT' : 'DATE';
+        $tiny = $sqlite ? 'INTEGER' : 'TINYINT(1)';
+        $tail = $sqlite ? '' : ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
+        // Helper untuk menambah baris KEY (hanya MySQL; SQLite abaikan)
+        $key = function (string $line) use ($sqlite) {
+            return $sqlite ? '' : $line . ',';
+        };
+
+        // patch_items — template item checklist patching
+        $db->exec("CREATE TABLE IF NOT EXISTS patch_items (
+            {$idCol},
+            name VARCHAR(120) NOT NULL,
+            description VARCHAR(255) DEFAULT NULL,
+            is_active {$tiny} NOT NULL DEFAULT 1,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            created_at {$dt} DEFAULT CURRENT_TIMESTAMP
+        ){$tail}");
+
+        // patch_schedules — jadwal patching kuartalan
+        $schedStatus = $statusCol(['draft','ongoing','completed'], 'draft');
+        $db->exec("CREATE TABLE IF NOT EXISTS patch_schedules (
+            {$idCol},
+            name VARCHAR(120) NOT NULL,
+            quarter INTEGER NOT NULL,
+            year INTEGER NOT NULL,
+            start_date {$dcol} DEFAULT NULL,
+            due_date {$dcol} DEFAULT NULL,
+            status {$schedStatus},
+            description VARCHAR(255) DEFAULT NULL,
+            created_by INTEGER DEFAULT NULL,
+            created_at {$dt} DEFAULT CURRENT_TIMESTAMP,
+            updated_at {$dt} DEFAULT CURRENT_TIMESTAMP
+            " . $key('PRIMARY KEY (id)') . "
+            " . $key('KEY idx_patch_sched_quarter (year, quarter)') . "
+            " . $key('KEY idx_patch_sched_status (status)') . "
+        ){$tail}");
+
+        // patch_checklists — per aset per jadwal
+        $clStatus = $statusCol(['pending','in_progress','completed','skipped'], 'pending');
+        $db->exec("CREATE TABLE IF NOT EXISTS patch_checklists (
+            {$idCol},
+            schedule_id INTEGER NOT NULL,
+            asset_id INTEGER NOT NULL,
+            status {$clStatus},
+            patched_by INTEGER DEFAULT NULL,
+            patched_at {$dt} DEFAULT NULL,
+            notes VARCHAR(255) DEFAULT NULL,
+            created_at {$dt} DEFAULT CURRENT_TIMESTAMP,
+            updated_at {$dt} DEFAULT CURRENT_TIMESTAMP
+            " . $key('PRIMARY KEY (id)') . "
+            " . $key('UNIQUE KEY uq_checklist (schedule_id, asset_id)') . "
+            " . $key('KEY idx_checklist_schedule (schedule_id)') . "
+            " . $key('KEY idx_checklist_asset (asset_id)') . "
+            " . $key('KEY idx_checklist_status (status)') . "
+        ){$tail}");
+
+        // patch_checklist_items — item yang dicentang per checklist
+        $db->exec("CREATE TABLE IF NOT EXISTS patch_checklist_items (
+            {$idCol},
+            checklist_id INTEGER NOT NULL,
+            item_id INTEGER NOT NULL,
+            is_checked {$tiny} NOT NULL DEFAULT 0,
+            checked_by INTEGER DEFAULT NULL,
+            checked_at {$dt} DEFAULT NULL,
+            notes VARCHAR(255) DEFAULT NULL
+            " . $key('PRIMARY KEY (id)') . "
+            " . $key('UNIQUE KEY uq_checklist_item (checklist_id, item_id)') . "
+            " . $key('KEY idx_pcli_checklist (checklist_id)') . "
+        ){$tail}");
+
+        // Index untuk SQLite (CREATE INDEX terpisah, aman bila sudah ada)
+        if ($sqlite) {
+            @$db->exec('CREATE INDEX IF NOT EXISTS idx_patch_sched_quarter ON patch_schedules(year, quarter)');
+            @$db->exec('CREATE INDEX IF NOT EXISTS idx_patch_sched_status ON patch_schedules(status)');
+            @$db->exec('CREATE INDEX IF NOT EXISTS idx_checklist_schedule ON patch_checklists(schedule_id)');
+            @$db->exec('CREATE INDEX IF NOT EXISTS idx_checklist_asset ON patch_checklists(asset_id)');
+            @$db->exec('CREATE INDEX IF NOT EXISTS idx_checklist_status ON patch_checklists(status)');
+            @$db->exec('CREATE INDEX IF NOT EXISTS idx_pcli_checklist ON patch_checklist_items(checklist_id)');
         }
 
-        if (self::isSqlite()) {
-            self::createSqliteSchema($db);
-        } else {
-            $sql = file_get_contents(__DIR__ . '/../database/assets_app.sql');
-            // SQLite tak perlu FK checks; MySQL aman
-            $db->exec($sql);
+        // Seed template item patching bila kosong
+        $cnt = (int)$db->query("SELECT COUNT(*) FROM patch_items")->fetchColumn();
+        if ($cnt === 0) {
+            $defaults = [
+                ['Update Sistem Operasi / Firmware', 'Patch OS terbaru atau firmware perangkat', 1],
+                ['Update Antivirus / Security', 'Update definisi virus & security patch', 2],
+                ['Backup Data', 'Backup konfigurasi & data penting', 3],
+                ['Cek Log Sistem', 'Tinjau log sistem untuk error/anomali', 4],
+                ['Restart Layanan', 'Restart service/daemon kritis', 5],
+                ['Verifikasi Konektivitas', 'Tes koneksi jaringan & fungsi perangkat', 6],
+            ];
+            $stmt = $db->prepare("INSERT INTO patch_items (name, description, sort_order, is_active) VALUES (?, ?, ?, 1)");
+            foreach ($defaults as $it) {
+                $stmt->execute($it);
+            }
         }
-        self::seed($db);
     }
 
     private static function createSqliteSchema(PDO $db): void

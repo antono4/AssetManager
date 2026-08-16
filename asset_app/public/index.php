@@ -26,6 +26,9 @@ try {
 } catch (Throwable $e) {
     // Untuk MySQL bila belum di-import, tampilkan pesan setup yang jelas
     // hanya pada route non-setup agar /setup tetap bisa dipakai.
+    if (strpos($_SERVER['REQUEST_URI'] ?? '', '/setup') === false) {
+        // Abaikan error koneksi DB agar /setup bisa dipakai memperbaiki.
+    }
 }
 
 // Ambil path relatif. Dengan PHP built-in server + router, REQUEST_URI sudah
@@ -97,6 +100,22 @@ Router::get('/logs',           fn() => $logCtl->index());
 $repCtl = new ReportController();
 Router::get('/reports',        fn() => $repCtl->index());
 Router::get('/reports/print',  fn() => $repCtl->print());
+
+// Patching (jadwal & checklist kuartalan)
+$patchCtl = new PatchController();
+Router::get('/patching',                     fn() => $patchCtl->index());
+Router::get('/patching/create',              fn() => $patchCtl->create());
+Router::post('/patching',                    fn() => $patchCtl->store());
+Router::get('/patching/{id}',                fn($p) => $patchCtl->show($p));
+Router::get('/patching/{id}/edit',           fn($p) => $patchCtl->edit($p));
+Router::post('/patching/{id}',               fn($p) => $patchCtl->update($p));
+Router::post('/patching/{id}/delete',        fn($p) => $patchCtl->delete($p));
+Router::post('/patching/{id}/generate',      fn($p) => $patchCtl->generate($p));
+Router::post('/patching/{id}/generate-all',  fn($p) => $patchCtl->generateAll($p));
+Router::get('/patching/checklist/{id}',      fn($p) => $patchCtl->checklist($p));
+Router::post('/patching/checklist/{id}/toggle',     fn($p) => $patchCtl->toggle($p));
+Router::post('/patching/checklist/{id}/status',     fn($p) => $patchCtl->setChecklistStatus($p));
+Router::post('/patching/checklist/{id}/delete',     fn($p) => $patchCtl->deleteChecklist($p));
 
 // Dispatch
 Router::dispatch($path, $_SERVER['REQUEST_METHOD'] ?? 'GET');

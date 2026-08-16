@@ -103,6 +103,11 @@ $role = $u['role'] ?? 'guest';
                             <i class="nav-icon fas fa-file-alt"></i><p>Laporan</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="<?= url('patching') ?>" class="nav-link <?= (str_starts_with($pageTitle, 'Jadwal') || str_starts_with($pageTitle, 'Checklist') || str_starts_with($pageTitle, 'Buat Jadwal') || str_starts_with($pageTitle, 'Edit Jadwal')) ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-shield-alt"></i><p>Patching</p>
+                        </a>
+                    </li>
                     <?php if ($role === 'admin'): ?>
                     <li class="nav-header">ADMINISTRASI</li>
                     <li class="nav-item">

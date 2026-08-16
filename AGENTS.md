@@ -36,3 +36,13 @@ PHP native asset management app with AdminLTE 3 UI. Located at `/workspace/proje
 - Static files (CSS/JS) need `return false;` in index.php for built-in server to serve them directly
 - `extract($data)` in View overwrites local vars — never name view/layout params same as data keys
 - `?? === ` precedence bug: `(self::user()['role'] ?? null) === 'admin'` needs parentheses
+- SQLite uses `AUTOINCREMENT` (no underscore) and must follow `PRIMARY KEY` directly: `id INTEGER PRIMARY KEY AUTOINCREMENT`. MySQL uses `AUTO_INCREMENT` with separate `PRIMARY KEY (id)` line. The migratePatching() helper handles both via driver detection.
+- DB migrations for new features: run via `ensureSchema()` → `migratePatching()` (idempotent, CREATE TABLE IF NOT EXISTS). Existing DBs get new tables without re-seed.
+
+## Patching Module (Jadwal & Checklist per 3 bulan/kuartal)
+- Tables: patch_items (template), patch_schedules (kuartal Q1-Q4), patch_checklists (per aset per jadwal), patch_checklist_items (centangan)
+- Flow: admin buat jadwal (auto-fill tanggal kuartal) → generate checklist aset IT (exclude kategori "Umum") → staff/admin centang item → auto-status: in_progress → completed saat semua item tercentang → schedule auto-refresh status (draft→ongoing→completed)
+- 6 default items: Update OS/Firmware, Antivirus, Backup, Cek Log, Restart, Verifikasi
+- Routes: /patching, /patching/create, /patching/{id}, /patching/checklist/{id}, toggle via AJAX
+- RBAC: admin=full CRUD+generate; staff=view+centang+skip (no create/edit/delete/generate)
+- Patch completion logged to asset_logs with action='patching'

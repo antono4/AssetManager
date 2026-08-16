@@ -149,3 +149,75 @@ INSERT INTO `asset_logs` (`asset_id`,`user_id`,`action`,`note`) VALUES
 (10,1,'rusak','Lampu proyektor mati, perlu penggantian'),
 (7,1,'perawatan','Maintenance switch core bulanan'),
 (3,1,'status_update','Status diperbarui melalui dashboard');
+
+
+-- ============================================================================
+--  TABEL PATCHING (Jadwal & Checklist Patching Kuartalan / per 3 bulan)
+--  Dibuat otomatis oleh aplikasi (migratePatching). Skema MySQL manual:
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS `patch_items` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(120) NOT NULL,
+  `description` VARCHAR(255) DEFAULT NULL,
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+  `sort_order` INT UNSIGNED NOT NULL DEFAULT 0,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `patch_schedules` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(120) NOT NULL,
+  `quarter` INT UNSIGNED NOT NULL,
+  `year` INT UNSIGNED NOT NULL,
+  `start_date` DATE DEFAULT NULL,
+  `due_date` DATE DEFAULT NULL,
+  `status` ENUM('draft','ongoing','completed') NOT NULL DEFAULT 'draft',
+  `description` VARCHAR(255) DEFAULT NULL,
+  `created_by` INT UNSIGNED DEFAULT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_patch_sched_quarter` (`year`, `quarter`),
+  KEY `idx_patch_sched_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `patch_checklists` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `schedule_id` INT UNSIGNED NOT NULL,
+  `asset_id` INT UNSIGNED NOT NULL,
+  `status` ENUM('pending','in_progress','completed','skipped') NOT NULL DEFAULT 'pending',
+  `patched_by` INT UNSIGNED DEFAULT NULL,
+  `patched_at` DATETIME DEFAULT NULL,
+  `notes` VARCHAR(255) DEFAULT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_checklist` (`schedule_id`, `asset_id`),
+  KEY `idx_checklist_schedule` (`schedule_id`),
+  KEY `idx_checklist_asset` (`asset_id`),
+  KEY `idx_checklist_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `patch_checklist_items` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `checklist_id` INT UNSIGNED NOT NULL,
+  `item_id` INT UNSIGNED NOT NULL,
+  `is_checked` TINYINT(1) NOT NULL DEFAULT 0,
+  `checked_by` INT UNSIGNED DEFAULT NULL,
+  `checked_at` DATETIME DEFAULT NULL,
+  `notes` VARCHAR(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_checklist_item` (`checklist_id`, `item_id`),
+  KEY `idx_pcli_checklist` (`checklist_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Template item checklist patching default
+INSERT INTO `patch_items` (`name`,`description`,`sort_order`) VALUES
+('Update Sistem Operasi / Firmware', 'Patch OS terbaru atau firmware perangkat', 1),
+('Update Antivirus / Security', 'Update definisi virus & security patch', 2),
+('Backup Data', 'Backup konfigurasi & data penting', 3),
+('Cek Log Sistem', 'Tinjau log sistem untuk error/anomali', 4),
+('Restart Layanan', 'Restart service/daemon kritis', 5),
+('Verifikasi Konektivitas', 'Tes koneksi jaringan & fungsi perangkat', 6);

@@ -115,6 +115,24 @@ function role_badge(string $role): string
     return '<span class="badge bg-' . $cls . '">' . ucfirst($role) . '</span>';
 }
 
+function patch_status_badge(string $status): string
+{
+    $map = [
+        'draft'      => 'secondary',
+        'ongoing'    => 'warning',
+        'completed'  => 'success',
+        'pending'    => 'secondary',
+        'in_progress'=> 'primary',
+        'skipped'    => 'dark',
+    ];
+    $cls = $map[$status] ?? 'secondary';
+    $labels = [
+        'draft' => 'Draft', 'ongoing' => 'Berjalan', 'completed' => 'Selesai',
+        'pending' => 'Menunggu', 'in_progress' => 'Proses', 'skipped' => 'Skip',
+    ];
+    return '<span class="badge badge-' . $cls . '">' . ($labels[$status] ?? ucfirst($status)) . '</span>';
+}
+
 function old(string $key, $default = ''): string
 {
     return e($_SESSION['old'][$key] ?? $default);

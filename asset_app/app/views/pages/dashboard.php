@@ -50,6 +50,39 @@ $s = $stats;
 
 <div class="row">
     <div class="col-md-6">
+        <div class="card card-warning card-outline">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-shield-alt mr-1"></i> Patching (Kuartalan)</h3>
+                <div class="card-tools">
+                    <a href="<?= url('patching') ?>" class="btn btn-tool"><i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="d-flex mb-2">
+                    <div class="text-center mr-4">
+                        <h4 class="mb-0 text-warning"><?= $patching['ongoing'] + $patching['draft'] ?></h4>
+                        <small class="text-muted">Jadwal Aktif</small>
+                    </div>
+                    <div class="text-center mr-4">
+                        <h4 class="mb-0 text-info"><?= $patching['checklists'] ?></h4>
+                        <small class="text-muted">Total Checklist</small>
+                    </div>
+                    <div class="text-center">
+                        <h4 class="mb-0 text-success"><?= $patching['done'] ?></h4>
+                        <small class="text-muted">Selesai</small>
+                    </div>
+                </div>
+                <?php
+                $pPct = $patching['checklists'] > 0 ? round(($patching['done'] / $patching['checklists']) * 100) : 0;
+                ?>
+                <div class="progress" style="height:18px">
+                    <div class="progress-bar bg-success" style="width:<?= $pPct ?>%"><?= $pPct ?>%</div>
+                </div>
+                <p class="text-muted small mt-2 mb-0">Progress patching semua jadwal (<?= $patching['done'] ?>/<?= $patching['checklists'] ?> aset selesai)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
         <div class="card card-info">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-box mr-1"></i> Aset Terbaru</h3>
