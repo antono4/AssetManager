@@ -1,12 +1,14 @@
-# Redirect semua request ke index.php (Apache + mod_rewrite)
+# Pastikan index.php jadi default file untuk folder
+DirectoryIndex index.php index.html
+
 RewriteEngine On
 
 # Izinkan akses langsung ke file static yang ada (CSS, JS, gambar, uploads)
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]
 
-# Redirect semua request lain ke index.php
-RewriteCond %{REQUEST_FILENAME} !-d
+# Redirect semua request lain (termasuk folder/PATH) ke index.php
+RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^ index.php [L]
 
 # Keamanan: block akses file sensitif
@@ -14,5 +16,5 @@ RewriteRule ^ index.php [L]
     Require all denied
 </FilesMatch>
 
-# Block directory listing
+# Block directory listing (tapi index.php tetap di-serve)
 Options -Indexes
