@@ -31,28 +31,39 @@ try {
     }
 }
 
-// Ambil path relatif. Dengan PHP built-in server + router, REQUEST_URI sudah
-// berupa path bersih (tanpa index.php prefix). Untuk Apache/nginx dengan
-// index.php di sub-folder, strip prefix BASE_URL bila ada.
+// Ambil path relatif. Support berbagai konfigurasi server (built-in, Apache, Nginx, XAMPP subfolder).
 $requestUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $path = $requestUri;
 
-// Normalisasi: hapus kemungkinan /index.php prefix
-if (preg_match('#(?:^|/)/index\.php#', $path)) {
-    $path = preg_replace('#^/index\.php#', '', $path);
+// Cari posisi "/public" di path — semua route ada setelah /public
+$publicPos = strpos($path, '/public');
+if ($publicPos !== false) {
+    $path = substr($path, $publicPos + strlen('/public'));
 }
-// Hapus BASE_URL prefix bila ada (sub-folder deployment non-router)
+// Hapus /index.php jika ada
+$path = str_replace('/index.php', '', $path);
+// Hapus BASE_URL prefix bila ada
 $base = BASE_URL;
 if ($base !== '' && strpos($path, $base) === 0) {
     $path = substr($path, strlen($base));
 }
-// Jika path masih punya prefix base (double), strip lagi (XAMPP edge case)
+// Strip BASE_URL lagi (edge case double prefix)
 if ($base !== '' && strpos($path, $base) === 0) {
     $path = substr($path, strlen($base));
 }
+// Fallback: jika path masih panjang (mismatch), ambil hanya bagian setelah /public/ terakhir
+if (strlen($path) > 1 && strpos($path, '/public/') !== false) {
+    $parts = explode('/public/', $path);
+    $path = '/' . end($parts);
+}
 $path = '/' . ltrim($path, '/');
-if ($path === '/index.php') {
+if ($path === '/' || $path === '') {
     $path = '/';
+}
+
+// Fallback: gunakan ?r= parameter jika mod_rewrite tidak aktif
+if ($path === '/' && isset($_GET['r']) && $_GET['r'] !== '') {
+    $path = '/' . ltrim($_GET['r'], '/');
 }
 
 // --- Definisi Routes ---
