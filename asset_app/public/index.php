@@ -93,5 +93,10 @@ Router::post('/profile',       fn() => $userCtl->updateProfile());
 // Logs
 Router::get('/logs',           fn() => $logCtl->index());
 
+// Reports
+$repCtl = new ReportController();
+Router::get('/reports',        fn() => $repCtl->index());
+Router::get('/reports/print',  fn() => $repCtl->print());
+
 // Dispatch
 Router::dispatch($path, $_SERVER['REQUEST_METHOD'] ?? 'GET');

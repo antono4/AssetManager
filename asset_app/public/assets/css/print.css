@@ -1,0 +1,124 @@
+/* ============================================================================
+   Print CSS - Laporan
+   ========================================================================== */
+
+.print-body {
+    background: #fff;
+    font-family: 'Source Sans Pro', sans-serif;
+    color: #212529;
+}
+
+.print-toolbar {
+    padding: 1rem;
+    text-align: center;
+    background: #f4f6f9;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 1rem;
+}
+.print-toolbar .btn { margin: 0 .25rem; }
+
+.print-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 1rem 2rem;
+}
+
+/* Kop laporan */
+.report-header {
+    text-align: center;
+    border-bottom: 3px solid #2b3a55;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+.report-header h2 {
+    margin: 0;
+    font-weight: 700;
+    color: #2b3a55;
+}
+.report-header .subtitle { color: #6c757d; margin: .25rem 0 0; }
+.report-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: .85rem;
+    color: #6c757d;
+    margin-top: .5rem;
+}
+
+.report-section { margin-bottom: 1.75rem; page-break-inside: avoid; }
+.report-section h4 {
+    border-left: 4px solid #2b3a55;
+    padding-left: .5rem;
+    margin-bottom: .75rem;
+    color: #2b3a55;
+}
+
+/* Kartu ringkasan cetak */
+.print-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    margin-bottom: 1rem;
+}
+.print-card {
+    flex: 1 1 200px;
+    border: 1px solid #dee2e6;
+    border-radius: .5rem;
+    padding: .75rem 1rem;
+}
+.print-card .label { font-size: .8rem; color: #6c757d; margin-bottom: .15rem; }
+.print-card .value { font-size: 1.4rem; font-weight: 700; color: #2b3a55; }
+.print-card .sub   { font-size: .8rem; color: #6c757d; }
+
+/* Tabel cetak */
+table.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+}
+table.report-table th {
+    background: #2b3a55;
+    color: #fff;
+    padding: .5rem .6rem;
+    text-align: left;
+    font-weight: 600;
+}
+table.report-table td {
+    padding: .45rem .6rem;
+    border-bottom: 1px solid #e9ecef;
+}
+table.report-table tfoot td {
+    font-weight: 700;
+    border-top: 2px solid #2b3a55;
+    background: #f8f9fa;
+}
+table.report-table tbody tr:nth-child(even) { background: #fafbfc; }
+
+.badge { font-size: .75rem; }
+
+.report-footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    font-size: .8rem;
+    color: #6c757d;
+}
+
+.tanda-tangan {
+    margin-top: 2.5rem;
+    text-align: center;
+    page-break-inside: avoid;
+}
+.tanda-tangan .tt-label { font-size: .85rem; }
+.tanda-tangan .tt-name { margin-top: 3.5rem; font-weight: 600; border-top: 1px solid #212529; display: inline-block; padding-top: .25rem; min-width: 200px; }
+
+/* Saat dicetak */
+@media print {
+    .no-print { display: none !important; }
+    .print-body { background: #fff; }
+    .print-container { max-width: 100%; padding: 0; }
+    .report-section { page-break-inside: avoid; }
+    table { font-size: .82rem; }
+    @page { margin: 1.5cm; }
+}

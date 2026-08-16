@@ -98,6 +98,11 @@ $role = $u['role'] ?? 'guest';
                             <i class="nav-icon fas fa-history"></i><p>Riwayat</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="<?= url('reports') ?>" class="nav-link <?= $pageTitle === 'Laporan Aset' ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-file-alt"></i><p>Laporan</p>
+                        </a>
+                    </li>
                     <?php if ($role === 'admin'): ?>
                     <li class="nav-header">ADMINISTRASI</li>
                     <li class="nav-item">

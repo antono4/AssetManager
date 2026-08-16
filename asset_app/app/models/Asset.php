@@ -150,4 +150,145 @@ class Asset
     {
         return self::all('', '', '', $limit, 0);
     }
+
+    // --- Khusus Laporan ---
+    // Aset dengan filter rentang tanggal pembelian (untuk laporan)
+    public static function forReport(array $filters): array
+    {
+        $sql = "SELECT a.*, c.name AS category_name
+                FROM assets a
+                LEFT JOIN categories c ON c.id = a.category_id
+                WHERE 1=1";
+        $params = [];
+        if (!empty($filters['category_id'])) {
+            $sql .= " AND a.category_id = ?";
+            $params[] = (int)$filters['category_id'];
+        }
+        if (!empty($filters['status'])) {
+            $sql .= " AND a.status = ?";
+            $params[] = $filters['status'];
+        }
+        if (!empty($filters['date_from'])) {
+            $sql .= " AND a.purchase_date >= ?";
+            $params[] = $filters['date_from'];
+        }
+        if (!empty($filters['date_to'])) {
+            $sql .= " AND a.purchase_date <= ?";
+            $params[] = $filters['date_to'];
+        }
+        if (!empty($filters['location'])) {
+            $sql .= " AND a.location LIKE ?";
+            $params[] = '%' . $filters['location'] . '%';
+        }
+        $sql .= " ORDER BY a.asset_code ASC";
+        return Database::fetchAll($sql, $params);
+    }
+
+    // Ringkasan nilai aset berdasarkan filter
+    public static function summaryForReport(array $filters): array
+    {
+        $rows = self::forReport($filters);
+        $summary = [
+            'total'      => count($rows),
+            'tersedia'   => 0,
+            'dipinjam'   => 0,
+            'rusak'      => 0,
+            'nilai_total' => 0.0,
+            'nilai_tersedia' => 0.0,
+            'nilai_dipinjam' => 0.0,
+            'nilai_rusak'    => 0.0,
+        ];
+        foreach ($rows as $r) {
+            $price = (float)$r['price'];
+            $summary['nilai_total'] += $price;
+            if ($r['status'] === 'tersedia') {
+                $summary['tersedia']++;
+                $summary['nilai_tersedia'] += $price;
+            } elseif ($r['status'] === 'dipinjam') {
+                $summary['dipinjam']++;
+                $summary['nilai_dipinjam'] += $price;
+            } elseif ($r['status'] === 'rusak') {
+                $summary['rusak']++;
+                $summary['nilai_rusak'] += $price;
+            }
+        }
+        return $summary;
+    }
+
+    // Rekap per kategori (dengan filter)
+    public static function recapByCategory(array $filters): array
+    {
+        $sql = "SELECT c.name AS category_name,
+                       COUNT(a.id) AS total,
+                       COALESCE(SUM(a.price), 0) AS nilai,
+                       SUM(CASE WHEN a.status='tersedia' THEN 1 ELSE 0 END) AS tersedia,
+                       SUM(CASE WHEN a.status='dipinjam' THEN 1 ELSE 0 END) AS dipinjam,
+                       SUM(CASE WHEN a.status='rusak'    THEN 1 ELSE 0 END) AS rusak
+                FROM categories c
+                LEFT JOIN assets a ON a.category_id = c.id
+                WHERE 1=1";
+        $params = [];
+        if (!empty($filters['status'])) {
+            $sql .= " AND a.status = ?";
+            $params[] = $filters['status'];
+        }
+        if (!empty($filters['date_from'])) {
+            $sql .= " AND a.purchase_date >= ?";
+            $params[] = $filters['date_from'];
+        }
+        if (!empty($filters['date_to'])) {
+            $sql .= " AND a.purchase_date <= ?";
+            $params[] = $filters['date_to'];
+        }
+        if (!empty($filters['location'])) {
+            $sql .= " AND a.location LIKE ?";
+            $params[] = '%' . $filters['location'] . '%';
+        }
+        $sql .= " GROUP BY c.id, c.name ORDER BY total DESC, c.name";
+        return Database::fetchAll($sql, $params);
+    }
+
+    // Rekap per lokasi
+    public static function recapByLocation(array $filters): array
+    {
+        $sql = "SELECT COALESCE(NULLIF(a.location,''), 'Tidak ditentukan') AS location,
+                       COUNT(*) AS total,
+                       COALESCE(SUM(a.price), 0) AS nilai,
+                       SUM(CASE WHEN a.status='tersedia' THEN 1 ELSE 0 END) AS tersedia,
+                       SUM(CASE WHEN a.status='dipinjam' THEN 1 ELSE 0 END) AS dipinjam,
+                       SUM(CASE WHEN a.status='rusak'    THEN 1 ELSE 0 END) AS rusak
+                FROM assets a
+                WHERE 1=1";
+        $params = [];
+        if (!empty($filters['category_id'])) {
+            $sql .= " AND a.category_id = ?";
+            $params[] = (int)$filters['category_id'];
+        }
+        if (!empty($filters['status'])) {
+            $sql .= " AND a.status = ?";
+            $params[] = $filters['status'];
+        }
+        if (!empty($filters['date_from'])) {
+            $sql .= " AND a.purchase_date >= ?";
+            $params[] = $filters['date_from'];
+        }
+        if (!empty($filters['date_to'])) {
+            $sql .= " AND a.purchase_date <= ?";
+            $params[] = $filters['date_to'];
+        }
+        if (!empty($filters['location'])) {
+            $sql .= " AND a.location LIKE ?";
+            $params[] = '%' . $filters['location'] . '%';
+        }
+        $sql .= " GROUP BY a.location ORDER BY total DESC";
+        return Database::fetchAll($sql, $params);
+    }
+
+    // Daftar lokasi unik (untuk dropdown/autocomplete filter)
+    public static function distinctLocations(): array
+    {
+        return Database::fetchAll(
+            "SELECT DISTINCT location FROM assets WHERE location IS NOT NULL AND location <> '' ORDER BY location"
+        );
+    }
 }
