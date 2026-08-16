@@ -8,9 +8,9 @@
         <table class="table table-striped table-hover mb-0">
             <thead>
             <tr>
-                <th width="40">#</th><th>Kategori</th>
-                <th class="text-center">Tersedia</th><th class="text-center">Dipinjam</th><th class="text-center">Rusak</th>
-                <th class="text-center">Total</th><th class="text-right">Nilai Aset</th>
+                <th width="40">#</th><th><?= t('category') ?></th>
+                <th class="text-center"><?= t('status_tersedia') ?></th><th class="text-center"><?= t('status_dipinjam') ?></th><th class="text-center"><?= t('status_rusak') ?></th>
+                <th class="text-center"><?= t('total') ?></th><?php if (price_visible()): ?><th class="text-right"><?= t('total_value') ?></th><?php endif; ?>
             </tr>
             </thead>
             <tbody>
@@ -28,18 +28,18 @@
                 <td class="text-center"><span class="badge badge-warning"><?= (int)$c['dipinjam'] ?></span></td>
                 <td class="text-center"><span class="badge badge-danger"><?= (int)$c['rusak'] ?></span></td>
                 <td class="text-center"><strong><?= (int)$c['total'] ?></strong></td>
-                <td class="text-right"><?= rp($c['nilai']) ?></td>
+                <?php if (price_visible()): ?><td class="text-right"><?= rp($c['nilai']) ?></td><?php endif; ?>
             </tr>
             <?php endforeach; ?>
             </tbody>
             <tfoot>
             <tr class="bg-light">
-                <th colspan="2">TOTAL</th>
+                <th colspan="2"><?= t('total') ?></th>
                 <th class="text-center"><?= $gtTer ?></th>
                 <th class="text-center"><?= $gtDip ?></th>
                 <th class="text-center"><?= $gtRus ?></th>
                 <th class="text-center"><?= $gtTot ?></th>
-                <th class="text-right"><?= rp($gtNilai) ?></th>
+                <?php if (price_visible()): ?><th class="text-right"><?= rp($gtNilai) ?></th><?php endif; ?>
             </tr>
             </tfoot>
         </table>

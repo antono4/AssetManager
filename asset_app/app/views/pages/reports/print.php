@@ -5,40 +5,42 @@ $s = $summary;
 $filterDesc = ReportController::describeFilters($f);
 ?>
 <div class="report-header">
-    <h2><i class="fas fa-cubes"></i> <?= APP_NAME ?> — Laporan Aset</h2>
-    <p class="subtitle">Laporan Manajemen Aset IT &amp; Umum</p>
+    <h2><i class="fas fa-cubes"></i> <?= APP_NAME ?> — <?= t('asset_report') ?></h2>
+    <p class="subtitle"><?= t('report_management') ?></p>
     <div class="report-meta">
-        <span><i class="far fa-calendar"></i> Dicetak: <?= tglwaktu(date('Y-m-d H:i:s')) ?></span>
+        <span><i class="far fa-calendar"></i> <?= t('report_printed') ?>: <?= tglwaktu(date('Y-m-d H:i:s')) ?></span>
         <span><i class="fas fa-filter"></i> <?= e($filterDesc) ?></span>
     </div>
 </div>
 
 <!-- Ringkasan -->
 <div class="report-section">
-    <h4><i class="fas fa-chart-line"></i> Ringkasan</h4>
+    <h4><i class="fas fa-chart-line"></i> <?= t('summary') ?></h4>
     <div class="print-cards">
-        <div class="print-card"><div class="label">Total Aset</div><div class="value"><?= $s['total'] ?></div></div>
-        <div class="print-card"><div class="label">Tersedia</div><div class="value text-success"><?= $s['tersedia'] ?></div></div>
-        <div class="print-card"><div class="label">Dipinjam</div><div class="value text-warning"><?= $s['dipinjam'] ?></div></div>
-        <div class="print-card"><div class="label">Rusak</div><div class="value text-danger"><?= $s['rusak'] ?></div></div>
-        <div class="print-card"><div class="label">Total Nilai Aset</div><div class="value"><?= rp($s['nilai_total']) ?></div></div>
+        <div class="print-card"><div class="label"><?= t('total_assets') ?></div><div class="value"><?= $s['total'] ?></div></div>
+        <div class="print-card"><div class="label"><?= t('status_tersedia') ?></div><div class="value text-success"><?= $s['tersedia'] ?></div></div>
+        <div class="print-card"><div class="label"><?= t('status_dipinjam') ?></div><div class="value text-warning"><?= $s['dipinjam'] ?></div></div>
+        <div class="print-card"><div class="label"><?= t('status_rusak') ?></div><div class="value text-danger"><?= $s['rusak'] ?></div></div>
+        <?php if (price_visible()): ?>
+        <div class="print-card"><div class="label"><?= t('total_value') ?></div><div class="value"><?= rp($s['nilai_total']) ?></div></div>
+        <?php endif; ?>
     </div>
     <table class="report-table">
-        <thead><tr><th>Status</th><th class="text-center">Jumlah</th><th class="text-right">Nilai</th></tr></thead>
+        <thead><tr><th><?= t('status') ?></th><th class="text-center"><?= t('total') ?></th><?php if (price_visible()): ?><th class="text-right"><?= t('total_value') ?></th><?php endif; ?></tr></thead>
         <tbody>
-            <tr><td>Tersedia</td><td class="text-center"><?= $s['tersedia'] ?></td><td class="text-right"><?= rp($s['nilai_tersedia']) ?></td></tr>
-            <tr><td>Dipinjam</td><td class="text-center"><?= $s['dipinjam'] ?></td><td class="text-right"><?= rp($s['nilai_dipinjam']) ?></td></tr>
-            <tr><td>Rusak</td><td class="text-center"><?= $s['rusak'] ?></td><td class="text-right"><?= rp($s['nilai_rusak']) ?></td></tr>
+            <tr><td><?= t('status_tersedia') ?></td><td class="text-center"><?= $s['tersedia'] ?></td><?php if (price_visible()): ?><td class="text-right"><?= rp($s['nilai_tersedia']) ?></td><?php endif; ?></tr>
+            <tr><td><?= t('status_dipinjam') ?></td><td class="text-center"><?= $s['dipinjam'] ?></td><?php if (price_visible()): ?><td class="text-right"><?= rp($s['nilai_dipinjam']) ?></td><?php endif; ?></tr>
+            <tr><td><?= t('status_rusak') ?></td><td class="text-center"><?= $s['rusak'] ?></td><?php if (price_visible()): ?><td class="text-right"><?= rp($s['nilai_rusak']) ?></td><?php endif; ?></tr>
         </tbody>
-        <tfoot><tr><td>TOTAL</td><td class="text-center"><?= $s['total'] ?></td><td class="text-right"><?= rp($s['nilai_total']) ?></td></tr></tfoot>
+        <tfoot><tr><td><?= t('total') ?></td><td class="text-center"><?= $s['total'] ?></td><?php if (price_visible()): ?><td class="text-right"><?= rp($s['nilai_total']) ?></td><?php endif; ?></tr></tfoot>
     </table>
 </div>
 
 <!-- Rekap per Kategori -->
 <div class="report-section">
-    <h4><i class="fas fa-tags"></i> Rekap per Kategori</h4>
+    <h4><i class="fas fa-tags"></i> <?= t('by_category') ?></h4>
     <table class="report-table">
-        <thead><tr><th>#</th><th>Kategori</th><th class="text-center">Tersedia</th><th class="text-center">Dipinjam</th><th class="text-center">Rusak</th><th class="text-center">Total</th><th class="text-right">Nilai</th></tr></thead>
+        <thead><tr><th>#</th><th><?= t('category') ?></th><th class="text-center"><?= t('status_tersedia') ?></th><th class="text-center"><?= t('status_dipinjam') ?></th><th class="text-center"><?= t('status_rusak') ?></th><th class="text-center"><?= t('total') ?></th><?php if (price_visible()): ?><th class="text-right"><?= t('total_value') ?></th><?php endif; ?></tr></thead>
         <tbody>
         <?php $no=1; foreach ($byCategory as $c): ?>
             <tr>
@@ -48,7 +50,7 @@ $filterDesc = ReportController::describeFilters($f);
                 <td class="text-center"><?= (int)$c['dipinjam'] ?></td>
                 <td class="text-center"><?= (int)$c['rusak'] ?></td>
                 <td class="text-center"><?= (int)$c['total'] ?></td>
-                <td class="text-right"><?= rp($c['nilai']) ?></td>
+                <?php if (price_visible()): ?><td class="text-right"><?= rp($c['nilai']) ?></td><?php endif; ?>
             </tr>
         <?php endforeach; ?>
         </tbody>
@@ -57,9 +59,9 @@ $filterDesc = ReportController::describeFilters($f);
 
 <!-- Rekap per Lokasi -->
 <div class="report-section">
-    <h4><i class="fas fa-map-marker-alt"></i> Rekap per Lokasi</h4>
+    <h4><i class="fas fa-map-marker-alt"></i> <?= t('by_location') ?></h4>
     <table class="report-table">
-        <thead><tr><th>#</th><th>Lokasi</th><th class="text-center">Tersedia</th><th class="text-center">Dipinjam</th><th class="text-center">Rusak</th><th class="text-center">Total</th><th class="text-right">Nilai</th></tr></thead>
+        <thead><tr><th>#</th><th><?= t('location') ?></th><th class="text-center"><?= t('status_tersedia') ?></th><th class="text-center"><?= t('status_dipinjam') ?></th><th class="text-center"><?= t('status_rusak') ?></th><th class="text-center"><?= t('total') ?></th><?php if (price_visible()): ?><th class="text-right"><?= t('total_value') ?></th><?php endif; ?></tr></thead>
         <tbody>
         <?php $no=1; foreach ($byLocation as $l): ?>
             <tr>
@@ -69,7 +71,7 @@ $filterDesc = ReportController::describeFilters($f);
                 <td class="text-center"><?= (int)$l['dipinjam'] ?></td>
                 <td class="text-center"><?= (int)$l['rusak'] ?></td>
                 <td class="text-center"><?= (int)$l['total'] ?></td>
-                <td class="text-right"><?= rp($l['nilai']) ?></td>
+                <?php if (price_visible()): ?><td class="text-right"><?= rp($l['nilai']) ?></td><?php endif; ?>
             </tr>
         <?php endforeach; ?>
         </tbody>
@@ -78,9 +80,9 @@ $filterDesc = ReportController::describeFilters($f);
 
 <!-- Detail Aset -->
 <div class="report-section">
-    <h4><i class="fas fa-list"></i> Daftar Detail Aset (<?= count($assets) ?>)</h4>
+    <h4><i class="fas fa-list"></i> <?= t('asset_detail_list') ?> (<?= count($assets) ?>)</h4>
     <table class="report-table">
-        <thead><tr><th>Kode</th><th>Nama</th><th>Kategori</th><th>Lokasi</th><th>Tgl. Beli</th><th>Status</th><th class="text-right">Harga</th></tr></thead>
+        <thead><tr><th><?= t('asset_code') ?></th><th><?= t('name') ?></th><th><?= t('category') ?></th><th><?= t('location') ?></th><th><?= t('purchase_date') ?></th><th><?= t('status') ?></th><?php if (price_visible()): ?><th class="text-right"><?= t('price') ?></th><?php endif; ?></tr></thead>
         <tbody>
         <?php $totalNilai = 0.0; foreach ($assets as $a): $totalNilai += (float)$a['price']; ?>
             <tr>
@@ -90,11 +92,13 @@ $filterDesc = ReportController::describeFilters($f);
                 <td><?= e($a['location']) ?: '-' ?></td>
                 <td><?= tgl($a['purchase_date']) ?></td>
                 <td><?= ucfirst($a['status']) ?></td>
-                <td class="text-right"><?= rp($a['price']) ?></td>
+                <?php if (price_visible()): ?><td class="text-right"><?= rp($a['price']) ?></td><?php endif; ?>
             </tr>
         <?php endforeach; ?>
         </tbody>
-        <tfoot><tr><td colspan="6">TOTAL NILAI</td><td class="text-right"><?= rp($totalNilai) ?></td></tr></tfoot>
+        <?php if (price_visible()): ?>
+        <tfoot><tr><td colspan="6"><?= t('total_value') ?></td><td class="text-right"><?= rp($totalNilai) ?></td></tr></tfoot>
+        <?php endif; ?>
     </table>
 </div>
 

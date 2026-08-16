@@ -139,6 +139,18 @@ function patch_status_badge(string $status): string
     return '<span class="badge badge-' . $cls . '">' . ($labels[$status] ?? ucfirst($status)) . '</span>';
 }
 
+// Hanya admin yang boleh melihat harga/nilai aset. Staff melihat '-'.
+function price_visible(): bool
+{
+    return Auth::isAdmin();
+}
+
+// Tampilkan harga (Rp) bila admin, '-' bila staff
+function price_hidden($value): string
+{
+    return Auth::isAdmin() ? rp($value) : '-';
+}
+
 function old(string $key, $default = ''): string
 {
     return e($_SESSION['old'][$key] ?? $default);

@@ -21,7 +21,9 @@ $a = $asset;
                     <dt class="col-sm-4"><?= t('brand_spec') ?></dt><dd class="col-sm-8"><?= e($a['brand_spec']) ?: '-' ?></dd>
                     <dt class="col-sm-4"><?= t('location') ?></dt><dd class="col-sm-8"><?= e($a['location']) ?: '-' ?></dd>
                     <dt class="col-sm-4"><?= t('purchase_date') ?></dt><dd class="col-sm-8"><?= tgl($a['purchase_date']) ?></dd>
+                    <?php if (price_visible()): ?>
                     <dt class="col-sm-4"><?= t('price') ?></dt><dd class="col-sm-8"><strong><?= rp($a['price']) ?></strong></dd>
+                    <?php endif; ?>
                     <dt class="col-sm-4"><?= t('created_at') ?></dt><dd class="col-sm-8"><?= tglwaktu($a['created_at']) ?></dd>
                     <dt class="col-sm-4"><?= t('updated_at') ?></dt><dd class="col-sm-8"><?= tglwaktu($a['updated_at']) ?></dd>
                 </dl>

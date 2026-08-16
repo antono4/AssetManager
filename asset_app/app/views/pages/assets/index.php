@@ -52,7 +52,7 @@
                 <thead>
                 <tr>
                     <th><?= t('asset_code') ?></th><th><?= t('name') ?></th><th><?= t('category') ?></th><th><?= t('location') ?></th>
-                    <th><?= t('status') ?></th><th class="text-right"><?= t('price') ?></th><th class="text-center"><?= t('action') ?></th>
+                    <th><?= t('status') ?></th><?php if (price_visible()): ?><th class="text-right"><?= t('price') ?></th><?php endif; ?><th class="text-center"><?= t('action') ?></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -63,7 +63,7 @@
                         <td><span class="badge badge-light"><?= e($a['category_name']) ?></span></td>
                         <td><i class="fas fa-map-marker-alt text-muted mr-1"></i><?= e($a['location']) ?: '-' ?></td>
                         <td><?= status_badge($a['status']) ?></td>
-                        <td class="text-right"><?= rp($a['price']) ?></td>
+                        <?php if (price_visible()): ?><td class="text-right"><?= rp($a['price']) ?></td><?php endif; ?>
                         <td class="text-center">
                             <a href="<?= url('assets/' . $a['id']) ?>" class="btn btn-info btn-sm" title="<?= t('asset_detail') ?>"><i class="fas fa-eye"></i></a>
                             <?php if (Auth::isAdmin()): ?>

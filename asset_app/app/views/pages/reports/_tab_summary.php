@@ -30,17 +30,17 @@
 </div>
 
 <div class="card card-outline card-info">
-    <div class="card-header"><h6 class="card-title">Ringkasan Nilai Aset</h6></div>
+    <div class="card-header"><h6 class="card-title"><?= t('asset_value_summary') ?? 'Ringkasan Nilai Aset' ?></h6></div>
     <div class="card-body p-0">
         <table class="table table-striped mb-0">
-            <thead><tr><th>Kategori</th><th class="text-center">Jumlah</th><th class="text-right">Nilai Aset</th></tr></thead>
+            <thead><tr><th><?= t('category') ?></th><th class="text-center"><?= t('total') ?></th><?php if (price_visible()): ?><th class="text-right"><?= t('total_value') ?></th><?php endif; ?></tr></thead>
             <tbody>
-                <tr><td>Tersedia</td><td class="text-center"><?= $s['tersedia'] ?></td><td class="text-right"><?= rp($s['nilai_tersedia']) ?></td></tr>
-                <tr><td>Dipinjam</td><td class="text-center"><?= $s['dipinjam'] ?></td><td class="text-right"><?= rp($s['nilai_dipinjam']) ?></td></tr>
-                <tr><td>Rusak</td><td class="text-center"><?= $s['rusak'] ?></td><td class="text-right"><?= rp($s['nilai_rusak']) ?></td></tr>
+                <tr><td><?= t('status_tersedia') ?></td><td class="text-center"><?= $s['tersedia'] ?></td><?php if (price_visible()): ?><td class="text-right"><?= rp($s['nilai_tersedia']) ?></td><?php endif; ?></tr>
+                <tr><td><?= t('status_dipinjam') ?></td><td class="text-center"><?= $s['dipinjam'] ?></td><?php if (price_visible()): ?><td class="text-right"><?= rp($s['nilai_dipinjam']) ?></td><?php endif; ?></tr>
+                <tr><td><?= t('status_rusak') ?></td><td class="text-center"><?= $s['rusak'] ?></td><?php if (price_visible()): ?><td class="text-right"><?= rp($s['nilai_rusak']) ?></td><?php endif; ?></tr>
             </tbody>
             <tfoot>
-                <tr><th>TOTAL</th><th class="text-center"><?= $s['total'] ?></th><th class="text-right"><?= rp($s['nilai_total']) ?></th></tr>
+                <tr><th><?= t('total') ?></th><th class="text-center"><?= $s['total'] ?></th><?php if (price_visible()): ?><th class="text-right"><?= rp($s['nilai_total']) ?></th><?php endif; ?></tr>
             </tfoot>
         </table>
     </div>
