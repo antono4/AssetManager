@@ -1,0 +1,101 @@
+name,category,brand_spec,location,status,purchase_date,price
+Printer Laser 001,Printer,Epson WorkForce WF-2820,Ruang HRD,tersedia,2023-09-21,1800000
+AP Meeting 002,Jaringan,Mikrotik RB4011iGS+,Server Farm,tersedia,2024-10-03,6900000
+Printer A3 003,Printer,Epson WorkForce WF-2820,Ruang QC,tersedia,2022-10-11,3000000
+Printer Mono 004,Printer,HP LaserJet Pro M404,Ruang IT,tersedia,2022-06-20,6200000
+PC Admin 005,Komputer,Dell OptiPlex 7090 / i7-11700 / 16GB / SSD 512GB,Ruang Rapat,tersedia,2022-06-28,21700000
+Laptop Remote 006,Laptop,Lenovo ThinkPad E14 / Ryzen 5 / 8GB / SSD 512GB,Ruang HRD,dipinjam,2021-12-27,13600000
+PC Workstation 007,Komputer,Dell OptiPlex 7090 / i7-11700 / 16GB / SSD 512GB,Ruang Produksi,tersedia,2024-05-20,24900000
+Laptop Training 008,Laptop,Asus ZenBook 14 / i5-1135G7 / 8GB / SSD 512GB,Ruang Operasional,tersedia,2021-12-03,15000000
+PC Server 009,Komputer,Lenovo ThinkCentre M90 / i7-10700 / 16GB / SSD 1TB,Ruang Direksi,tersedia,2024-04-28,23600000
+Scanner 010,Printer,Epson WorkForce WF-2820,Meeting Room B,tersedia,2021-09-19,6800000
+Router Edge 011,Jaringan,TP-Link EAP670 AX3000,Ruang IT,tersedia,2021-12-18,15300000
+Laptop Staff 012,Laptop,Asus ZenBook 14 / i5-1135G7 / 8GB / SSD 512GB,Lobi Utama,rusak,2023-06-26,24900000
+Laptop Support 013,Laptop,MacBook Air M2 / 8GB / SSD 256GB,Ruang Developer,dipinjam,2024-07-01,27300000
+Laptop Training 014,Laptop,Dell Latitude 5420 / i7-1165G7 / 16GB / SSD 512GB,Meeting Room A,tersedia,2023-08-24,27200000
+PC Lab 015,Komputer,Intel NUC 11 / i5-1135G7 / 8GB / SSD 256GB,Ruang Keuangan,tersedia,2022-07-07,17700000
+Printer Label 016,Printer,Epson EcoTank L3210,Ruang Marketing,tersedia,2022-12-12,2600000
+Load Balancer 017,Jaringan,Cisco Catalyst 2960 24-Port,Meeting Room A,tersedia,2021-05-27,11400000
+Printer Thermal 018,Printer,Epson WorkForce WF-2820,Ruang Server,tersedia,2021-01-02,1800000
+Proyektor 019,Umum,Daikin R32 inverter 1PK,Ruang Server,tersedia,2021-01-14,8400000
+Load Balancer 020,Jaringan,Aruba Instant On 1830 24G,Ruang IT,dipinjam,2021-11-03,15300000
+Router Backup 021,Jaringan,TP-Link EAP670 AX3000,Ruang Marketing,tersedia,2023-05-04,12200000
+PC Admin 022,Komputer,Asus ProArt PA90 / i9-10900 / 32GB / SSD 2TB,Ruang HRD,tersedia,2022-07-18,9200000
+Switch Access 023,Jaringan,Ubiquiti UniFi U6-Pro,Ruang Marketing,tersedia,2020-02-22,19300000
+PC Lab 024,Komputer,Intel NUC 11 / i5-1135G7 / 8GB / SSD 256GB,Reception,tersedia,2021-12-26,14500000
+Laptop Dev 025,Laptop,MacBook Air M2 / 8GB / SSD 256GB,Ruang Server,tersedia,2022-02-13,6100000
+Access Point Tamu 026,Jaringan,Ubiquiti UniFi U6-Pro,Ruang Operasional,tersedia,2024-11-02,2500000
+PC Backup 027,Komputer,Lenovo ThinkCentre M90 / i7-10700 / 16GB / SSD 1TB,Server Farm,tersedia,2022-12-13,23200000
+Laptop Training 028,Laptop,Asus ZenBook 14 / i5-1135G7 / 8GB / SSD 512GB,Ruang Developer,dipinjam,2021-09-27,26900000
+Printer Laser 029,Printer,Epson EcoTank L3210,Ruang HRD,dipinjam,2023-07-16,6900000
+Proyektor 030,Umum,Daikin R32 inverter 1PK,Lobi Utama,dipinjam,2020-05-14,8100000
+Router Backup 031,Jaringan,TP-Link EAP670 AX3000,Lobi Utama,tersedia,2023-11-18,3200000
+PC Desktop Dev 032,Komputer,Asus ProArt PA90 / i9-10900 / 32GB / SSD 2TB,Ruang Rapat,tersedia,2024-08-11,8800000
+Laptop Marketing 033,Laptop,HP ProBook 450 G8 / i5-1135G7 / 8GB / SSD 512GB,Ruang Teknisi,tersedia,2023-04-23,17800000
+Printer Inkjet 034,Printer,Brother HL-L2375DW,Reception,rusak,2020-06-02,3700000
+Microscope 035,Umum,Sharp SJ-X176P,Ruang Teknisi,tersedia,2023-03-27,3000000
+Router Backup 036,Jaringan,Ubiquiti UniFi U6-Pro,Ruang QC,dipinjam,2021-05-27,10600000
+PC QC 037,Komputer,HP EliteDesk 800 G6 / i5-10500 / 8GB / SSD 256GB,Lobi Utama,tersedia,2020-04-02,22000000
+Sound System 038,Umum,Panasonic KX-TGE210,Ruang Direksi,tersedia,2020-10-01,10600000
+Laptop Direksi 039,Laptop,Dell Latitude 5420 / i7-1165G7 / 16GB / SSD 512GB,Meeting Room B,tersedia,2020-05-16,26400000
+Printer Multifungsi 040,Printer,Canon PIXMA G2010,Workshop,dipinjam,2023-04-13,1900000
+Laptop Training 041,Laptop,Dell Latitude 5420 / i7-1165G7 / 16GB / SSD 512GB,Ruang Produksi,tersedia,2020-09-09,12500000
+PC Server 042,Komputer,HP EliteDesk 800 G6 / i5-10500 / 8GB / SSD 256GB,Server Farm,tersedia,2023-03-09,13200000
+Printer Thermal 043,Printer,HP LaserJet Pro M404,Ruang Marketing,tersedia,2020-11-17,3400000
+Laptop Staff 044,Laptop,Lenovo ThinkPad E14 / Ryzen 5 / 8GB / SSD 512GB,Ruang Rapat,tersedia,2022-11-28,8800000
+Switch Access 045,Jaringan,Aruba Instant On 1830 24G,Reception,tersedia,2021-07-24,19500000
+Laptop Direksi 046,Laptop,Asus ZenBook 14 / i5-1135G7 / 8GB / SSD 512GB,Ruang IT,tersedia,2024-11-14,25200000
+Printer Inkjet 047,Printer,Brother HL-L2375DW,Ruang Operasional,tersedia,2024-07-05,7100000
+Router Edge 048,Jaringan,Mikrotik RB4011iGS+,Ruang Produksi,tersedia,2020-09-20,15700000
+Microscope 049,Umum,Philips 50PUS7505,Ruang Keuangan,tersedia,2022-12-09,4800000
+Air Purifier 050,Umum,Sharp SJ-X176P,Reception,dipinjam,2022-12-02,4900000
+Switch Core 051,Jaringan,TP-Link EAP670 AX3000,Ruang Teknisi,dipinjam,2023-11-14,3600000
+Router Backup 052,Jaringan,Cisco Catalyst 2960 24-Port,Ruang Server,tersedia,2023-12-07,16000000
+Printer Label 053,Printer,Epson WorkForce WF-2820,Workshop,tersedia,2023-07-11,3700000
+Router Backup 054,Jaringan,TP-Link EAP670 AX3000,Ruang Operasional,tersedia,2021-10-06,7800000
+Printer A3 055,Printer,Brother HL-L2375DW,Ruang Keuangan,dipinjam,2020-05-25,7000000
+PC Admin 056,Komputer,HP EliteDesk 800 G6 / i5-10500 / 8GB / SSD 256GB,Ruang Teknisi,tersedia,2023-11-10,21400000
+Printer Thermal 057,Printer,Canon PIXMA G2010,Ruang Produksi,dipinjam,2023-10-10,7600000
+PC Server 058,Komputer,HP EliteDesk 800 G6 / i5-10500 / 8GB / SSD 256GB,Ruang Marketing,tersedia,2020-07-08,15500000
+Air Purifier 059,Umum,Daikin R32 inverter 1PK,Gudang,tersedia,2022-10-27,5900000
+Router Edge 060,Jaringan,TP-Link EAP670 AX3000,Ruang Produksi,tersedia,2023-06-05,11400000
+Printer Label 061,Printer,Epson EcoTank L3210,Ruang QC,tersedia,2022-12-12,1500000
+Laptop Remote 062,Laptop,Dell Latitude 5420 / i7-1165G7 / 16GB / SSD 512GB,Ruang HRD,dipinjam,2024-09-14,25100000
+Timbangan 063,Umum,Panasonic KX-TGE210,Ruang Teknisi,tersedia,2023-03-01,4800000
+Router Edge 064,Jaringan,TP-Link EAP670 AX3000,Ruang Server,dipinjam,2020-08-16,17300000
+PC Admin 065,Komputer,Intel NUC 11 / i5-1135G7 / 8GB / SSD 256GB,Ruang Produksi,rusak,2020-01-15,19000000
+Scanner 066,Printer,Canon PIXMA G2010,Ruang Rapat,tersedia,2021-07-01,5800000
+Printer Laser 067,Printer,HP LaserJet Pro M404,Ruang Direksi,dipinjam,2023-11-21,6200000
+Printer Inkjet 068,Printer,Brother HL-L2375DW,Lab,tersedia,2020-04-12,3200000
+Dispenser Air 069,Umum,Philips 50PUS7505,Ruang Direksi,tersedia,2024-02-20,1100000
+Printer Label 070,Printer,HP LaserJet Pro M404,Ruang Developer,tersedia,2020-01-25,6300000
+PC Lab 071,Komputer,Dell OptiPlex 7090 / i7-11700 / 16GB / SSD 512GB,Workshop,tersedia,2021-05-26,14100000
+Router Edge 072,Jaringan,TP-Link EAP670 AX3000,Lobi Utama,dipinjam,2024-07-12,16100000
+Laptop Remote 073,Laptop,Dell Latitude 5420 / i7-1165G7 / 16GB / SSD 512GB,Ruang Direksi,tersedia,2021-03-01,10100000
+Switch Lab 074,Jaringan,Aruba Instant On 1830 24G,Ruang Marketing,tersedia,2020-02-15,7900000
+Kulkas 075,Umum,Epson EB-X51 2700 lumen,Meeting Room A,tersedia,2023-09-28,5200000
+Microscope 076,Umum,Daikin R32 inverter 1PK,Ruang Marketing,tersedia,2024-06-27,1400000
+PC Admin 077,Komputer,HP EliteDesk 800 G6 / i5-10500 / 8GB / SSD 256GB,Ruang Server,tersedia,2022-10-21,22400000
+Laptop Staff 078,Laptop,HP ProBook 450 G8 / i5-1135G7 / 8GB / SSD 512GB,Gudang,tersedia,2022-01-22,15700000
+Kulkas 079,Umum,Daikin R32 inverter 1PK,Meeting Room B,rusak,2020-12-15,11800000
+Dispenser Air 080,Umum,Epson EB-X51 2700 lumen,Ruang Marketing,rusak,2024-02-23,8800000
+Laptop Remote 081,Laptop,MacBook Air M2 / 8GB / SSD 256GB,Ruang Teknisi,dipinjam,2020-11-22,12600000
+Firewall 082,Jaringan,TP-Link EAP670 AX3000,Meeting Room A,dipinjam,2024-11-21,12300000
+AP Meeting 083,Jaringan,Cisco Catalyst 2960 24-Port,Ruang Keuangan,rusak,2022-04-27,13000000
+Printer Color 084,Printer,Brother HL-L2375DW,Ruang Produksi,tersedia,2024-01-27,2400000
+Timbangan 085,Umum,Philips 50PUS7505,Ruang Marketing,tersedia,2021-08-26,4700000
+Switch Lab 086,Jaringan,Aruba Instant On 1830 24G,Ruang QC,rusak,2020-01-07,15600000
+PC Reception 087,Komputer,Asus ProArt PA90 / i9-10900 / 32GB / SSD 2TB,Workshop,dipinjam,2023-06-07,8400000
+Laptop QA 088,Laptop,Dell Latitude 5420 / i7-1165G7 / 16GB / SSD 512GB,Ruang Operasional,tersedia,2022-01-28,22700000
+Router Edge 089,Jaringan,Aruba Instant On 1830 24G,Ruang Marketing,tersedia,2021-08-12,9400000
+Laptop Support 090,Laptop,HP ProBook 450 G8 / i5-1135G7 / 8GB / SSD 512GB,Ruang Developer,dipinjam,2022-11-20,13900000
+Laptop Staff 091,Laptop,MacBook Air M2 / 8GB / SSD 256GB,Ruang HRD,tersedia,2022-11-08,21000000
+Microscope 092,Umum,Panasonic KX-TGE210,Ruang Keuangan,tersedia,2024-02-28,5100000
+PC Kasir 093,Komputer,HP EliteDesk 800 G6 / i5-10500 / 8GB / SSD 256GB,Gudang,tersedia,2023-03-18,12400000
+PC Desktop Dev 094,Komputer,Dell OptiPlex 7090 / i7-11700 / 16GB / SSD 512GB,Workshop,tersedia,2024-08-03,19900000
+AP Meeting 095,Jaringan,Cisco Catalyst 2960 24-Port,Ruang Teknisi,tersedia,2020-07-12,2300000
+Laptop Field 096,Laptop,Lenovo ThinkPad E14 / Ryzen 5 / 8GB / SSD 512GB,Ruang Operasional,dipinjam,2021-06-12,28100000
+Firewall 097,Jaringan,Cisco Catalyst 2960 24-Port,Ruang IT,tersedia,2022-03-15,19300000
+Microscope 098,Umum,Daikin R32 inverter 1PK,Meeting Room B,tersedia,2020-08-07,10300000
+Firewall 099,Jaringan,Mikrotik RB4011iGS+,Server Farm,dipinjam,2022-02-05,17800000
+Laptop Sales 100,Laptop,Dell Latitude 5420 / i7-1165G7 / 16GB / SSD 512GB,Gudang,tersedia,2020-05-10,9700000
