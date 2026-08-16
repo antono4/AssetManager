@@ -1,0 +1,49 @@
+/* ============================================================================
+   AssetManager HTML Version — Dark Mode (loaded on demand)
+   Bagian dark mode dipisah dari app.css agar bisa di-toggle tanpa reload file utama.
+   ========================================================================== */
+
+body.dark-mode,
+.dark-mode .wrapper,
+.dark-mode .main-header,
+.dark-mode .main-sidebar,
+.dark-mode .content-wrapper,
+.dark-mode .main-footer { background-color: #1a1f2e !important; color: #c2cbe0; }
+.dark-mode .main-header.navbar { background: #161b28 !important; border-bottom: 1px solid #2a3041; }
+.dark-mode .main-sidebar { background: #11151e !important; }
+.dark-mode .nav-sidebar .nav-link { color: #8898aa; }
+.dark-mode .nav-sidebar .nav-link.active { background: rgba(79,124,255,.15); color: #6d9cff; }
+.dark-mode .nav-sidebar .nav-link:hover { background: rgba(255,255,255,.05); }
+.dark-mode .brand-link { color: #fff; }
+.dark-mode .card, .dark-mode .dash-card { background: #20263a !important; border: 1px solid #2a3041; box-shadow: 0 4px 18px rgba(0,0,0,.3); }
+.dark-mode .card-header { background: #20263a !important; border-bottom: 1px solid #2a3041; }
+.dark-mode .card-title { color: #e2e8f0; }
+.dark-mode .card-body { color: #c2cbe0; }
+.dark-mode .table { color: #c2cbe0; }
+.dark-mode .table thead th { color: #8898aa; border-bottom-color: #2a3041; }
+.dark-mode .table tbody tr { border-bottom-color: #2a3041; }
+.dark-mode .table tbody tr:hover { background: rgba(255,255,255,.04); }
+.dark-mode .table-striped tbody tr:nth-of-type(odd) { background: rgba(255,255,255,.02); }
+.dark-mode .form-control, .dark-mode .input-group-text { background: #161b28; border-color: #2a3041; color: #c2cbe0; }
+.dark-mode .form-control:focus { border-color: #4f7cff; background: #11151e; }
+.dark-mode .content-header h1 { color: #e2e8f0; }
+.dark-mode .breadcrumb-item a { color: #6d9cff; }
+.dark-mode .breadcrumb-item.active { color: #8898aa; }
+.dark-mode .text-muted { color: #6c7a8c !important; }
+.dark-mode .small-box { color: #fff; }
+.dark-mode .dash-welcome { background: linear-gradient(120deg, #11151e, #1a2235); }
+.dark-mode .stat-card .sc-bg { opacity: .85; }
+.dark-mode .recent-table tbody tr:hover { background: rgba(255,255,255,.04); }
+.dark-mode .act-timeline li { border-bottom-color: #2a3041; }
+.dark-mode .dropdown-menu { background: #20263a; border: 1px solid #2a3041; }
+.dark-mode .dropdown-item { color: #c2cbe0; }
+.dark-mode .dropdown-item:hover { background: rgba(79,124,255,.15); }
+.dark-mode .dropdown-divider { border-color: #2a3041; }
+.dark-mode .modal-content { background: #20263a; border: 1px solid #2a3041; }
+.dark-mode .modal-header { border-bottom-color: #2a3041; }
+.dark-mode .modal-footer { border-top-color: #2a3041; }
+.dark-mode .close { color: #8898aa; }
+.dark-mode .main-footer { border-top: 1px solid #2a3041; color: #6c7a8c; }
+.dark-mode .login-card .alert-info { background: rgba(79,124,255,.15); color: #9ec1ff; border-color: rgba(79,124,255,.3); }
+.dark-mode pre.bg-light, .dark-mode pre { background: #11151e !important; color: #c2cbe0; }
+.dark-mode .breadcrumb { background: transparent; }
