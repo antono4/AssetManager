@@ -93,6 +93,11 @@
 - Global search di navbar
 - Responsive (desktop, tablet, mobile)
 
+### 🏢 Pengaturan Perusahaan (Admin)
+- Edit **nama perusahaan, alamat, telepon, email** — admin only
+- Nama perusahaan tampil di sidebar & kop laporan cetak
+- Disimpan ke tabel settings (key-value), auto-migrate
+
 ---
 
 ## 🛠 Teknologi
@@ -287,6 +292,7 @@ Via environment variable atau edit `asset_app/config.php`:
 | Audit Trail, API Token | ✅ | ❌ |
 | Buat Jadwal Patching, Generate | ✅ | ❌ |
 | Centang Checklist Patching | ✅ | ✅ |
+| Pengaturan Perusahaan | ✅ | ❌ |
 | Laporan, Riwayat, Notifikasi | ✅ | ✅ |
 | Edit Profil | ✅ | ✅ |
 
@@ -327,6 +333,7 @@ GET /api/assets?token=YOUR_TOKEN
 | GET | `/search?q=` | Global search |
 | GET | `/dark-mode` | Toggle dark mode |
 | GET | `/language/set?lang=` | Ganti bahasa |
+| GET/POST | `/settings` | Pengaturan perusahaan (admin) |
 
 > Daftar lengkap 40+ route: [asset_app/README.md](asset_app/README.md)
 

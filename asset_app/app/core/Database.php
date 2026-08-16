@@ -292,6 +292,15 @@ class Database
             created_at {$dt} DEFAULT CURRENT_TIMESTAMP
         ){$tail}");
 
+        // Tabel settings (key-value) — menyimpan konfigurasi aplikasi seperti
+        // nama perusahaan, alamat, telepon, dll. Dapat diubah oleh admin.
+        $db->exec("CREATE TABLE IF NOT EXISTS settings (
+            {$idCol},
+            setting_key VARCHAR(60) NOT NULL,
+            setting_value TEXT,
+            updated_at {$dt} DEFAULT CURRENT_TIMESTAMP
+        ){$tail}");
+
         // Kolom currency & useful_life pada assets
         if ($sqlite) {
             $aCols2 = $db->query("PRAGMA table_info(assets)")->fetchAll(PDO::FETCH_COLUMN, 1);

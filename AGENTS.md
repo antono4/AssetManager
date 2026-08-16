@@ -41,6 +41,15 @@ PHP native asset management app with AdminLTE 3 UI. Located at `/workspace/proje
 - SQLite permission gotcha: folder `database/` HARUS writable oleh user web server (XAMPP/Apache jalan sebagai `daemon`/`nobody`, Nginx+PHP-FPM sebagai `www-data`). Bila tidak writable → error `SQLSTATE[HY000] [14] unable to open database file`. Folder `database/` sering sudah ada (berisi `assets_app.sql`) saat diekstrak, sehingga `mkdir()` di `Database::conn()` tidak dipanggil dan izin default dipakai. Solusi: `chmod 775 database` + `chown` ke user web server. Kode `Database::conn()` kini auto-`chmod` folder (0777) & file DB (0666) bila tidak writable, tapi ini gagal bila PHP/web server sendiri tidak punya izin ubah izin → set manual tetap perlu.
 - Folder writable yang perlu dijaga: `database/` (SQLite file) dan `public/uploads/assets/` (foto aset).
 
+## Company Settings Module (Nama & Alamat Perusahaan)
+- Table: `settings` (key-value: `setting_key`, `setting_value`, `updated_at`) — dibuat via `migrateExtended()` (idempotent, CREATE TABLE IF NOT EXISTS)
+- Model `Setting::get($key, $default)` (cached), `Setting::set($key, $value)` (SELECT-then-INSERT/UPDATE upsert, driver-agnostic), `Setting::companyName()/companyAddress()/companyPhone()/companyEmail()` (companyName fallback ke APP_NAME bila kosong)
+- Controller `SettingController::index()` (form) + `update()` (save) — **admin only** via `Auth::requireAdmin()`; log ke `audit_trail` module='settings'
+- Route: `/settings` (GET form, POST update)
+- View: `app/views/pages/settings/index.php` (form nama, alamat, telepon, email)
+- Integrasi: brand-text sidebar (`app.php`) pakai `Setting::companyName()`; kop laporan (`reports/print.php`) pakai nama + alamat + telepon + email
+- Menu sidebar "Company Settings" muncul di section ADMINISTRATION (admin only)
+
 ## Patching Module (Jadwal & Checklist per 3 bulan/kuartal)
 - Tables: patch_items (template), patch_schedules (kuartal Q1-Q4), patch_checklists (per aset per jadwal), patch_checklist_items (centangan)
 - Flow: admin buat jadwal (auto-fill tanggal kuartal) → generate checklist aset IT (exclude kategori "Umum") → staff/admin centang item → auto-status: in_progress → completed saat semua item tercentang → schedule auto-refresh status (draft→ongoing→completed)

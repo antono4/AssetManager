@@ -132,7 +132,7 @@ $role = $u['role'] ?? 'guest';
     <aside class="main-sidebar sidebar-dark-info elevation-4">
         <a href="<?= url('dashboard') ?>" class="brand-link">
             <i class="nav-icon fas fa-cubes brand-image ml-3 mt-1" style="font-size:1.6rem;color:#fff;opacity:.9"></i>
-            <span class="brand-text font-weight-bold"><?= APP_NAME ?></span>
+            <span class="brand-text font-weight-bold"><?= e(Setting::companyName()) ?></span>
         </a>
 
         <div class="sidebar">
@@ -211,6 +211,11 @@ $role = $u['role'] ?? 'guest';
                     <li class="nav-item">
                         <a href="<?= url('assets/import') ?>" class="nav-link <?= $pageTitle === t('import_assets') ? 'active' : '' ?>">
                             <i class="nav-icon fas fa-file-import"></i><p><?= t('import_csv') ?></p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= url('settings') ?>" class="nav-link <?= $pageTitle === t('company_settings') ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-building"></i><p><?= t('company_settings') ?></p>
                         </a>
                     </li>
                     <li class="nav-item">

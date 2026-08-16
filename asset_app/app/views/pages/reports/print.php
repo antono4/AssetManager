@@ -5,8 +5,15 @@ $s = $summary;
 $filterDesc = ReportController::describeFilters($f);
 ?>
 <div class="report-header">
-    <h2><i class="fas fa-cubes"></i> <?= APP_NAME ?> — <?= t('asset_report') ?></h2>
-    <p class="subtitle"><?= t('report_management') ?></p>
+    <h2><i class="fas fa-cubes"></i> <?= e(Setting::companyName()) ?> — <?= t('asset_report') ?></h2>
+    <?php $addr = Setting::companyAddress(); $phone = Setting::companyPhone(); $cemail = Setting::companyEmail(); ?>
+    <?php if ($addr !== '' || $phone !== '' || $cemail !== ''): ?>
+    <p class="subtitle">
+        <?= $addr !== '' ? e($addr) : '' ?>
+        <?php if ($phone !== ''): ?> &middot; <i class="fas fa-phone"></i> <?= e($phone) ?><?php endif; ?>
+        <?php if ($cemail !== ''): ?> &middot; <i class="fas fa-envelope"></i> <?= e($cemail) ?><?php endif; ?>
+    </p>
+    <?php endif; ?>
     <div class="report-meta">
         <span><i class="far fa-calendar"></i> <?= t('report_printed') ?>: <?= tglwaktu(date('Y-m-d H:i:s')) ?></span>
         <span><i class="fas fa-filter"></i> <?= e($filterDesc) ?></span>

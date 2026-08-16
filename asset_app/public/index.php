@@ -73,6 +73,7 @@ $assetCtl = new AssetController();
 $catCtl = new CategoryController();
 $userCtl = new UserController();
 $logCtl = new LogController();
+$setCtl = new SettingController();
 
 // Auth
 Router::get('/login',  fn() => $auth->loginForm());
@@ -161,6 +162,10 @@ Router::post('/profile',       fn() => $userCtl->updateProfile());
 
 // Logs
 Router::get('/logs',           fn() => $logCtl->index());
+
+// Company Settings (admin)
+Router::get('/settings',       fn() => $setCtl->index());
+Router::post('/settings',      fn() => $setCtl->update());
 
 // Reports
 $repCtl = new ReportController();

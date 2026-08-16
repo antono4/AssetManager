@@ -326,4 +326,19 @@ return [
     'database'           => 'Database',
     'built_with'         => 'Built with PHP Native & AdminLTE 3.',
     'language'           => 'Language',
+
+    // Company Settings
+    'company_settings'   => 'Company Settings',
+    'company_info'       => 'Company Information',
+    'company_name'       => 'Company Name',
+    'company_name_hint'  => 'Displayed in the sidebar and report header. Leave the app name if empty.',
+    'company_address'    => 'Address',
+    'company_address_placeholder' => 'Street, building, city, postal code',
+    'company_phone'      => 'Phone',
+    'company_settings_saved' => 'Company settings saved successfully.',
+    'company_settings_updated' => 'Company settings updated',
+    'company_usage'      => 'Where is this used?',
+    'company_usage_desc' => 'The company information appears in the following places:',
+    'company_usage_sidebar' => 'Sidebar brand name (top-left)',
+    'company_usage_report' => 'Report print header (name, address, phone, email)',
 ];

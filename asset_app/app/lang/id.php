@@ -326,4 +326,19 @@ return [
     'database'           => 'Database',
     'built_with'         => 'Dibuat dengan PHP Native & AdminLTE 3.',
     'language'           => 'Bahasa',
+
+    // Company Settings
+    'company_settings'   => 'Pengaturan Perusahaan',
+    'company_info'       => 'Informasi Perusahaan',
+    'company_name'       => 'Nama Perusahaan',
+    'company_name_hint'  => 'Tampil di sidebar dan kop laporan. Kosongkan untuk memakai nama aplikasi.',
+    'company_address'    => 'Alamat',
+    'company_address_placeholder' => 'Jalan, gedung, kota, kode pos',
+    'company_phone'      => 'Telepon',
+    'company_settings_saved' => 'Pengaturan perusahaan berhasil disimpan.',
+    'company_settings_updated' => 'Pengaturan perusahaan diperbarui',
+    'company_usage'      => 'Digunakan di mana saja?',
+    'company_usage_desc' => 'Informasi perusahaan tampil pada tempat berikut:',
+    'company_usage_sidebar' => 'Nama brand di sidebar (pojok kiri atas)',
+    'company_usage_report' => 'Kop laporan cetak (nama, alamat, telepon, email)',
 ];

@@ -102,6 +102,11 @@
 - Riwayat aktivitas (log semua perubahan aset)
 - Setup route `/setup` untuk reset password
 
+### Pengaturan Perusahaan (Admin)
+- Edit **nama perusahaan, alamat, telepon, email** — admin only
+- Nama perusahaan tampil di sidebar & kop laporan cetak
+- Disimpan ke tabel `settings` (key-value), auto-migrate
+
 ---
 
 ## 🛠 Teknologi
@@ -210,6 +215,7 @@ Akses `http://localhost:8080/setup` sekali untuk reset password.
 | Audit Trail, API Token | ✅ | ❌ |
 | Buat/Edit Jadwal Patching, Generate | ✅ | ❌ |
 | Centang Checklist Patching | ✅ | ✅ |
+| Pengaturan Perusahaan | ✅ | ❌ |
 | Lihat Laporan, Riwayat, Notifikasi | ✅ | ✅ |
 | Edit Profil | ✅ | ✅ |
 
@@ -233,6 +239,7 @@ Akses `http://localhost:8080/setup` sekali untuk reset password.
 | GET | `/language/set?lang=xx` | Ganti bahasa |
 | GET | `/dark-mode` | Toggle dark mode |
 | GET | `/search?q=xx` | Global search |
+| GET/POST | `/settings` | Pengaturan perusahaan (admin) |
 
 ### Aset
 | Method | Path | Deskripsi |
