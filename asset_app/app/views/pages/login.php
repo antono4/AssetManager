@@ -1,29 +1,38 @@
-<?php /** Halaman Login */ ?>
-<p class="login-box-msg"><?= t('login_message') ?></p>
+<?php /** Halaman Login — modern glassmorphism form */ ?>
+<div class="login-head">
+    <div class="head-ic"><i class="fas fa-fingerprint"></i></div>
+    <h3><?= t('login_welcome') ?? 'Welcome Back' ?></h3>
+    <p><?= t('login_message') ?></p>
+</div>
 
-<form action="<?= url('login') ?>" method="post">
-    <div class="input-group mb-3">
-        <input type="text" name="username" class="form-control" placeholder="<?= t('username') ?>" required autofocus
-               value="<?= e($_POST['username'] ?? '') ?>">
-        <div class="input-group-append">
-            <div class="input-group-text"><span class="fas fa-user"></span></div>
-        </div>
+<form action="<?= url('login') ?>" method="post" autocomplete="on">
+    <div class="login-field">
+        <input type="text" name="username" id="login-username" placeholder="<?= t('username') ?>" required autofocus
+               value="<?= e($_POST['username'] ?? '') ?>" autocomplete="username">
+        <i class="fas fa-user field-ic"></i>
     </div>
-    <div class="input-group mb-3">
-        <input type="password" name="password" class="form-control" placeholder="<?= t('password') ?>" required>
-        <div class="input-group-append">
-            <div class="input-group-text"><span class="fas fa-lock"></span></div>
-        </div>
+
+    <div class="login-field">
+        <input type="password" name="password" id="login-password" placeholder="<?= t('password') ?>" required autocomplete="current-password">
+        <i class="fas fa-lock field-ic"></i>
+        <button type="button" class="pw-toggle" tabindex="-1" aria-label="toggle password"><i class="fas fa-eye"></i></button>
     </div>
-    <div class="row">
-        <div class="col-8">
-            <div class="icheck-primary">
-                <input type="checkbox" id="remember">
-                <label for="remember"><?= t('remember_me') ?></label>
-            </div>
-        </div>
-        <div class="col-4">
-            <button type="submit" class="btn btn-primary btn-block"><?= t('sign_in') ?></button>
-        </div>
+
+    <div class="login-row">
+        <label class="login-check">
+            <input type="checkbox" id="remember">
+            <span class="check-box"></span>
+            <?= t('remember_me') ?>
+        </label>
     </div>
+
+    <button type="submit" class="btn-login">
+        <i class="fas fa-arrow-right-to-bracket mr-1"></i> <?= t('sign_in') ?>
+    </button>
 </form>
+
+<div class="login-divider"><?= t('login_secure') ?? 'Secured Login' ?></div>
+
+<div class="login-sec">
+    <i class="fas fa-lock"></i> <?= t('login_secured_note') ?? 'Your data is protected with bcrypt encryption' ?>
+</div>
