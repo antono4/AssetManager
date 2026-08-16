@@ -1,0 +1,11 @@
+# Redirect semua request ke index.php (Apache + mod_rewrite)
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]
+
+# Keamanan dasar
+Options -Indexes
+<FilesMatch "\.(sql|sqlite|md|log)$">
+    Require all denied
+</FilesMatch>

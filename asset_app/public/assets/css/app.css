@@ -1,0 +1,95 @@
+/* ============================================================================
+   Custom CSS - AssetManager (di atas AdminLTE 3)
+   ========================================================================== */
+
+:root {
+    --brand: #2b3a55;
+    --brand-light: #3c5184;
+}
+
+.brand-link .brand-image {
+    margin-right: .6rem;
+}
+
+/* Small-info-card hover */
+.small-box:hover .icon {
+    transform: scale(1.15);
+}
+
+/* Tabel aset */
+.table-assets tbody tr:hover {
+    background-color: #f4f6f9;
+    cursor: pointer;
+}
+
+.table-assets .asset-code {
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-weight: 600;
+}
+
+/* Status badges lebih bulat */
+.badge {
+    border-radius: .4rem;
+    font-weight: 500;
+    padding: .4em .6em;
+}
+
+/* Timeline log */
+.timeline-log {
+    list-style: none;
+    padding-left: 1.5rem;
+    margin: 0;
+    position: relative;
+}
+.timeline-log::before {
+    content: '';
+    position: absolute;
+    left: .35rem;
+    top: .4rem;
+    bottom: .4rem;
+    width: 2px;
+    background: #dee2e6;
+}
+.timeline-log li {
+    position: relative;
+    padding-bottom: 1rem;
+}
+.timeline-log li::before {
+    content: '';
+    position: absolute;
+    left: -1.25rem;
+    top: .35rem;
+    width: .7rem;
+    height: .7rem;
+    border-radius: 50%;
+    background: var(--brand-light);
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #adb5bd;
+}
+
+/* Search bar */
+.search-bar .form-control:focus {
+    border-color: var(--brand-light);
+    box-shadow: 0 0 0 .2rem rgba(60, 81, 132, .15);
+}
+
+/* Login tweaks */
+.login-page .card { box-shadow: 0 10px 40px rgba(0,0,0,.25); }
+.login-logo, .login-box-msg { margin-bottom: 1.2rem; }
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: #6c757d;
+}
+.empty-state i { font-size: 3.5rem; opacity: .5; }
+
+/* Detail view */
+.asset-detail dt { font-weight: 600; color: #495057; width: 180px; }
+.asset-detail dd { color: #212529; }
+
+/* Responsive nav title */
+@media (max-width: 575.98px) {
+    .small-box .icon { font-size: 3rem !important; }
+}

@@ -1,0 +1,19 @@
+# Database SQLite (auto-generated untuk demo)
+asset_app/database/*.sqlite
+
+# Log
+*.log
+/tmp/
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,97 @@
+<?php
+// ============================================================================
+//  ENTRY POINT - Aplikasi Manajemen Aset
+// ============================================================================
+
+// Untuk PHP built-in server: jika request adalah file/direktori static yang
+// ada di document root, kembalikan false agar server menyajikannya langsung.
+$_reqPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+$_reqPath = ltrim($_reqPath, '/');
+if ($_reqPath !== '' && $_reqPath !== 'index.php') {
+    $candidate = __DIR__ . '/' . $_reqPath;
+    if (file_exists($candidate) && !is_dir($candidate)) {
+        return false; // biarkan built-in server serve static file
+    }
+}
+
+require_once __DIR__ . '/../config.php';
+
+Auth::startSession();
+
+// Pastikan skema & data dummy ada (auto untuk SQLite; untuk MySQL
+// disarankan import assets_app.sql terlebih dahulu, tapi tetap aman
+// bila tabel users belum ada -> dilewati tanpa error fatal di sini).
+try {
+    Database::ensureSchema();
+} catch (Throwable $e) {
+    // Untuk MySQL bila belum di-import, tampilkan pesan setup yang jelas
+    // hanya pada route non-setup agar /setup tetap bisa dipakai.
+}
+
+// Ambil path relatif. Dengan PHP built-in server + router, REQUEST_URI sudah
+// berupa path bersih (tanpa index.php prefix). Untuk Apache/nginx dengan
+// index.php di sub-folder, strip prefix BASE_URL bila ada.
+$requestUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+$path = $requestUri;
+
+// Normalisasi: hapus kemungkinan /index.php prefix
+if (preg_match('#(?:^|/)/index\.php#', $path)) {
+    $path = preg_replace('#^/index\.php#', '', $path);
+}
+// Hapus BASE_URL prefix bila ada (sub-folder deployment non-router)
+$base = BASE_URL;
+if ($base !== '' && strpos($path, $base) === 0) {
+    $path = substr($path, strlen($base));
+}
+$path = '/' . ltrim($path, '/');
+if ($path === '/index.php') {
+    $path = '/';
+}
+
+// --- Definisi Routes ---
+$auth = new AuthController();
+$dash = new DashboardController();
+$assetCtl = new AssetController();
+$catCtl = new CategoryController();
+$userCtl = new UserController();
+$logCtl = new LogController();
+
+// Auth
+Router::get('/login',  fn() => $auth->loginForm());
+Router::post('/login', fn() => $auth->login());
+Router::get('/logout', fn() => $auth->logout());
+Router::get('/setup',  fn() => $auth->setup());
+
+// Dashboard
+Router::get('/',         fn() => $dash->index());
+Router::get('/dashboard', fn() => $dash->index());
+
+// Assets
+Router::get('/assets',         fn() => $assetCtl->index());
+Router::get('/assets/create',  fn() => $assetCtl->create());
+Router::post('/assets',        fn() => $assetCtl->store());
+Router::get('/assets/{id}',    fn($p) => $assetCtl->show($p));
+Router::get('/assets/{id}/edit', fn($p) => $assetCtl->edit($p));
+Router::post('/assets/{id}',   fn($p) => $assetCtl->update($p));
+Router::post('/assets/{id}/delete', fn($p) => $assetCtl->delete($p));
+Router::post('/assets/{id}/status', fn($p) => $assetCtl->status($p));
+
+// Categories
+Router::get('/categories',     fn() => $catCtl->index());
+Router::post('/categories',    fn() => $catCtl->store());
+Router::post('/categories/{id}', fn($p) => $catCtl->update($p));
+Router::post('/categories/{id}/delete', fn($p) => $catCtl->delete($p));
+
+// Users
+Router::get('/users',          fn() => $userCtl->index());
+Router::post('/users',         fn() => $userCtl->store());
+Router::post('/users/{id}',    fn($p) => $userCtl->update($p));
+Router::post('/users/{id}/delete', fn($p) => $userCtl->delete($p));
+Router::get('/profile',        fn() => $userCtl->profile());
+Router::post('/profile',       fn() => $userCtl->updateProfile());
+
+// Logs
+Router::get('/logs',           fn() => $logCtl->index());
+
+// Dispatch
+Router::dispatch($path, $_SERVER['REQUEST_METHOD'] ?? 'GET');
