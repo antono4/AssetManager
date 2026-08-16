@@ -80,3 +80,6 @@ spl_autoload_register(function ($class) {
 
 // --- Inisialisasi bahasa (default English) ---
 Lang::init();
+
+// --- Helper functions global (url, asset_url, e, rp, dll) ---
+require_once APP_PATH . '/core/helpers.php';
