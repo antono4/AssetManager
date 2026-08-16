@@ -61,15 +61,32 @@ class PatchController
             Flash::set('error', t('schedule_not_found'));
             Auth::redirect(url('/patching'));
         }
-        $checklists = PatchChecklist::forSchedule($id);
-        $existingIds = array_column($checklists, 'asset_id');
-        $availableAssets = $this->availableItAssets($existingIds);
+
+        // Paginasi daftar checklist (mencegah render ribuan baris sekaligus)
+        $page = max(1, (int)($_GET['page'] ?? 1));
+        $perPage = 20;
+        $totalChecklists = PatchChecklist::countForSchedule($id);
+        $totalPages = max(1, (int)ceil($totalChecklists / $perPage));
+        $checklists = PatchChecklist::forSchedulePaged($id, $perPage, ($page - 1) * $perPage);
+
+        // Pre-load progress item batch (hindari N+1 query)
+        $clIds = array_column($checklists, 'id');
+        $progress = PatchChecklist::progressBatch($clIds);
+
+        // Aset IT yang belum punya checklist (untuk tombol generate).
+        // availableItAssets() memakai subquery berdasarkan schedule id.
+        $availableAssets = $this->availableItAssets($id);
 
         View::render('patch/show', [
             'pageTitle'       => t('patch_schedule') . ': ' . $schedule['name'],
             'schedule'        => $schedule,
             'checklists'      => $checklists,
+            'progress'        => $progress,
             'availableAssets' => $availableAssets,
+            'page'            => $page,
+            'perPage'         => $perPage,
+            'totalChecklists' => $totalChecklists,
+            'totalPages'      => $totalPages,
         ]);
     }
 
@@ -140,8 +157,7 @@ class PatchController
     {
         Auth::requireAdmin();
         $id = (int)$p['id'];
-        $existing = array_column(PatchChecklist::forSchedule($id), 'asset_id');
-        $assets = $this->availableItAssets($existing);
+        $assets = $this->availableItAssets($id);
         $ids = array_column($assets, 'id');
         if (empty($ids)) {
             Flash::set('warning', t('no_new_it_assets'));
@@ -277,19 +293,18 @@ class PatchController
         Auth::redirect(url('/patching/' . $schedId));
     }
 
-    // Aset IT yang tersedia untuk generate (kategori non-"Umum")
-    private function availableItAssets(array $excludeIds = []): array
+    // Aset IT yang tersedia untuk generate (kategori non-"Umum") untuk schedule tertentu.
+    // Pakai NOT IN (subquery) agar tidak mengikat ribuan parameter placeholder
+    // (bisa bermasalah pada beberapa konfigurasi PDO SQLite/MySQL dengan EMULATE_PREPARES off).
+    private function availableItAssets(int $scheduleId): array
     {
         $sql = "SELECT a.id, a.asset_code, a.name, a.location, c.name AS category_name
                 FROM assets a LEFT JOIN categories c ON c.id = a.category_id
-                WHERE c.name <> 'Umum' OR c.name IS NULL";
-        $params = [];
-        if (!empty($excludeIds)) {
-            $placeholders = implode(',', array_fill(0, count($excludeIds), '?'));
-            $sql .= " AND a.id NOT IN ($placeholders)";
-            $params = $excludeIds;
-        }
-        $sql .= " ORDER BY a.asset_code";
-        return Database::fetchAll($sql, $params);
+                WHERE (c.name <> 'Umum' OR c.name IS NULL)
+                  AND a.id NOT IN (
+                      SELECT asset_id FROM patch_checklists WHERE schedule_id = ?
+                  )
+                ORDER BY a.asset_code";
+        return Database::fetchAll($sql, [$scheduleId]);
     }
 }

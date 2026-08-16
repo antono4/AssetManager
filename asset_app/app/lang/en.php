@@ -317,6 +317,8 @@ return [
 
     // Misc
     'access_denied'      => 'Access denied. Admin only page.',
+    'showing'            => 'Showing',
+    'of'                 => 'of',
     'page_not_found'     => '404 - Not Found',
     'not_found_message'  => 'The page you are looking for was not found.',
     'oops'               => 'Oops!',

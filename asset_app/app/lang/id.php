@@ -317,6 +317,8 @@ return [
 
     // Misc
     'access_denied'      => 'Akses ditolak. Halaman khusus admin.',
+    'showing'            => 'Menampilkan',
+    'of'                 => 'dari',
     'page_not_found'     => '404 - Tidak Ditemukan',
     'not_found_message'  => 'Halaman yang Anda cari tidak ditemukan.',
     'oops'               => 'Oops!',

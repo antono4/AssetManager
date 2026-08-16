@@ -27,6 +27,7 @@ class AssetController
             'status'     => $status,
             'category'   => $category,
             'page'       => $page,
+            'perPage'    => $perPage,
             'totalPages' => $totalPages,
             'total'      => $total,
         ]);

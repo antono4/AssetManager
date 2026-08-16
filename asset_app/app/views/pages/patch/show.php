@@ -106,7 +106,7 @@ $pct = $s['total_aset'] > 0 ? round(($s['done_aset'] / $s['total_aset']) * 100) 
 
 <div class="card card-info card-outline">
     <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-list-check mr-1"></i> <?= t('checklists') ?> (<?= count($checklists) ?>)</h3>
+        <h3 class="card-title"><i class="fas fa-list-check mr-1"></i> <?= t('checklists') ?> (<?= number_format($totalChecklists ?? count($checklists)) ?>)</h3>
         <div class="card-tools">
             <a href="<?= url('patching/' . $s['id'] . '/computers') ?>" class="btn btn-info btn-sm">
                 <i class="fas fa-laptop-code"></i> <?= t('view_patch_list') ?>
@@ -125,11 +125,11 @@ $pct = $s['total_aset'] > 0 ? round(($s['done_aset'] / $s['total_aset']) * 100) 
                 </tr></thead>
                 <tbody>
                 <?php foreach ($checklists as $c):
-                    // hitung progress item
-                    $items = PatchChecklist::items($c['id']);
-                    $tot = count($items);
-                    $dn = count(array_filter($items, fn($i)=>(int)$i['is_checked']===1));
-                    $ip = $tot>0 ? round(($dn/$tot)*100) : 0;
+                    // Progress di-pre-load batch (hindari N+1 query)
+                    $p = $progress[$c['id']] ?? ['done' => 0, 'total' => 0];
+                    $dn = $p['done'];
+                    $tot = $p['total'];
+                    $ip = $tot > 0 ? round(($dn / $tot) * 100) : 0;
                 ?>
                     <tr>
                         <td class="asset-code"><?= e($c['asset_code']) ?></td>
@@ -158,6 +158,33 @@ $pct = $s['total_aset'] > 0 ? round(($s['done_aset'] / $s['total_aset']) * 100) 
                 </tbody>
             </table>
         </div>
+        <?php if (($totalPages ?? 1) > 1): ?>
+        <div class="card-footer">
+            <nav><ul class="pagination pagination-sm justify-content-center mb-0">
+                <?php
+                $pbase = url('patching/' . $s['id']) . '?';
+                $tp = $totalPages ?? 1;
+                $window = 5;
+                $pstart = max(1, $page - $window);
+                $pend = min($tp, $page + $window);
+                ?>
+                <li class="page-item <?= $page<=1?'disabled':'' ?>"><a class="page-link" href="<?= $pbase ?>page=<?= $page-1 ?>">&laquo;</a></li>
+                <?php if ($pstart > 1): ?>
+                    <li class="page-item"><a class="page-link" href="<?= $pbase ?>page=1">1</a></li>
+                    <?php if ($pstart > 2): ?><li class="page-item disabled"><span class="page-link">&hellip;</span></li><?php endif; ?>
+                <?php endif; ?>
+                <?php for ($i=$pstart; $i<=$pend; $i++): ?>
+                    <li class="page-item <?= $i===$page?'active':'' ?>"><a class="page-link" href="<?= $pbase ?>page=<?= $i ?>"><?= $i ?></a></li>
+                <?php endfor; ?>
+                <?php if ($pend < $tp): ?>
+                    <?php if ($pend < $tp - 1): ?><li class="page-item disabled"><span class="page-link">&hellip;</span></li><?php endif; ?>
+                    <li class="page-item"><a class="page-link" href="<?= $pbase ?>page=<?= $tp ?>"><?= $tp ?></a></li>
+                <?php endif; ?>
+                <li class="page-item <?= $page>=$tp?'disabled':'' ?>"><a class="page-link" href="<?= $pbase ?>page=<?= $page+1 ?>">&raquo;</a></li>
+            </ul></nav>
+            <div class="text-center text-muted small mt-1"><?= t('showing') ?> <?= number_format(($page-1)*$perPage+1) ?>–<?= number_format(min($page*$perPage, $totalChecklists)) ?> <?= t('of') ?> <?= number_format($totalChecklists) ?></div>
+        </div>
+        <?php endif; ?>
         <?php endif; ?>
     </div>
 </div>
