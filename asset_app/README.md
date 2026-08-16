@@ -284,12 +284,19 @@ Akses `http://localhost:8080/setup` sekali untuk reset password.
 
 | Masalah | Solusi |
 |---------|--------|
+| `unable to open database file` (SQLite) | Folder `database/` tidak writable oleh web server. Jalankan: `chmod -R 775 database` (atau `chown` ke user web server `daemon`/`nobody`/`www-data`). Versi terbaru sudah auto-`chmod`, tapi bila web server tidak punya izin ubah izin folder, lakukan manual. |
 | Grafik kosong | Cek koneksi internet (CDN ApexCharts) |
 | Login gagal/locked | Rate limit: tunggu 15 menit atau `/setup` |
 | Foto tidak upload | Folder `public/uploads/assets` writable (775) |
 | 404 semua halaman | Jalankan via `php -S ... public/index.php` |
 | Dark mode tidak persist | Clear cookie, toggle ulang |
 | API 401 | Sertakan token: `?token=YOUR_TOKEN` |
+
+> 📌 **Folder yang harus writable** (mode SQLite demo & produksi):
+> - `database/` — file SQLite `asset_db.sqlite` dibuat di sini
+> - `public/uploads/assets/` — upload foto aset
+>
+> Bila deploy di XAMPP/Apache/Nginx, pastikan user web server (`daemon`, `nobody`, `www-data`) bisa menulis ke kedua folder di atas.
 
 ---
 

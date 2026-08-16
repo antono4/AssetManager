@@ -38,6 +38,8 @@ PHP native asset management app with AdminLTE 3 UI. Located at `/workspace/proje
 - `?? === ` precedence bug: `(self::user()['role'] ?? null) === 'admin'` needs parentheses
 - SQLite uses `AUTOINCREMENT` (no underscore) and must follow `PRIMARY KEY` directly: `id INTEGER PRIMARY KEY AUTOINCREMENT`. MySQL uses `AUTO_INCREMENT` with separate `PRIMARY KEY (id)` line. The migratePatching() helper handles both via driver detection.
 - DB migrations for new features: run via `ensureSchema()` → `migratePatching()` (idempotent, CREATE TABLE IF NOT EXISTS). Existing DBs get new tables without re-seed.
+- SQLite permission gotcha: folder `database/` HARUS writable oleh user web server (XAMPP/Apache jalan sebagai `daemon`/`nobody`, Nginx+PHP-FPM sebagai `www-data`). Bila tidak writable → error `SQLSTATE[HY000] [14] unable to open database file`. Folder `database/` sering sudah ada (berisi `assets_app.sql`) saat diekstrak, sehingga `mkdir()` di `Database::conn()` tidak dipanggil dan izin default dipakai. Solusi: `chmod 775 database` + `chown` ke user web server. Kode `Database::conn()` kini auto-`chmod` folder (0777) & file DB (0666) bila tidak writable, tapi ini gagal bila PHP/web server sendiri tidak punya izin ubah izin → set manual tetap perlu.
+- Folder writable yang perlu dijaga: `database/` (SQLite file) dan `public/uploads/assets/` (foto aset).
 
 ## Patching Module (Jadwal & Checklist per 3 bulan/kuartal)
 - Tables: patch_items (template), patch_schedules (kuartal Q1-Q4), patch_checklists (per aset per jadwal), patch_checklist_items (centangan)

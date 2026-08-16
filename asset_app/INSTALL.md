@@ -36,7 +36,14 @@ php -m | grep -E "pdo|sqlite|mbstring|fileinfo|json"
 Dibutuhkan: `pdo`, `pdo_sqlite` (demo), `pdo_mysql` (produksi), `mbstring`, `fileinfo`, `json`.
 
 ### Folder writable
+- `database/` — file SQLite `asset_db.sqlite` dibuat di sini (mode demo). `chmod 775`
 - `public/uploads/assets/` — untuk upload foto aset (chmod 775)
+
+> ⚠️ Bila deploy di web server (XAMPP/Apache/Nginx), pastikan user web server (`daemon`/`nobody`/`www-data`) bisa menulis ke kedua folder di atas. Versi terbaru aplikasi sudah auto-`chmod`, tapi bila web server tidak punya izin ubah izin folder, set manual:
+> ```bash
+> chmod -R 775 database public/uploads/assets
+> chown -R daemon:daemon database public/uploads/assets   # XAMPP Linux
+> ```
 
 ---
 
@@ -284,6 +291,7 @@ tar -czf backup_photos.tar.gz public/uploads/assets/
 
 | Masalah | Solusi |
 |---------|--------|
+| `unable to open database file` (SQLite) | Folder `database/` tidak writable oleh web server. Jalankan: `chmod -R 775 database` (atau `chown` ke user web server `daemon`/`nobody`/`www-data`). Versi terbaru sudah auto-`chmod`, tapi bila web server tidak punya izin ubah izin folder, lakukan manual. |
 | "PHP tidak ditemukan" | `sudo apt install php php-cli php-sqlite3 php-mysql php-mbstring` |
 | Permission denied uploads | `chmod -R 775 public/uploads/` |
 | Could not connect MySQL | Cek MySQL berjalan & kredensial |

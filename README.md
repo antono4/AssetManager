@@ -192,11 +192,19 @@ DB_DRIVER=mysql DB_HOST=127.0.0.1 DB_NAME=asset_db DB_USER=root DB_PASS=secret \
 Lihat panduan lengkap: **[XAMPP_Installation_Guide.pdf](asset_app/XAMPP_Installation_Guide.pdf)**
 
 Ringkasan:
+
 1. Install XAMPP → start Apache & MySQL
 2. Copy folder `asset_app` ke `C:\xampp\htdocs\`
 3. Buat database `asset_db` via phpMyAdmin → import `assets_app.sql`
-4. Akses `http://localhost/asset_app/public/setup` → reset password
-5. Login `admin` / `admin123`
+4. **Set permission folder** (penting!):
+   ```bash
+   # Linux/macOS XAMPP — biar Apache (user daemon) bisa tulis
+   chmod -R 775 asset_app/database asset_app/public/uploads/assets
+   chown -R daemon:daemon asset_app/database asset_app/public/uploads/assets
+   ```
+   Pada Windows XAMPP, izin file mengikuti user Windows dan biasanya tidak perlu diatur manual.
+5. Akses `http://localhost/asset_app/public/setup` → reset password
+6. Login `admin` / `admin123`
 
 ---
 
@@ -328,12 +336,19 @@ GET /api/assets?token=YOUR_TOKEN
 
 | Masalah | Solusi |
 |---------|--------|
+| `unable to open database file` (SQLite) | Folder `database/` tidak writable oleh web server. Jalankan: `chmod -R 775 asset_app/database` (atau `chown` ke user web server `daemon`/`nobody`/`www-data`). Versi terbaru sudah auto-`chmod`, tapi bila web server tidak punya izin ubah izin folder, lakukan manual. |
 | Grafik kosong | Cek koneksi internet (CDN ApexCharts) |
 | Login gagal/locked | Rate limit: tunggu 15 menit atau `/setup` |
-| Foto tidak upload | Folder `uploads/assets` writable (775) |
+| Foto tidak upload | Folder `public/uploads/assets` writable (775) |
 | 404 semua halaman | Akses via `php -S ... public/index.php` |
 | API 401 | Sertakan token: `?token=YOUR_TOKEN` |
 | ERR_FAILED login | Clear browser cache/service worker |
+
+> 📌 **Folder yang harus writable** (mode SQLite demo & produksi):
+> - `asset_app/database/` — file SQLite `asset_db.sqlite` dibuat di sini
+> - `asset_app/public/uploads/assets/` — upload foto aset
+>
+> Bila deploy di XAMPP/Apache/Nginx, pastikan user web server (`daemon`, `nobody`, `www-data`) bisa menulis ke kedua folder di atas.
 
 ---
 

@@ -25,6 +25,16 @@ class Database
                     if (!is_dir($dir)) {
                         mkdir($dir, 0777, true);
                     }
+                    // Pastikan folder database writable oleh web server (XAMPP/Apache
+                    // sering jalan sebagai daemon/nobody). Bila tidak writable, coba
+                    // perbaiki izin — mencegah error "unable to open database file".
+                    if (!is_writable($dir)) {
+                        @chmod($dir, 0777);
+                    }
+                    // Bila file DB sudah ada tapi read-only, perbaiki agar bisa ditulis.
+                    if (is_file(SQLITE_PATH) && !is_writable(SQLITE_PATH)) {
+                        @chmod(SQLITE_PATH, 0666);
+                    }
                     self::$instance = new PDO('sqlite:' . SQLITE_PATH, null, null, [
                         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
