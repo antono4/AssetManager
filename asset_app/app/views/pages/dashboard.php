@@ -92,10 +92,11 @@ $s = $stats;
             </div>
             <div class="card-body p-0">
                 <table class="table table-striped table-sm mb-0">
-                    <thead><tr><th><?= t('asset_code') ?></th><th><?= t('name') ?></th><th><?= t('status') ?></th></tr></thead>
+                    <thead><tr><th width="50"><?= t('photo') ?></th><th><?= t('asset_code') ?></th><th><?= t('name') ?></th><th><?= t('status') ?></th></tr></thead>
                     <tbody>
                     <?php foreach ($recentAssets as $a): ?>
                         <tr data-href="<?= url('assets/' . $a['id']) ?>">
+                            <td class="text-center"><?= asset_photo_img($a['photo'] ?? null, 36) ?></td>
                             <td class="asset-code"><?= e($a['asset_code']) ?></td>
                             <td><?= e($a['name']) ?></td>
                             <td><?= status_badge($a['status']) ?></td>

@@ -166,11 +166,26 @@ class Database
             if (!in_array('patch_code', $cols, true)) {
                 $db->exec("ALTER TABLE patch_checklist_items ADD COLUMN patch_code VARCHAR(80) DEFAULT NULL");
             }
+            // Kolom photo pada assets (path foto aset)
+            $assetCols = $db->query("PRAGMA table_info(assets)")->fetchAll(PDO::FETCH_COLUMN, 1);
+            if (!in_array('photo', $assetCols, true)) {
+                $db->exec("ALTER TABLE assets ADD COLUMN photo VARCHAR(255) DEFAULT NULL");
+            }
         } else {
             $hasCol = $db->query("SHOW COLUMNS FROM patch_checklist_items LIKE 'patch_code'")->fetch();
             if (!$hasCol) {
                 $db->exec("ALTER TABLE patch_checklist_items ADD COLUMN patch_code VARCHAR(80) DEFAULT NULL AFTER notes");
             }
+            $hasPhoto = $db->query("SHOW COLUMNS FROM assets LIKE 'photo'")->fetch();
+            if (!$hasPhoto) {
+                $db->exec("ALTER TABLE assets ADD COLUMN photo VARCHAR(255) DEFAULT NULL AFTER location");
+            }
+        }
+
+        // Pastikan folder uploads ada
+        $uploadDir = PUBLIC_PATH . '/uploads/assets';
+        if (!is_dir($uploadDir)) {
+            @mkdir($uploadDir, 0777, true);
         }
 
         // Seed template item patching bila kosong

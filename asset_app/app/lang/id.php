@@ -239,6 +239,15 @@ return [
     'view_patch_list'    => 'Lihat Daftar Patch',
     'patched_items'      => 'Item Terpatch',
 
+    // Photo
+    'photo'              => 'Foto',
+    'upload_photo'       => 'Upload Foto',
+    'photo_hint'         => 'File gambar (JPG, PNG, GIF, WebP). Maks 5MB.',
+    'current_photo'      => 'Foto Saat Ini',
+    'remove_photo'       => 'Hapus Foto',
+    'photo_removed'      => 'Foto berhasil dihapus.',
+    'no_photo'           => 'Tidak ada foto',
+
     // Misc
     'access_denied'      => 'Akses ditolak. Halaman khusus admin.',
     'page_not_found'     => '404 - Tidak Ditemukan',

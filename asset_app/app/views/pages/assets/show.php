@@ -9,9 +9,7 @@ $a = $asset;
             </div>
             <div class="card-body">
                 <div class="text-center mb-3">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-info" style="width:90px;height:90px;border-radius:12px">
-                        <i class="fas fa-box text-white" style="font-size:2.5rem"></i>
-                    </div>
+                    <?= asset_photo_img($a['photo'] ?? null, 110, 'mb-2') ?>
                     <h4 class="mt-2 mb-0"><?= e($a['name']) ?></h4>
                     <p class="text-muted asset-code"><?= e($a['asset_code']) ?></p>
                     <?= status_badge($a['status']) ?>

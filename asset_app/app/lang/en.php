@@ -239,6 +239,15 @@ return [
     'view_patch_list'    => 'View Patch List',
     'patched_items'      => 'Patched Items',
 
+    // Photo
+    'photo'              => 'Photo',
+    'upload_photo'       => 'Upload Photo',
+    'photo_hint'         => 'Image file (JPG, PNG, GIF, WebP). Max 5MB.',
+    'current_photo'      => 'Current Photo',
+    'remove_photo'       => 'Remove Photo',
+    'photo_removed'      => 'Photo removed successfully.',
+    'no_photo'           => 'No photo',
+
     // Misc
     'access_denied'      => 'Access denied. Admin only page.',
     'page_not_found'     => '404 - Not Found',

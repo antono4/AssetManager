@@ -86,6 +86,7 @@ Router::get('/assets/{id}/edit', fn($p) => $assetCtl->edit($p));
 Router::post('/assets/{id}',   fn($p) => $assetCtl->update($p));
 Router::post('/assets/{id}/delete', fn($p) => $assetCtl->delete($p));
 Router::post('/assets/{id}/status', fn($p) => $assetCtl->status($p));
+Router::post('/assets/{id}/remove-photo', fn($p) => $assetCtl->removePhoto($p));
 
 // Categories
 Router::get('/categories',     fn() => $catCtl->index());

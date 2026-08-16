@@ -130,4 +130,14 @@ class AssetController
         Flash::set('success', t('status_changed'));
         Auth::redirect(BASE_URL . '/assets/' . $id);
     }
+
+    // Hapus foto aset
+    public function removePhoto(array $p)
+    {
+        Auth::requireAdmin();
+        $id = (int)$p['id'];
+        Asset::removePhoto($id);
+        Flash::set('success', t('photo_removed'));
+        Auth::redirect(BASE_URL . '/assets/' . $id . '/edit');
+    }
 }

@@ -151,6 +151,28 @@ function price_hidden($value): string
     return Auth::isAdmin() ? rp($value) : '-';
 }
 
+// URL foto aset (absolute path dari BASE_URL). Bila tidak ada foto, return null.
+function asset_photo_url(?string $photo): ?string
+{
+    if (!$photo) {
+        return null;
+    }
+    return BASE_URL . '/' . $photo;
+}
+
+// Tag <img> foto aset dengan fallback icon bila tidak ada foto.
+// $size = px (default 80). $cls = class tambahan.
+function asset_photo_img(?string $photo, int $size = 80, string $cls = ''): string
+{
+    $url = asset_photo_url($photo);
+    if ($url) {
+        return '<img src="' . e($url) . '" alt="photo" class="asset-photo ' . e($cls) . '" style="width:' . $size . 'px;height:' . $size . 'px;object-fit:cover;border-radius:8px">';
+    }
+    return '<div class="asset-photo-placeholder d-inline-flex align-items-center justify-content-center bg-secondary ' . e($cls) . '" style="width:' . $size . 'px;height:' . $size . 'px;border-radius:8px">'
+         . '<i class="fas fa-image text-white" style="font-size:' . round($size * 0.4) . 'px"></i>'
+         . '</div>';
+}
+
 function old(string $key, $default = ''): string
 {
     return e($_SESSION['old'][$key] ?? $default);

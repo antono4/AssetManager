@@ -4,7 +4,7 @@ $isEdit = $action === 'edit';
 ?>
 <div class="card card-primary">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-<?= $isEdit?'edit':'plus' ?> mr-1"></i> <?= $isEdit ? t('edit_asset') : t('add_new_asset') ?></h3></div>
-    <form method="post" action="<?= $isEdit ? url('assets/' . $a['id']) : url('assets') ?>">
+    <form method="post" action="<?= $isEdit ? url('assets/' . $a['id']) : url('assets') ?>" enctype="multipart/form-data">
         <div class="card-body">
             <?php if (!$isEdit): ?>
             <div class="form-group">
@@ -17,6 +17,29 @@ $isEdit = $action === 'edit';
                 <input type="text" class="form-control" value="<?= e($a['asset_code']) ?>" disabled>
             </div>
             <?php endif; ?>
+
+            <?php if ($isEdit && !empty($a['photo'])): ?>
+            <div class="form-group">
+                <label><?= t('current_photo') ?></label>
+                <div class="d-flex align-items-center">
+                    <img src="<?= e(asset_photo_url($a['photo'])) ?>" class="mr-3" style="width:100px;height:100px;object-fit:cover;border-radius:8px;border:1px solid #dee2e6">
+                    <form action="<?= url('assets/' . $a['id'] . '/remove-photo') ?>" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm btn-delete" data-confirm="<?= t('remove_photo') ?>?">
+                            <i class="fas fa-trash"></i> <?= t('remove_photo') ?>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <div class="form-group">
+                <label><?= t('photo') ?></label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-image"></i></span></div>
+                    <input type="file" name="photo" class="form-control" accept="image/jpeg,image/png,image/gif,image/webp">
+                </div>
+                <small class="text-muted"><?= t('photo_hint') ?></small>
+            </div>
 
             <div class="row">
                 <div class="col-md-8">

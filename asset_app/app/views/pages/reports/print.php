@@ -82,10 +82,11 @@ $filterDesc = ReportController::describeFilters($f);
 <div class="report-section">
     <h4><i class="fas fa-list"></i> <?= t('asset_detail_list') ?> (<?= count($assets) ?>)</h4>
     <table class="report-table">
-        <thead><tr><th><?= t('asset_code') ?></th><th><?= t('name') ?></th><th><?= t('category') ?></th><th><?= t('location') ?></th><th><?= t('purchase_date') ?></th><th><?= t('status') ?></th><?php if (price_visible()): ?><th class="text-right"><?= t('price') ?></th><?php endif; ?></tr></thead>
+        <thead><tr><th width="40"><?= t('photo') ?></th><th><?= t('asset_code') ?></th><th><?= t('name') ?></th><th><?= t('category') ?></th><th><?= t('location') ?></th><th><?= t('purchase_date') ?></th><th><?= t('status') ?></th><?php if (price_visible()): ?><th class="text-right"><?= t('price') ?></th><?php endif; ?></tr></thead>
         <tbody>
         <?php $totalNilai = 0.0; foreach ($assets as $a): $totalNilai += (float)$a['price']; ?>
             <tr>
+                <td><?= asset_photo_img($a['photo'] ?? null, 30) ?></td>
                 <td><?= e($a['asset_code']) ?></td>
                 <td><?= e($a['name']) ?><br><small class="text-muted"><?= e($a['brand_spec']) ?></small></td>
                 <td><?= e($a['category_name']) ?></td>

@@ -51,6 +51,7 @@
             <table class="table table-hover table-assets">
                 <thead>
                 <tr>
+                    <th width="60"><?= t('photo') ?></th>
                     <th><?= t('asset_code') ?></th><th><?= t('name') ?></th><th><?= t('category') ?></th><th><?= t('location') ?></th>
                     <th><?= t('status') ?></th><?php if (price_visible()): ?><th class="text-right"><?= t('price') ?></th><?php endif; ?><th class="text-center"><?= t('action') ?></th>
                 </tr>
@@ -58,6 +59,7 @@
                 <tbody>
                 <?php foreach ($assets as $a): ?>
                     <tr data-href="<?= url('assets/' . $a['id']) ?>">
+                        <td class="text-center"><?= asset_photo_img($a['photo'] ?? null, 44) ?></td>
                         <td class="asset-code"><?= e($a['asset_code']) ?></td>
                         <td><?= e($a['name']) ?><br><small class="text-muted"><?= e($a['brand_spec']) ?></small></td>
                         <td><span class="badge badge-light"><?= e($a['category_name']) ?></span></td>

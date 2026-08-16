@@ -1,6 +1,10 @@
 # Database SQLite (auto-generated untuk demo)
 asset_app/database/*.sqlite
 
+# Uploads (jangan commit file foto user, tapi keep folder)
+asset_app/public/uploads/assets/*
+!asset_app/public/uploads/assets/.gitkeep
+
 # Log
 *.log
 /tmp/

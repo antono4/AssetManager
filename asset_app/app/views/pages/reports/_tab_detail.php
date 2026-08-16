@@ -6,13 +6,14 @@
         <table class="table table-striped table-hover mb-0">
             <thead>
             <tr>
-                <th><?= t('asset_code') ?></th><th><?= t('name') ?></th><th><?= t('category') ?></th><th><?= t('brand_spec') ?></th>
+                <th width="50"><?= t('photo') ?></th><th><?= t('asset_code') ?></th><th><?= t('name') ?></th><th><?= t('category') ?></th><th><?= t('brand_spec') ?></th>
                 <th><?= t('location') ?></th><th><?= t('purchase_date') ?></th><th><?= t('status') ?></th><?php if (price_visible()): ?><th class="text-right"><?= t('price') ?></th><?php endif; ?>
             </tr>
             </thead>
             <tbody>
             <?php $totalNilai = 0.0; foreach ($assets as $a): $totalNilai += (float)$a['price']; ?>
             <tr>
+                <td class="text-center"><?= asset_photo_img($a['photo'] ?? null, 36) ?></td>
                 <td class="asset-code"><?= e($a['asset_code']) ?></td>
                 <td><?= e($a['name']) ?></td>
                 <td><span class="badge badge-light"><?= e($a['category_name']) ?></span></td>

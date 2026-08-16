@@ -93,3 +93,9 @@
 @media (max-width: 575.98px) {
     .small-box .icon { font-size: 3rem !important; }
 }
+
+/* Foto aset */
+.asset-photo { border: 1px solid #dee2e6; }
+.asset-photo-placeholder { background: #e9ecef !important; }
+.asset-photo-placeholder i { opacity: .6; }
+.table td .asset-photo, .table td .asset-photo-placeholder { border: 1px solid #dee2e6; }

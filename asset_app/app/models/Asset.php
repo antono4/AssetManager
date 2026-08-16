@@ -64,11 +64,12 @@ class Asset
     public static function create(array $d): int
     {
         $code = self::generateCode();
+        $photo = self::handleUpload();
         Database::query(
-            "INSERT INTO assets (asset_code, name, category_id, brand_spec, location, status, purchase_date, price)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO assets (asset_code, name, category_id, brand_spec, location, status, purchase_date, price, photo)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             [$code, $d['name'], (int)$d['category_id'], $d['brand_spec'] ?: null, $d['location'] ?: null,
-             $d['status'], $d['purchase_date'] ?: null, (float)$d['price']]
+             $d['status'], $d['purchase_date'] ?: null, (float)$d['price'], $photo]
         );
         $id = (int)Database::lastInsertId();
         AssetLog::add($id, Auth::id(), 'created', 'Aset baru ditambahkan: ' . $code);
@@ -78,10 +79,19 @@ class Asset
     public static function update(int $id, array $d): void
     {
         $old = self::find($id);
+        // Handle upload foto baru (bila ada)
+        $photo = $old['photo'] ?? null;
+        if (!empty($_FILES['photo']['name'])) {
+            // Hapus foto lama bila ada
+            if ($photo) {
+                self::deletePhotoFile($photo);
+            }
+            $photo = self::handleUpload();
+        }
         Database::query(
-            "UPDATE assets SET name=?, category_id=?, brand_spec=?, location=?, status=?, purchase_date=?, price=? WHERE id=?",
+            "UPDATE assets SET name=?, category_id=?, brand_spec=?, location=?, status=?, purchase_date=?, price=?, photo=? WHERE id=?",
             [$d['name'], (int)$d['category_id'], $d['brand_spec'] ?: null, $d['location'] ?: null,
-             $d['status'], $d['purchase_date'] ?: null, (float)$d['price'], $id]
+             $d['status'], $d['purchase_date'] ?: null, (float)$d['price'], $photo, $id]
         );
         $new = self::find($id);
         if ($old && $old['status'] !== $new['status']) {
@@ -95,7 +105,66 @@ class Asset
     {
         $asset = self::find($id);
         if ($asset) {
+            // Hapus file foto bila ada
+            if (!empty($asset['photo'])) {
+                self::deletePhotoFile($asset['photo']);
+            }
             Database::query("DELETE FROM assets WHERE id=?", [$id]);
+        }
+    }
+
+    // Hapus foto saja (bila user klik hapus foto)
+    public static function removePhoto(int $id): void
+    {
+        $asset = self::find($id);
+        if ($asset && !empty($asset['photo'])) {
+            self::deletePhotoFile($asset['photo']);
+            Database::query("UPDATE assets SET photo=NULL WHERE id=?", [$id]);
+        }
+    }
+
+    // Upload file foto, return path relatif atau null
+    public static function handleUpload(): ?string
+    {
+        if (empty($_FILES['photo']['name']) || $_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
+            return null;
+        }
+        $allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $_FILES['photo']['tmp_name']);
+        finfo_close($finfo);
+        if (!in_array($mime, $allowed, true)) {
+            return null;
+        }
+        // Maks 5MB
+        if ($_FILES['photo']['size'] > 5 * 1024 * 1024) {
+            return null;
+        }
+        $ext = match ($mime) {
+            'image/jpeg' => 'jpg',
+            'image/png'  => 'png',
+            'image/gif'  => 'gif',
+            'image/webp' => 'webp',
+            default      => 'img',
+        };
+        $name = 'asset_' . date('Ymd_His') . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+        $dest = PUBLIC_PATH . '/uploads/assets/' . $name;
+        if (move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
+            return 'uploads/assets/' . $name;
+        }
+        return null;
+    }
+
+    // Hapus file foto dari disk
+    public static function deletePhotoFile(?string $path): void
+    {
+        if (!$path) {
+            return;
+        }
+        $full = PUBLIC_PATH . '/' . $path;
+        // Safety: path harus di dalam uploads/assets
+        if (str_starts_with(realpath($full) ?: '', PUBLIC_PATH . '/uploads/assets') && is_file($full)) {
+            @unlink($full);
         }
     }
 
