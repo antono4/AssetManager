@@ -4,9 +4,14 @@
         <h3 class="card-title"><i class="fas fa-box mr-1"></i> <?= t('asset_list') ?> <small class="text-muted">(<?= $total ?> <?= t('data') ?>)</small></h3>
         <?php if (Auth::isAdmin()): ?>
         <div class="card-tools">
+            <a href="<?= url('assets/export?' . http_build_query(array_filter(['search'=>$search,'status'=>$status,'category'=>$category]))) ?>" class="btn btn-success btn-sm" title="<?= t('export_csv') ?>"><i class="fas fa-file-csv"></i> CSV</a>
             <a href="<?= url('assets/create') ?>" class="btn btn-primary btn-sm">
                 <i class="fas fa-plus"></i> <?= t('add_asset') ?>
             </a>
+        </div>
+        <?php else: ?>
+        <div class="card-tools">
+            <a href="<?= url('assets/export?' . http_build_query(array_filter(['search'=>$search,'status'=>$status,'category'=>$category]))) ?>" class="btn btn-success btn-sm" title="<?= t('export_csv') ?>"><i class="fas fa-file-csv"></i> CSV</a>
         </div>
         <?php endif; ?>
     </div>

@@ -6,7 +6,6 @@
 /** @var string $content */
 /** @var string $pageTitle */
 /** @var array $currentUser */
-use app\core\Auth;
 $u = $currentUser;
 $role = $u['role'] ?? 'guest';
 ?>
@@ -31,8 +30,14 @@ $role = $u['role'] ?? 'guest';
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?= asset_url('css/app.css') ?>">
     <link rel="stylesheet" href="<?= asset_url('css/dashboard.css') ?>">
+    <?php if (($_COOKIE['dark_mode'] ?? '0') === '1'): ?>
+    <link rel="stylesheet" href="<?= asset_url('css/darkmode.css') ?>">
+    <?php endif; ?>
+    <!-- PWA -->
+    <link rel="manifest" href="<?= BASE_URL ?>/manifest.json">
+    <meta name="theme-color" content="#2b3a55">
 </head>
-<body class="hold-transition sidebar-mini layout-navbar-fixed">
+<body class="hold-transition sidebar-mini layout-navbar-fixed<?= (($_COOKIE['dark_mode'] ?? '0') === '1') ? ' dark-mode' : '' ?>">
 <div class="wrapper">
 
     <!-- Navbar -->
@@ -41,15 +46,59 @@ $role = $u['role'] ?? 'guest';
             <li class="nav-item">
                 <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
             </li>
-            <li class="nav-item d-none d-sm-inline-block">
-                <a class="nav-link" href="<?= url('dashboard') ?>"><?= t('home') ?></a>
-            </li>
-            <li class="nav-item d-none d-sm-inline-block">
-                <a class="nav-link" href="<?= url('assets') ?>"><?= t('assets') ?></a>
+            <!-- Global Search -->
+            <li class="nav-item">
+                <form action="<?= url('search') ?>" method="get" class="form-inline ml-2">
+                    <div class="input-group input-group-sm" style="width:220px">
+                        <input type="text" name="q" class="form-control" placeholder="<?= t('global_search') ?>" value="<?= e($_GET['q'] ?? '') ?>">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                </form>
             </li>
         </ul>
 
         <ul class="navbar-nav ml-auto">
+            <?php
+            // Cek notifikasi overdue patching & generate jika perlu
+            $unreadNotif = 0;
+            $overdueBorrows = 0;
+            if (Auth::check()) {
+                try { Notification::checkPatchingDue(); } catch (Throwable $e) {}
+                try { $unreadNotif = Notification::unreadCount(Auth::id()); } catch (Throwable $e) {}
+                try { $overdueBorrows = count(Borrowing::overdue()); } catch (Throwable $e) {}
+            }
+            ?>
+            <!-- Notifications -->
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-toggle="dropdown" href="#" title="<?= t('notifications') ?>">
+                    <i class="far fa-bell"></i>
+                    <?php if ($unreadNotif > 0): ?><span class="badge badge-warning navbar-badge"><?= $unreadNotif ?></span><?php endif; ?>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <span class="dropdown-item dropdown-header"><?= $unreadNotif ?> <?= t('notifications') ?></span>
+                    <div class="dropdown-divider"></div>
+                    <a href="<?= url('notifications') ?>" class="dropdown-item">
+                        <i class="fas fa-bell mr-2 text-info"></i> <?= t('notifications') ?>
+                        <?php if ($unreadNotif > 0): ?><span class="float-right text-muted text-sm"><?= $unreadNotif ?> baru</span><?php endif; ?>
+                    </a>
+                    <?php if ($overdueBorrows > 0): ?>
+                    <a href="<?= url('borrowings') ?>" class="dropdown-item">
+                        <i class="fas fa-clock mr-2 text-danger"></i> <?= $overdueBorrows ?> <?= t('overdue_patching') ?>
+                    </a>
+                    <?php endif; ?>
+                    <div class="dropdown-divider"></div>
+                    <a href="<?= url('notifications') ?>" class="dropdown-item dropdown-footer"><?= t('view_details') ?></a>
+                </div>
+            </li>
+            <!-- Dark mode toggle -->
+            <li class="nav-item">
+                <a class="nav-link" href="<?= url('dark-mode') ?>" title="<?= (($_COOKIE['dark_mode'] ?? '0') === '1') ? t('light_mode') : t('dark_mode') ?>">
+                    <i class="fas fa-<?php echo (($_COOKIE['dark_mode'] ?? '0') === '1') ? 'sun' : 'moon'; ?>"></i>
+                </a>
+            </li>
+            <!-- Language -->
             <li class="nav-item dropdown">
                 <a class="nav-link" data-toggle="dropdown" href="#" title="<?= t('language') ?>">
                     <i class="fas fa-language"></i>
@@ -57,11 +106,11 @@ $role = $u['role'] ?? 'guest';
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
                     <a href="<?= url('language/set?lang=en') ?>" class="dropdown-item <?= Lang::is('en')?'active':'' ?>">
-                        <i class="flag-icon flag-icon-us mr-2"></i> English
+                        <span class="flag-icon flag-icon-us mr-2"></span> English
                         <?php if (Lang::is('en')): ?><i class="fas fa-check float-right"></i><?php endif; ?>
                     </a>
                     <a href="<?= url('language/set?lang=id') ?>" class="dropdown-item <?= Lang::is('id')?'active':'' ?>">
-                        <i class="flag-icon flag-icon-id mr-2"></i> Bahasa Indonesia
+                        <span class="flag-icon flag-icon-id mr-2"></span> Bahasa Indonesia
                         <?php if (Lang::is('id')): ?><i class="fas fa-check float-right"></i><?php endif; ?>
                     </a>
                 </div>
@@ -113,6 +162,11 @@ $role = $u['role'] ?? 'guest';
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="<?= url('borrowings') ?>" class="nav-link <?= $pageTitle === t('borrowing') ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-hand-paper"></i><p><?= t('borrowing') ?></p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="<?= url('logs') ?>" class="nav-link <?= $pageTitle === t('activity_log') ? 'active' : '' ?>">
                             <i class="nav-icon fas fa-history"></i><p><?= t('history') ?></p>
                         </a>
@@ -137,6 +191,26 @@ $role = $u['role'] ?? 'guest';
                     <li class="nav-item">
                         <a href="<?= url('users') ?>" class="nav-link <?= $pageTitle === t('user_list') ? 'active' : '' ?>">
                             <i class="nav-icon fas fa-users"></i><p><?= t('user_management') ?></p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= url('assets/trash') ?>" class="nav-link <?= $pageTitle === t('trash') ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-trash-restore"></i><p><?= t('trash') ?></p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= url('audit') ?>" class="nav-link <?= $pageTitle === t('audit_trail') ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-clipboard-list"></i><p><?= t('audit_trail') ?></p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= url('api-tokens') ?>" class="nav-link <?= $pageTitle === t('api_token') ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-key"></i><p><?= t('api_token') ?></p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= url('assets/import') ?>" class="nav-link <?= $pageTitle === t('import_assets') ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-file-import"></i><p><?= t('import_csv') ?></p>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -192,5 +266,11 @@ $role = $u['role'] ?? 'guest';
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.1/dist/apexcharts.min.js"></script>
 <script src="<?= asset_url('js/app.js') ?>"></script>
 <?= $scripts ?? '' ?>
+<script>
+// PWA Service Worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('<?= BASE_URL ?>/sw.js').catch(function(){});
+}
+</script>
 </body>
 </html>

@@ -10,7 +10,7 @@ class Asset
         $sql = "SELECT a.*, c.name AS category_name
                 FROM assets a
                 LEFT JOIN categories c ON c.id = a.category_id
-                WHERE 1=1";
+                WHERE a.deleted_at IS NULL";
         $params = [];
         if ($search !== '') {
             $sql .= " AND (a.asset_code LIKE ? OR a.name LIKE ? OR a.brand_spec LIKE ? OR a.location LIKE ?)";
@@ -34,7 +34,7 @@ class Asset
 
     public static function count(string $search = '', string $status = '', string $category = ''): int
     {
-        $sql = "SELECT COUNT(*) FROM assets a WHERE 1=1";
+        $sql = "SELECT COUNT(*) FROM assets a WHERE a.deleted_at IS NULL";
         $params = [];
         if ($search !== '') {
             $sql .= " AND (a.asset_code LIKE ? OR a.name LIKE ? OR a.brand_spec LIKE ? OR a.location LIKE ?)";
@@ -57,8 +57,47 @@ class Asset
         return Database::fetch(
             "SELECT a.*, c.name AS category_name
              FROM assets a LEFT JOIN categories c ON c.id = a.category_id
-             WHERE a.id = ?", [$id]
+             WHERE a.id = ? AND a.deleted_at IS NULL", [$id]
         );
+    }
+
+    // Aset yang sudah di-soft-delete (trash)
+    public static function trashed(): array
+    {
+        return Database::fetchAll(
+            "SELECT a.*, c.name AS category_name
+             FROM assets a LEFT JOIN categories c ON c.id = a.category_id
+             WHERE a.deleted_at IS NOT NULL ORDER BY a.deleted_at DESC"
+        );
+    }
+
+    // Soft delete: pindahkan ke trash
+    public static function softDelete(int $id): void
+    {
+        Database::query("UPDATE assets SET deleted_at=? WHERE id=?", [date('Y-m-d H:i:s'), $id]);
+        AssetLog::add($id, Auth::id(), 'soft_deleted', 'Aset dipindahkan ke sampah');
+        AuditTrail::log('asset', 'soft_delete', $id, 'Asset moved to trash: #' . $id);
+    }
+
+    // Restore dari trash
+    public static function restore(int $id): void
+    {
+        Database::query("UPDATE assets SET deleted_at=NULL WHERE id=?", [$id]);
+        AssetLog::add($id, Auth::id(), 'restored', 'Aset dipulihkan dari sampah');
+        AuditTrail::log('asset', 'restore', $id, 'Asset restored: #' . $id);
+    }
+
+    // Hapus permanen (dari trash)
+    public static function forceDelete(int $id): void
+    {
+        $asset = Database::fetch("SELECT * FROM assets WHERE id=?", [$id]);
+        if ($asset) {
+            if (!empty($asset['photo'])) {
+                self::deletePhotoFile($asset['photo']);
+            }
+            Database::query("DELETE FROM assets WHERE id=?", [$id]);
+            AuditTrail::log('asset', 'force_delete', $id, 'Asset permanently deleted: #' . $id);
+        }
     }
 
     public static function create(array $d): int
@@ -103,14 +142,117 @@ class Asset
 
     public static function delete(int $id): void
     {
-        $asset = self::find($id);
-        if ($asset) {
-            // Hapus file foto bila ada
-            if (!empty($asset['photo'])) {
-                self::deletePhotoFile($asset['photo']);
-            }
-            Database::query("DELETE FROM assets WHERE id=?", [$id]);
+        // Soft delete: pindahkan ke trash, jangan hapus permanen
+        self::softDelete($id);
+    }
+
+    // Export semua aset ke format CSV
+    public static function exportCsv(string $search = '', string $status = '', string $category = ''): string
+    {
+        $assets = self::all($search, $status, $category, 0, 0);
+        $out = "asset_code,name,category,brand_spec,location,status,purchase_date,price,currency\n";
+        foreach ($assets as $a) {
+            $row = [
+                $a['asset_code'], $a['name'], $a['category_name'],
+                $a['brand_spec'] ?? '', $a['location'] ?? '', $a['status'],
+                $a['purchase_date'] ?? '', $a['price'], $a['currency'] ?? 'IDR'
+            ];
+            $out .= implode(',', array_map(fn($v) => '"' . str_replace('"', '""', $v) . '"', $row)) . "\n";
         }
+        return $out;
+    }
+
+    // Hitung nilai penyusutan (depreciation) aset
+    public static function depreciation(array $asset): array
+    {
+        $price = (float)$asset['price'];
+        $usefulLife = (int)($asset['useful_life'] ?? 5);
+        $purchaseDate = $asset['purchase_date'] ?? date('Y-m-d');
+        $salvage = $price * 0.1; // nilai residu 10%
+        $depreciable = $price - $salvage;
+        $yearsElapsed = (time() - strtotime($purchaseDate)) / (365.25 * 24 * 3600);
+        $yearsElapsed = max(0, $yearsElapsed);
+        $annualDepreciation = $usefulLife > 0 ? $depreciable / $usefulLife : 0;
+        $accumulatedDepreciation = min($depreciable, $annualDepreciation * $yearsElapsed);
+        $bookValue = max($salvage, $price - $accumulatedDepreciation);
+        return [
+            'price' => $price,
+            'salvage_value' => $salvage,
+            'useful_life' => $usefulLife,
+            'annual_depreciation' => $annualDepreciation,
+            'years_elapsed' => round($yearsElapsed, 2),
+            'accumulated_depreciation' => $accumulatedDepreciation,
+            'book_value' => $bookValue,
+        ];
+    }
+
+    // Global search: aset, user, kategori, jadwal patching
+    public static function globalSearch(string $q): array
+    {
+        $kw = "%$q%";
+        $assets = Database::fetchAll(
+            "SELECT id, asset_code, name, 'asset' AS type FROM assets WHERE deleted_at IS NULL AND (asset_code LIKE ? OR name LIKE ?) LIMIT 10",
+            [$kw, $kw]
+        );
+        $users = Database::fetchAll(
+            "SELECT id, username AS title, name AS sub, 'user' AS type FROM users WHERE username LIKE ? OR name LIKE ? LIMIT 5",
+            [$kw, $kw]
+        );
+        $categories = Database::fetchAll(
+            "SELECT id, name AS title, description AS sub, 'category' AS type FROM categories WHERE name LIKE ? LIMIT 5",
+            [$kw]
+        );
+        $schedules = Database::fetchAll(
+            "SELECT id, name AS title, CONCAT('Q', quarter, ' ', year) AS sub, 'patching' AS type FROM patch_schedules WHERE name LIKE ? LIMIT 5",
+            [$kw]
+        );
+        return ['assets' => $assets, 'users' => $users, 'categories' => $categories, 'patching' => $schedules];
+    }
+
+    // Import aset dari CSV
+    public static function importCsv(string $csvContent): int
+    {
+        $lines = self::parseCsv($csvContent);
+        if (count($lines) < 2) {
+            return 0;
+        }
+        // skip header
+        $imported = 0;
+        for ($i = 1; $i < count($lines); $i++) {
+            $row = $lines[$i];
+            if (count($row) < 2) continue;
+            $name = trim($row[0] ?? '');
+            $catName = trim($row[1] ?? '');
+            if ($name === '') continue;
+            // cari kategori by name
+            $cat = Database::fetch("SELECT id FROM categories WHERE name=?", [$catName]);
+            $catId = $cat ? (int)$cat['id'] : 1;
+            $code = self::generateCode();
+            $brand = trim($row[2] ?? '');
+            $location = trim($row[3] ?? '');
+            $status = trim($row[4] ?? 'tersedia');
+            if (!in_array($status, ['tersedia','dipinjam','rusak'])) $status = 'tersedia';
+            $pdate = trim($row[5] ?? '') ?: null;
+            $price = (float)($row[6] ?? 0);
+            Database::query(
+                "INSERT INTO assets (asset_code, name, category_id, brand_spec, location, status, purchase_date, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                [$code, $name, $catId, $brand ?: null, $location ?: null, $status, $pdate, $price]
+            );
+            $imported++;
+        }
+        return $imported;
+    }
+
+    // Parse CSV string ke array of rows
+    private static function parseCsv(string $csv): array
+    {
+        $rows = [];
+        $lines = preg_split('/\r\n|\r|\n/', trim($csv));
+        foreach ($lines as $line) {
+            if ($line === '') continue;
+            $rows[] = str_getcsv($line, ',', '"', '\\');
+        }
+        return $rows;
     }
 
     // Hapus foto saja (bila user klik hapus foto)

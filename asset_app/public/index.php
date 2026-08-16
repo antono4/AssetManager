@@ -73,6 +73,48 @@ Router::get('/language/set', function () {
     Auth::redirect($back);
 });
 
+// Dark mode toggle
+Router::get('/dark-mode', fn() => (new ExtendedController())->darkMode());
+
+// Global search
+Router::get('/search', fn() => (new ExtendedController())->search());
+
+// Export & Import CSV
+Router::get('/assets/export', fn() => (new ExtendedController())->exportCsv());
+Router::get('/assets/import', fn() => (new ExtendedController())->importForm());
+Router::post('/assets/import', fn() => (new ExtendedController())->import());
+Router::get('/assets/csv-template', fn() => (new ExtendedController())->csvTemplate());
+
+// Trash (soft delete)
+Router::get('/assets/trash', fn() => (new ExtendedController())->trash());
+Router::post('/assets/{id}/restore', fn($p) => (new ExtendedController())->restore($p));
+Router::post('/assets/{id}/force-delete', fn($p) => (new ExtendedController())->forceDelete($p));
+
+// Borrowing
+Router::get('/borrowings', fn() => (new ExtendedController())->borrowings());
+Router::get('/assets/{id}/borrow', fn($p) => (new ExtendedController())->borrowForm($p));
+Router::post('/assets/{id}/borrow', fn($p) => (new ExtendedController())->borrow($p));
+Router::post('/borrowings/{id}/return', fn($p) => (new ExtendedController())->returnAsset($p));
+
+// Notifications
+Router::get('/notifications', fn() => (new ExtendedController())->notifications());
+Router::post('/notifications/{id}/read', fn($p) => (new ExtendedController())->markNotifRead($p));
+Router::post('/notifications/read-all', fn() => (new ExtendedController())->markAllNotifRead());
+
+// Audit Trail
+Router::get('/audit', fn() => (new ExtendedController())->audit());
+
+// API Tokens
+Router::get('/api-tokens', fn() => (new ExtendedController())->apiTokens());
+Router::post('/api-tokens', fn() => (new ExtendedController())->generateToken());
+Router::post('/api-tokens/{id}/delete', fn($p) => (new ExtendedController())->deleteToken($p));
+
+// REST API endpoint
+Router::get('/api/assets', fn() => (new ExtendedController())->apiAssets());
+
+// Activity by user
+Router::get('/users/{id}/activity', fn($p) => (new ExtendedController())->activityByUser($p));
+
 // Dashboard
 Router::get('/',         fn() => $dash->index());
 Router::get('/dashboard', fn() => $dash->index());

@@ -188,6 +188,9 @@ class Database
             @mkdir($uploadDir, 0777, true);
         }
 
+        // Migrasi kolom tambahan & tabel fitur baru
+        self::migrateExtended($db, $sqlite);
+
         // Seed template item patching bila kosong
         $cnt = (int)$db->query("SELECT COUNT(*) FROM patch_items")->fetchColumn();
         if ($cnt === 0) {
@@ -202,6 +205,98 @@ class Database
             $stmt = $db->prepare("INSERT INTO patch_items (name, description, sort_order, is_active) VALUES (?, ?, ?, 1)");
             foreach ($defaults as $it) {
                 $stmt->execute($it);
+            }
+        }
+    }
+
+    // Migrasi tabel & kolom fitur baru (soft delete, audit, API token, borrow, notif, depreciation)
+    private static function migrateExtended(PDO $db, bool $sqlite): void
+    {
+        $int = $sqlite ? 'INTEGER' : 'INT UNSIGNED';
+        $text = $sqlite ? 'TEXT' : 'TEXT';
+        $dt = $sqlite ? 'TEXT' : 'DATETIME';
+        $tail = $sqlite ? '' : ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
+        $tiny = $sqlite ? 'INTEGER' : 'TINYINT(1)';
+        $idCol = $sqlite ? 'id INTEGER PRIMARY KEY AUTOINCREMENT' : 'id INT UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY (id)';
+
+        // Kolom deleted_at pada assets (soft delete)
+        if ($sqlite) {
+            $aCols = $db->query("PRAGMA table_info(assets)")->fetchAll(PDO::FETCH_COLUMN, 1);
+            if (!in_array('deleted_at', $aCols, true)) {
+                $db->exec("ALTER TABLE assets ADD COLUMN deleted_at {$dt} DEFAULT NULL");
+            }
+        } else {
+            if (!$db->query("SHOW COLUMNS FROM assets LIKE 'deleted_at'")->fetch()) {
+                $db->exec("ALTER TABLE assets ADD COLUMN deleted_at DATETIME DEFAULT NULL");
+            }
+        }
+
+        // Tabel audit_trail
+        $db->exec("CREATE TABLE IF NOT EXISTS audit_trail (
+            {$idCol},
+            module VARCHAR(50) NOT NULL,
+            action VARCHAR(40) NOT NULL,
+            target_id {$int} DEFAULT NULL,
+            description VARCHAR(255) DEFAULT NULL,
+            user_id {$int} DEFAULT NULL,
+            ip VARCHAR(45) DEFAULT NULL,
+            created_at {$dt} DEFAULT CURRENT_TIMESTAMP
+        ){$tail}");
+        if ($sqlite) {
+            @$db->exec('CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_trail(user_id)');
+            @$db->exec('CREATE INDEX IF NOT EXISTS idx_audit_module ON audit_trail(module)');
+        }
+
+        // Tabel api_tokens
+        $db->exec("CREATE TABLE IF NOT EXISTS api_tokens (
+            {$idCol},
+            user_id {$int} NOT NULL,
+            token VARCHAR(80) NOT NULL,
+            name VARCHAR(80) DEFAULT NULL,
+            last_used_at {$dt} DEFAULT NULL,
+            created_at {$dt} DEFAULT CURRENT_TIMESTAMP
+        ){$tail}");
+
+        // Tabel borrowings (peminjaman aset)
+        $db->exec("CREATE TABLE IF NOT EXISTS borrowings (
+            {$idCol},
+            asset_id {$int} NOT NULL,
+            borrower_name VARCHAR(100) DEFAULT NULL,
+            user_id {$int} DEFAULT NULL,
+            borrow_date {$dt} DEFAULT CURRENT_TIMESTAMP,
+            expected_return {$dt} DEFAULT NULL,
+            actual_return {$dt} DEFAULT NULL,
+            note VARCHAR(255) DEFAULT NULL,
+            status VARCHAR(20) NOT NULL DEFAULT 'borrowed'
+        ){$tail}");
+
+        // Tabel notifications
+        $db->exec("CREATE TABLE IF NOT EXISTS notifications (
+            {$idCol},
+            user_id {$int} DEFAULT NULL,
+            type VARCHAR(40) NOT NULL,
+            title VARCHAR(120) NOT NULL,
+            body TEXT DEFAULT NULL,
+            link VARCHAR(255) DEFAULT NULL,
+            is_read {$tiny} NOT NULL DEFAULT 0,
+            created_at {$dt} DEFAULT CURRENT_TIMESTAMP
+        ){$tail}");
+
+        // Kolom currency & useful_life pada assets
+        if ($sqlite) {
+            $aCols2 = $db->query("PRAGMA table_info(assets)")->fetchAll(PDO::FETCH_COLUMN, 1);
+            if (!in_array('currency', $aCols2, true)) {
+                $db->exec("ALTER TABLE assets ADD COLUMN currency VARCHAR(3) DEFAULT 'IDR'");
+            }
+            if (!in_array('useful_life', $aCols2, true)) {
+                $db->exec("ALTER TABLE assets ADD COLUMN useful_life INTEGER DEFAULT 5");
+            }
+        } else {
+            if (!$db->query("SHOW COLUMNS FROM assets LIKE 'currency'")->fetch()) {
+                $db->exec("ALTER TABLE assets ADD COLUMN currency VARCHAR(3) DEFAULT 'IDR'");
+            }
+            if (!$db->query("SHOW COLUMNS FROM assets LIKE 'useful_life'")->fetch()) {
+                $db->exec("ALTER TABLE assets ADD COLUMN useful_life INT DEFAULT 5");
             }
         }
     }

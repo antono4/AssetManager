@@ -178,6 +178,39 @@ function old(string $key, $default = ''): string
     return e($_SESSION['old'][$key] ?? $default);
 }
 
+// Parse CSV string ke array of rows (multi-line aware)
+function str_getcsv_all(string $csv): array
+{
+    $rows = [];
+    $lines = preg_split('/\r\n|\r|\n/', trim($csv));
+    foreach ($lines as $line) {
+        if ($line === '') continue;
+        $rows[] = str_getcsv($line);
+    }
+    return $rows;
+}
+
+// Generate QR code URL via public API (no dependency)
+function qr_code_url(string $text, int $size = 200): string
+{
+    return 'https://api.qrserver.com/v1/create-qr-code/?size=' . $size . 'x' . $size . '&data=' . urlencode($text);
+}
+
+// Format mata uang berdasarkan currency code
+function rp_currency($value, string $currency = 'IDR'): string
+{
+    if ($value === null || $value === '') return '-';
+    $currency = strtoupper($currency);
+    if ($currency === 'IDR') {
+        return 'Rp ' . number_format((float)$value, 0, ',', '.');
+    } elseif ($currency === 'USD') {
+        return '$ ' . number_format((float)$value, 2, '.', ',');
+    } elseif ($currency === 'EUR') {
+        return '€ ' . number_format((float)$value, 2, ',', '.');
+    }
+    return $currency . ' ' . number_format((float)$value, 2, '.', ',');
+}
+
 function flash_messages(): string
 {
     $html = '';

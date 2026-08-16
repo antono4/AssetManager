@@ -20,14 +20,29 @@ $a = $asset;
                     <dt class="col-sm-4"><?= t('location') ?></dt><dd class="col-sm-8"><?= e($a['location']) ?: '-' ?></dd>
                     <dt class="col-sm-4"><?= t('purchase_date') ?></dt><dd class="col-sm-8"><?= tgl($a['purchase_date']) ?></dd>
                     <?php if (price_visible()): ?>
-                    <dt class="col-sm-4"><?= t('price') ?></dt><dd class="col-sm-8"><strong><?= rp($a['price']) ?></strong></dd>
+                    <dt class="col-sm-4"><?= t('price') ?></dt><dd class="col-sm-8"><strong><?= rp_currency($a['price'], $a['currency'] ?? 'IDR') ?></strong></dd>
+                    <?php
+                    // Depreciation calculation
+                    $dep = Asset::depreciation($a);
+                    if (price_visible() && $dep['years_elapsed'] > 0):
+                    ?>
+                    <dt class="col-sm-4"><?= t('book_value') ?></dt><dd class="col-sm-8"><strong class="text-info"><?= rp_currency($dep['book_value'], $a['currency'] ?? 'IDR') ?></strong> <small class="text-muted">(<?= t('depreciation') ?>: <?= rp_currency($dep['accumulated_depreciation'], $a['currency'] ?? 'IDR') ?>, <?= $dep['years_elapsed'] ?>y / <?= $dep['useful_life'] ?>y)</small></dd>
+                    <?php endif; ?>
                     <?php endif; ?>
                     <dt class="col-sm-4"><?= t('created_at') ?></dt><dd class="col-sm-8"><?= tglwaktu($a['created_at']) ?></dd>
                     <dt class="col-sm-4"><?= t('updated_at') ?></dt><dd class="col-sm-8"><?= tglwaktu($a['updated_at']) ?></dd>
                 </dl>
+                <!-- QR Code -->
+                <div class="text-center mt-2">
+                    <img src="<?= e(qr_code_url(url('assets/' . $a['id']), 120)) ?>" alt="QR" class="img-fluid" style="width:120px;height:120px;border:1px solid #dee2e6;border-radius:8px">
+                    <br><small class="text-muted"><?= t('qr_code') ?> — <?= e($a['asset_code']) ?></small>
+                </div>
             </div>
             <div class="card-footer">
                 <a href="<?= url('assets') ?>" class="btn btn-default"><i class="fas fa-arrow-left"></i> <?= t('back') ?></a>
+                <?php if ($a['status'] === 'tersedia'): ?>
+                <a href="<?= url('assets/' . $a['id'] . '/borrow') ?>" class="btn btn-warning"><i class="fas fa-hand-paper"></i> <?= t('borrow') ?></a>
+                <?php endif; ?>
                 <?php if (Auth::isAdmin()): ?>
                 <a href="<?= url('assets/' . $a['id'] . '/edit') ?>" class="btn btn-warning"><i class="fas fa-edit"></i> <?= t('edit') ?></a>
                 <form action="<?= url('assets/' . $a['id'] . '/delete') ?>" method="post" class="d-inline">

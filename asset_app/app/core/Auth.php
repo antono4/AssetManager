@@ -21,12 +21,54 @@ class Auth
 
     public static function attempt(string $username, string $password): bool
     {
-        $user = Database::fetch("SELECT * FROM users WHERE username = ? AND is_active = 1", [$username]);
-        if (!$user || !password_verify($password, $user['password'])) {
+        // Rate limiting: max 5 percobaan dalam 5 menit, lock 15 menit
+        if (session_status() === PHP_SESSION_NONE) {
+            self::startSession();
+        }
+        $key = 'rl_' . md5(strtolower($username));
+        $now = time();
+        $attempts = $_SESSION[$key] ?? [];
+        // buang percobaan lebih dari 5 menit lalu
+        $attempts = array_values(array_filter($attempts, fn($t) => $now - $t < 300));
+        if (count($attempts) >= 5) {
+            $_SESSION[$key] = $attempts;
+            $_SESSION['rl_locked'] = $key;
             return false;
         }
+        // cek lock 15 menit
+        if (isset($_SESSION['rl_locked']) && $_SESSION['rl_locked'] === $key && isset($_SESSION['rl_lock_until']) && $now < $_SESSION['rl_lock_until']) {
+            return false;
+        }
+        $user = Database::fetch("SELECT * FROM users WHERE username = ? AND is_active = 1", [$username]);
+        if (!$user || !password_verify($password, $user['password'])) {
+            $attempts[] = $now;
+            $_SESSION[$key] = $attempts;
+            if (count($attempts) >= 5) {
+                $_SESSION['rl_lock_until'] = $now + 900; // lock 15 menit
+            }
+            return false;
+        }
+        // sukses: reset rate limit
+        unset($_SESSION[$key], $_SESSION['rl_locked'], $_SESSION['rl_lock_until']);
         self::setUser($user);
         return true;
+    }
+
+    // Cek apakah login di-lock karena rate limiting
+    public static function loginLocked(string $username): bool
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            self::startSession();
+        }
+        $key = 'rl_' . md5(strtolower($username));
+        if (isset($_SESSION['rl_locked']) && $_SESSION['rl_locked'] === $key && isset($_SESSION['rl_lock_until']) && time() < $_SESSION['rl_lock_until']) {
+            return true;
+        }
+        // bersihkan lock yang sudah expired
+        if (isset($_SESSION['rl_lock_until']) && time() >= $_SESSION['rl_lock_until']) {
+            unset($_SESSION['rl_locked'], $_SESSION['rl_lock_until'], $_SESSION[$key]);
+        }
+        return false;
     }
 
     public static function setUser(array $user): void

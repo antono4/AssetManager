@@ -23,6 +23,11 @@ class AuthController
             Auth::redirect(BASE_URL . '/login');
         }
 
+        if (Auth::loginLocked($username)) {
+            Flash::set('error', t('login_locked'));
+            Auth::redirect(BASE_URL . '/login');
+        }
+
         if (Auth::attempt($username, $password)) {
             Flash::set('success', t('login_success', ['name' => Auth::user()['name']]));
             Auth::redirect(BASE_URL . '/dashboard');
