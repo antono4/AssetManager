@@ -19,6 +19,11 @@ class Borrowing
         return Database::fetchAll($sql);
     }
 
+    public static function count(): int
+    {
+        return (int)Database::scalar("SELECT COUNT(*) FROM borrowings");
+    }
+
     public static function forAsset(int $assetId): array
     {
         return Database::fetchAll(

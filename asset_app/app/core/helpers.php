@@ -170,3 +170,62 @@ function flash_messages(): string
     }
     return $html;
 }
+
+/**
+ * Render pagination windowed (reusable) — hanya tampilkan window halaman di
+ * sekitar halaman aktif + ellipsis, agar tetap ringan untuk ribuan halaman.
+ *
+ * @param int    $page       Halaman aktif (1-based)
+ * @param int    $totalPages Total halaman
+ * @param string $baseUrl    URL dasar TANPA page param (sudah termasuk ? atau &)
+ *                           Contoh: url('assets') . '?status=dipinjam&'
+ * @param int    $total      Total record (untuk label "Showing x–y of z")
+ * @param int    $perPage    Record per halaman (untuk label)
+ */
+function pagination(int $page, int $totalPages, string $baseUrl, int $total = 0, int $perPage = 0): string
+{
+    if ($totalPages <= 1) {
+        return '';
+    }
+    $window = 5;
+    $start = max(1, $page - $window);
+    $end = min($totalPages, $page + $window);
+
+    $html = '<div class="card-footer"><nav><ul class="pagination pagination-sm justify-content-center mb-0">';
+    // Prev
+    $html .= '<li class="page-item ' . ($page <= 1 ? 'disabled' : '') . '">'
+           . '<a class="page-link" href="' . $baseUrl . 'page=' . ($page - 1) . '">&laquo;</a></li>';
+    // First + ellipsis
+    if ($start > 1) {
+        $html .= '<li class="page-item"><a class="page-link" href="' . $baseUrl . 'page=1">1</a></li>';
+        if ($start > 2) {
+            $html .= '<li class="page-item disabled"><span class="page-link">&hellip;</span></li>';
+        }
+    }
+    // Window
+    for ($i = $start; $i <= $end; $i++) {
+        $html .= '<li class="page-item ' . ($i === $page ? 'active' : '') . '">'
+               . '<a class="page-link" href="' . $baseUrl . 'page=' . $i . '">' . $i . '</a></li>';
+    }
+    // Last + ellipsis
+    if ($end < $totalPages) {
+        if ($end < $totalPages - 1) {
+            $html .= '<li class="page-item disabled"><span class="page-link">&hellip;</span></li>';
+        }
+        $html .= '<li class="page-item"><a class="page-link" href="' . $baseUrl . 'page=' . $totalPages . '">' . $totalPages . '</a></li>';
+    }
+    // Next
+    $html .= '<li class="page-item ' . ($page >= $totalPages ? 'disabled' : '') . '">'
+           . '<a class="page-link" href="' . $baseUrl . 'page=' . ($page + 1) . '">&raquo;</a></li>';
+    $html .= '</ul></nav>';
+    // Label "Showing x–y of z"
+    if ($total > 0 && $perPage > 0) {
+        $from = ($page - 1) * $perPage + 1;
+        $to = min($page * $perPage, $total);
+        $html .= '<div class="text-center text-muted small mt-1">' . t('showing') . ' '
+               . number_format($from) . '–' . number_format($to) . ' '
+               . t('of') . ' ' . number_format($total) . '</div>';
+    }
+    $html .= '</div>';
+    return $html;
+}

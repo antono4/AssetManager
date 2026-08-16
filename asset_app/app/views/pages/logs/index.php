@@ -35,15 +35,5 @@
         <?php endif; ?>
     </div>
 
-    <?php if ($totalPages > 1): ?>
-    <div class="card-footer">
-        <nav><ul class="pagination pagination-sm justify-content-center mb-0">
-            <li class="page-item <?= $page<=1?'disabled':'' ?>"><a class="page-link" href="<?= url('logs?page=' . ($page-1)) ?>">&laquo;</a></li>
-            <?php for ($i=1; $i<=$totalPages; $i++): ?>
-                <li class="page-item <?= $i===$page?'active':'' ?>"><a class="page-link" href="<?= url('logs?page=' . $i) ?>"><?= $i ?></a></li>
-            <?php endfor; ?>
-            <li class="page-item <?= $page>=$totalPages?'disabled':'' ?>"><a class="page-link" href="<?= url('logs?page=' . ($page+1)) ?>">&raquo;</a></li>
-        </ul></nav>
-    </div>
-    <?php endif; ?>
+    <?= pagination($page, $totalPages, url('logs?'), $total, 20) ?>
 </div>

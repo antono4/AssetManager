@@ -1,7 +1,9 @@
-<?php /** Trash (soft-deleted assets) */ ?>
+<?php /** Trash (soft-deleted assets) */
+$trashTotal = $total ?? count($assets);
+?>
 <div class="card card-warning card-outline">
     <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-trash-restore mr-1"></i> <?= t('trash') ?> (<?= count($assets) ?>)</h3>
+        <h3 class="card-title"><i class="fas fa-trash-restore mr-1"></i> <?= t('trash') ?> (<?= number_format($trashTotal) ?>)</h3>
         <div class="card-tools">
             <a href="<?= url('assets') ?>" class="btn btn-default btn-sm"><i class="fas fa-arrow-left"></i> <?= t('back') ?></a>
         </div>
@@ -35,4 +37,5 @@
         </div>
         <?php endif; ?>
     </div>
+    <?= pagination($page ?? 1, $totalPages ?? 1, url('assets/trash?'), $trashTotal, $perPage ?? 20) ?>
 </div>

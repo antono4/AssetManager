@@ -254,14 +254,22 @@ class PatchController
             Flash::set('error', t('schedule_not_found'));
             Auth::redirect(url('/patching'));
         }
-        $computers = PatchChecklist::computersWithPatchCodes($id);
+        $page = max(1, (int)($_GET['page'] ?? 1));
+        $perPage = 20;
+        $total = PatchChecklist::countForSchedule($id);
+        $totalPages = max(1, (int)ceil($total / $perPage));
+        $computers = PatchChecklist::computersWithPatchCodesPaged($id, $perPage, ($page - 1) * $perPage);
         $items = PatchChecklist::activeItems();
 
         View::render('patch/computers', [
-            'pageTitle' => t('computer_patch_list') . ' — ' . $schedule['name'],
-            'schedule'  => $schedule,
-            'computers' => $computers,
-            'items'     => $items,
+            'pageTitle'  => t('computer_patch_list') . ' — ' . $schedule['name'],
+            'schedule'   => $schedule,
+            'computers'  => $computers,
+            'items'      => $items,
+            'page'       => $page,
+            'perPage'    => $perPage,
+            'total'      => $total,
+            'totalPages' => $totalPages,
         ]);
     }
 

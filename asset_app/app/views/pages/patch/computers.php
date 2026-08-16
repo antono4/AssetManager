@@ -1,10 +1,11 @@
 <?php
 /** Daftar Komputer & Kode Patching per jadwal */
 $sch = $schedule;
+$compTotal = $total ?? count($computers);
 ?>
 <div class="card card-primary card-outline">
     <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-laptop-code mr-1"></i> <?= t('computer_patch_list') ?></h3>
+        <h3 class="card-title"><i class="fas fa-laptop-code mr-1"></i> <?= t('computer_patch_list') ?> (<?= number_format($compTotal) ?>)</h3>
         <div class="card-tools">
             <a href="<?= url('patching/' . $sch['id']) ?>" class="btn btn-default btn-sm"><i class="fas fa-arrow-left"></i> <?= t('back') ?></a>
         </div>
@@ -122,4 +123,5 @@ $sch = $schedule;
         </div>
         <?php endif; ?>
     </div>
+    <?= pagination($page ?? 1, $totalPages ?? 1, url('patching/' . $sch['id'] . '/computers?'), $compTotal, $perPage ?? 20) ?>
 </div>

@@ -1,4 +1,7 @@
-<?php /** Daftar Aset + filter/search + pagination */ ?>
+<?php /** Daftar Aset + filter/search + pagination */
+$q = http_build_query(array_filter(['search'=>$search,'status'=>$status,'category'=>$category]));
+$base = url('assets') . ($q ? '?' . $q . '&' : '?');
+?>
 <div class="card card-primary card-outline">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-box mr-1"></i> <?= t('asset_list') ?> <small class="text-muted">(<?= $total ?> <?= t('data') ?>)</small></h3>
@@ -85,33 +88,5 @@
         <?php endif; ?>
     </div>
 
-    <?php if ($totalPages > 1): ?>
-    <div class="card-footer">
-        <nav><ul class="pagination pagination-sm justify-content-center mb-0">
-            <?php
-            $q = http_build_query(array_filter(['search'=>$search,'status'=>$status,'category'=>$category]));
-            $base = url('assets') . ($q ? '?' . $q . '&' : '?');
-            // Windowed pagination: tampilkan window halaman di sekitar halaman aktif
-            // agar tetap ringan untuk dataset besar (ribuan halaman).
-            $window = 5;
-            $start = max(1, $page - $window);
-            $end = min($totalPages, $page + $window);
-            ?>
-            <li class="page-item <?= $page<=1?'disabled':'' ?>"><a class="page-link" href="<?= $base ?>page=<?= $page-1 ?>">&laquo;</a></li>
-            <?php if ($start > 1): ?>
-                <li class="page-item"><a class="page-link" href="<?= $base ?>page=1">1</a></li>
-                <?php if ($start > 2): ?><li class="page-item disabled"><span class="page-link">&hellip;</span></li><?php endif; ?>
-            <?php endif; ?>
-            <?php for ($i=$start; $i<=$end; $i++): ?>
-                <li class="page-item <?= $i===$page?'active':'' ?>"><a class="page-link" href="<?= $base ?>page=<?= $i ?>"><?= $i ?></a></li>
-            <?php endfor; ?>
-            <?php if ($end < $totalPages): ?>
-                <?php if ($end < $totalPages - 1): ?><li class="page-item disabled"><span class="page-link">&hellip;</span></li><?php endif; ?>
-                <li class="page-item"><a class="page-link" href="<?= $base ?>page=<?= $totalPages ?>"><?= $totalPages ?></a></li>
-            <?php endif; ?>
-            <li class="page-item <?= $page>=$totalPages?'disabled':'' ?>"><a class="page-link" href="<?= $base ?>page=<?= $page+1 ?>">&raquo;</a></li>
-        </ul></nav>
-        <div class="text-center text-muted small mt-1"><?= t('showing') ?> <?= number_format(($page-1)*$perPage+1) ?>–<?= number_format(min($page*$perPage, $total)) ?> <?= t('of') ?> <?= number_format($total) ?></div>
-    </div>
-    <?php endif; ?>
+    <?= pagination($page, $totalPages, $base, $total, $perPage) ?>
 </div>

@@ -13,6 +13,12 @@ class ReportController
         $filters = $this->collectFilters();
         $tab = $_GET['tab'] ?? 'summary';
 
+        // Paginasi hanya untuk tab detail (daftar aset lengkap)
+        $detailPage = max(1, (int)($_GET['detail_page'] ?? 1));
+        $detailPerPage = 50;
+        $detailTotal = Asset::forReportCount($filters);
+        $detailTotalPages = max(1, (int)ceil($detailTotal / $detailPerPage));
+
         $data = [
             'pageTitle'    => t('asset_report'),
             'filters'      => $filters,
@@ -22,7 +28,14 @@ class ReportController
             'summary'      => Asset::summaryForReport($filters),
             'byCategory'   => Asset::recapByCategory($filters),
             'byLocation'   => Asset::recapByLocation($filters),
-            'assets'       => Asset::forReport($filters),
+            // Tab detail pakai pagination; tab lain tetap fetch semua untuk recap
+            'assets'       => $tab === 'detail'
+                                ? Asset::forReport($filters, $detailPerPage, ($detailPage - 1) * $detailPerPage)
+                                : Asset::forReport($filters),
+            'detailPage'       => $detailPage,
+            'detailPerPage'    => $detailPerPage,
+            'detailTotal'      => $detailTotal,
+            'detailTotalPages' => $detailTotalPages,
         ];
 
         // Tambah grafik data untuk tab ringkasan

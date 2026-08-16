@@ -32,15 +32,9 @@
             </table>
         </div>
     </div>
-    <?php if ($totalPages > 1): ?>
-    <div class="card-footer">
-        <nav><ul class="pagination pagination-sm justify-content-center mb-0">
-            <li class="page-item <?= $page<=1?'disabled':'' ?>"><a class="page-link" href="<?= url('audit?page=' . ($page-1) . ($module?'&module=' . $module : '')) ?>">&laquo;</a></li>
-            <?php for ($i=1; $i<=$totalPages; $i++): ?>
-            <li class="page-item <?= $i===$page?'active':'' ?>"><a class="page-link" href="<?= url('audit?page=' . $i . ($module?'&module=' . $module : '')) ?>"><?= $i ?></a></li>
-            <?php endfor; ?>
-            <li class="page-item <?= $page>=$totalPages?'disabled':'' ?>"><a class="page-link" href="<?= url('audit?page=' . ($page+1) . ($module?'&module=' . $module : '')) ?>">&raquo;</a></li>
-        </ul></nav>
-    </div>
-    <?php endif; ?>
+    <?php
+    $auditBase = url('audit?') . ($module ? 'module=' . urlencode($module) . '&' : '');
+    $auditPerPage = 30;
+    ?>
+    <?= pagination($page, $totalPages, $auditBase, $total, $auditPerPage) ?>
 </div>

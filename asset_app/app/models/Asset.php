@@ -71,6 +71,22 @@ class Asset
         );
     }
 
+    // Aset yang sudah di-soft-delete (paginated)
+    public static function trashedPaged(int $limit, int $offset): array
+    {
+        return Database::fetchAll(
+            "SELECT a.*, c.name AS category_name
+             FROM assets a LEFT JOIN categories c ON c.id = a.category_id
+             WHERE a.deleted_at IS NOT NULL ORDER BY a.deleted_at DESC
+             LIMIT " . (int)$limit . " OFFSET " . (int)$offset
+        );
+    }
+
+    public static function trashedCount(): int
+    {
+        return (int)Database::scalar("SELECT COUNT(*) FROM assets WHERE deleted_at IS NOT NULL");
+    }
+
     // Soft delete: pindahkan ke trash
     public static function softDelete(int $id): void
     {
@@ -364,7 +380,7 @@ class Asset
 
     // --- Khusus Laporan ---
     // Aset dengan filter rentang tanggal pembelian (untuk laporan)
-    public static function forReport(array $filters): array
+    public static function forReport(array $filters, int $limit = 0, int $offset = 0): array
     {
         $sql = "SELECT a.*, c.name AS category_name
                 FROM assets a
@@ -392,7 +408,38 @@ class Asset
             $params[] = '%' . $filters['location'] . '%';
         }
         $sql .= " ORDER BY a.asset_code ASC";
+        if ($limit > 0) {
+            $sql .= " LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
+        }
         return Database::fetchAll($sql, $params);
+    }
+
+    // Jumlah aset untuk laporan dengan filter (tanpa fetch semua data)
+    public static function forReportCount(array $filters): int
+    {
+        $sql = "SELECT COUNT(*) FROM assets a WHERE 1=1";
+        $params = [];
+        if (!empty($filters['category_id'])) {
+            $sql .= " AND a.category_id = ?";
+            $params[] = (int)$filters['category_id'];
+        }
+        if (!empty($filters['status'])) {
+            $sql .= " AND a.status = ?";
+            $params[] = $filters['status'];
+        }
+        if (!empty($filters['date_from'])) {
+            $sql .= " AND a.purchase_date >= ?";
+            $params[] = $filters['date_from'];
+        }
+        if (!empty($filters['date_to'])) {
+            $sql .= " AND a.purchase_date <= ?";
+            $params[] = $filters['date_to'];
+        }
+        if (!empty($filters['location'])) {
+            $sql .= " AND a.location LIKE ?";
+            $params[] = '%' . $filters['location'] . '%';
+        }
+        return (int)Database::scalar($sql, $params);
     }
 
     // Ringkasan nilai aset berdasarkan filter

@@ -1,7 +1,9 @@
-<?php /** Borrowing list */ ?>
+<?php /** Borrowing list */
+$borTotal = $total ?? count($borrowings);
+?>
 <div class="card card-primary card-outline">
     <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-hand-paper mr-1"></i> <?= t('borrowing') ?></h3>
+        <h3 class="card-title"><i class="fas fa-hand-paper mr-1"></i> <?= t('borrowing') ?> <small class="text-muted">(<?= number_format($borTotal) ?>)</small></h3>
     </div>
     <div class="card-body p-0">
         <?php if (empty($borrowings)): ?>
@@ -43,4 +45,5 @@
         </div>
         <?php endif; ?>
     </div>
+    <?= pagination($page ?? 1, $totalPages ?? 1, url('borrowings?'), $borTotal, $perPage ?? 20) ?>
 </div>

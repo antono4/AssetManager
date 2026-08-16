@@ -208,25 +208,96 @@ class PatchChecklist
         }
     }
 
-    // Ambil daftar komputer (checklist) beserta kode patching per item untuk sebuah jadwal
+    // Ambil daftar komputer (checklist) beserta kode patching per item untuk sebuah jadwal.
+    // Pakai query JOIN tunggal (semua item digabung per checklist) — hindari N+1.
+    // Returns: array of checklist rows, masing-masing dengan key 'patch_codes' (array item).
     public static function computersWithPatchCodes(int $scheduleId): array
     {
-        $checklists = self::forSchedule($scheduleId);
-        foreach ($checklists as &$cl) {
-            $items = Database::fetchAll(
-                "SELECT ci.patch_code, i.name AS item_name, ci.is_checked
-                 FROM patch_checklist_items ci
-                 LEFT JOIN patch_items i ON i.id = ci.item_id
-                 WHERE ci.checklist_id = ?
-                 ORDER BY i.sort_order, i.id",
-                [$cl['id']]
-            );
-            $cl['patch_codes'] = $items;
-            // Gabungkan semua kode patch yang sudah diisi
-            $codes = array_filter(array_map(fn($i) => $i['patch_code'], $items));
+        $rows = Database::fetchAll(
+            "SELECT c.id AS checklist_id, c.asset_id, c.status,
+                    a.asset_code, a.name AS asset_name, a.location, a.brand_spec,
+                    cat.name AS category_name,
+                    ci.patch_code, ci.is_checked, ci.item_id,
+                    i.name AS item_name, i.sort_order
+             FROM patch_checklists c
+             LEFT JOIN assets a ON a.id = c.asset_id
+             LEFT JOIN categories cat ON cat.id = a.category_id
+             LEFT JOIN patch_checklist_items ci ON ci.checklist_id = c.id
+             LEFT JOIN patch_items i ON i.id = ci.item_id
+             WHERE c.schedule_id = ?
+             ORDER BY a.asset_code, i.sort_order, i.id",
+            [$scheduleId]
+        );
+        return self::groupPatchCodes($rows);
+    }
+
+    // Versi paginated dari computersWithPatchCodes (untuk dataset besar).
+    public static function computersWithPatchCodesPaged(int $scheduleId, int $limit, int $offset): array
+    {
+        // Ambil checklist_id untuk halaman ini dulu
+        $pageIds = Database::fetchAll(
+            "SELECT id FROM patch_checklists WHERE schedule_id = ?
+             ORDER BY (SELECT asset_code FROM assets WHERE id = patch_checklists.asset_id)
+             LIMIT " . (int)$limit . " OFFSET " . (int)$offset,
+            [$scheduleId]
+        );
+        $ids = array_column($pageIds, 'id');
+        if (empty($ids)) {
+            return [];
+        }
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $rows = Database::fetchAll(
+            "SELECT c.id AS checklist_id, c.asset_id, c.status,
+                    a.asset_code, a.name AS asset_name, a.location, a.brand_spec,
+                    cat.name AS category_name,
+                    ci.patch_code, ci.is_checked, ci.item_id,
+                    i.name AS item_name, i.sort_order
+             FROM patch_checklists c
+             LEFT JOIN assets a ON a.id = c.asset_id
+             LEFT JOIN categories cat ON cat.id = a.category_id
+             LEFT JOIN patch_checklist_items ci ON ci.checklist_id = c.id
+             LEFT JOIN patch_items i ON i.id = ci.item_id
+             WHERE c.id IN ($placeholders)
+             ORDER BY a.asset_code, i.sort_order, i.id",
+            $ids
+        );
+        return self::groupPatchCodes($rows);
+    }
+
+    // Kelompokkan hasil JOIN menjadi struktur checklist dengan patch_codes array.
+    private static function groupPatchCodes(array $rows): array
+    {
+        $result = [];
+        foreach ($rows as $r) {
+            $cid = (int)$r['checklist_id'];
+            if (!isset($result[$cid])) {
+                $result[$cid] = [
+                    'id'             => $cid,
+                    'asset_id'       => $r['asset_id'],
+                    'status'         => $r['status'],
+                    'asset_code'     => $r['asset_code'],
+                    'asset_name'     => $r['asset_name'],
+                    'location'       => $r['location'],
+                    'brand_spec'     => $r['brand_spec'],
+                    'category_name'  => $r['category_name'],
+                    'patch_codes'    => [],
+                    'patch_codes_summary' => '',
+                ];
+            }
+            if ($r['item_id'] !== null) {
+                $result[$cid]['patch_codes'][] = [
+                    'patch_code' => $r['patch_code'],
+                    'item_name'  => $r['item_name'],
+                    'is_checked' => $r['is_checked'],
+                ];
+            }
+        }
+        // Bangun summary kode patch per checklist
+        foreach ($result as &$cl) {
+            $codes = array_filter(array_map(fn($i) => $i['patch_code'], $cl['patch_codes']));
             $cl['patch_codes_summary'] = $codes ? implode(', ', $codes) : '';
         }
-        return $checklists;
+        return array_values($result);
     }
 
     // Update status checklist berdasarkan item yang tercentang

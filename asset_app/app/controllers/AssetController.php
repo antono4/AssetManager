@@ -15,9 +15,13 @@ class AssetController
         $category = trim($_GET['category'] ?? '');
 
         $total = Asset::count($search, $status, $category);
-        $assets = Asset::all($search, $status, $category, $perPage, ($page - 1) * $perPage);
         $categories = Category::options();
         $totalPages = max(1, (int)ceil($total / $perPage));
+        // Clamp page ke range valid agar label "Showing" tidak aneh
+        if ($page > $totalPages) {
+            $page = $totalPages;
+        }
+        $assets = Asset::all($search, $status, $category, $perPage, ($page - 1) * $perPage);
 
         View::render('assets/index', [
             'pageTitle'  => t('asset_list'),

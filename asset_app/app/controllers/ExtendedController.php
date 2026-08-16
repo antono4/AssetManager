@@ -55,8 +55,19 @@ class ExtendedController
     public function trash()
     {
         Auth::requireAdmin();
-        $assets = Asset::trashed();
-        View::render('assets/trash', ['pageTitle' => t('trash'), 'assets' => $assets]);
+        $page = max(1, (int)($_GET['page'] ?? 1));
+        $perPage = 20;
+        $total = Asset::trashedCount();
+        $totalPages = max(1, (int)ceil($total / $perPage));
+        $assets = Asset::trashedPaged($perPage, ($page - 1) * $perPage);
+        View::render('assets/trash', [
+            'pageTitle'  => t('trash'),
+            'assets'     => $assets,
+            'page'       => $page,
+            'perPage'    => $perPage,
+            'total'      => $total,
+            'totalPages' => $totalPages,
+        ]);
     }
 
     public function restore(array $p)
@@ -196,10 +207,18 @@ class ExtendedController
     public function borrowings()
     {
         Auth::requireLogin();
-        $borrowings = Borrowing::all();
+        $page = max(1, (int)($_GET['page'] ?? 1));
+        $perPage = 20;
+        $total = Borrowing::count();
+        $totalPages = max(1, (int)ceil($total / $perPage));
+        $borrowings = Borrowing::all($perPage, ($page - 1) * $perPage);
         View::render('borrowings/index', [
-            'pageTitle' => t('borrowing'),
-            'borrowings' => $borrowings,
+            'pageTitle'   => t('borrowing'),
+            'borrowings'  => $borrowings,
+            'page'        => $page,
+            'perPage'     => $perPage,
+            'total'       => $total,
+            'totalPages'  => $totalPages,
         ]);
     }
 

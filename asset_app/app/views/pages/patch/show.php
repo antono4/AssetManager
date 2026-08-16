@@ -158,33 +158,7 @@ $pct = $s['total_aset'] > 0 ? round(($s['done_aset'] / $s['total_aset']) * 100) 
                 </tbody>
             </table>
         </div>
-        <?php if (($totalPages ?? 1) > 1): ?>
-        <div class="card-footer">
-            <nav><ul class="pagination pagination-sm justify-content-center mb-0">
-                <?php
-                $pbase = url('patching/' . $s['id']) . '?';
-                $tp = $totalPages ?? 1;
-                $window = 5;
-                $pstart = max(1, $page - $window);
-                $pend = min($tp, $page + $window);
-                ?>
-                <li class="page-item <?= $page<=1?'disabled':'' ?>"><a class="page-link" href="<?= $pbase ?>page=<?= $page-1 ?>">&laquo;</a></li>
-                <?php if ($pstart > 1): ?>
-                    <li class="page-item"><a class="page-link" href="<?= $pbase ?>page=1">1</a></li>
-                    <?php if ($pstart > 2): ?><li class="page-item disabled"><span class="page-link">&hellip;</span></li><?php endif; ?>
-                <?php endif; ?>
-                <?php for ($i=$pstart; $i<=$pend; $i++): ?>
-                    <li class="page-item <?= $i===$page?'active':'' ?>"><a class="page-link" href="<?= $pbase ?>page=<?= $i ?>"><?= $i ?></a></li>
-                <?php endfor; ?>
-                <?php if ($pend < $tp): ?>
-                    <?php if ($pend < $tp - 1): ?><li class="page-item disabled"><span class="page-link">&hellip;</span></li><?php endif; ?>
-                    <li class="page-item"><a class="page-link" href="<?= $pbase ?>page=<?= $tp ?>"><?= $tp ?></a></li>
-                <?php endif; ?>
-                <li class="page-item <?= $page>=$tp?'disabled':'' ?>"><a class="page-link" href="<?= $pbase ?>page=<?= $page+1 ?>">&raquo;</a></li>
-            </ul></nav>
-            <div class="text-center text-muted small mt-1"><?= t('showing') ?> <?= number_format(($page-1)*$perPage+1) ?>–<?= number_format(min($page*$perPage, $totalChecklists)) ?> <?= t('of') ?> <?= number_format($totalChecklists) ?></div>
-        </div>
-        <?php endif; ?>
+        <?= pagination($page ?? 1, $totalPages ?? 1, url('patching/' . $s['id']) . '?', $totalChecklists ?? count($checklists), $perPage ?? 20) ?>
         <?php endif; ?>
     </div>
 </div>
