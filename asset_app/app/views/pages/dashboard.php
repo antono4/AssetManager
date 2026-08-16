@@ -5,30 +5,30 @@ $s = $stats;
 <div class="row">
     <div class="col-lg-3 col-md-6 col-sm-6">
         <div class="small-box bg-info">
-            <div class="inner"><h3><?= $s['total'] ?></h3><p>Total Aset</p></div>
+            <div class="inner"><h3><?= $s['total'] ?></h3><p><?= t('total_assets') ?></p></div>
             <div class="icon"><i class="fas fa-boxes"></i></div>
-            <a href="<?= url('assets') ?>" class="small-box-footer">Lihat detail <i class="fas fa-arrow-circle-right"></i></a>
+            <a href="<?= url('assets') ?>" class="small-box-footer"><?= t('view_details') ?> <i class="fas fa-arrow-circle-right"></i></a>
         </div>
     </div>
     <div class="col-lg-3 col-md-6 col-sm-6">
         <div class="small-box bg-success">
-            <div class="inner"><h3><?= $s['tersedia'] ?></h3><p>Tersedia</p></div>
+            <div class="inner"><h3><?= $s['tersedia'] ?></h3><p><?= t('available') ?></p></div>
             <div class="icon"><i class="fas fa-check-circle"></i></div>
-            <a href="<?= url('assets?status=tersedia') ?>" class="small-box-footer">Lihat detail <i class="fas fa-arrow-circle-right"></i></a>
+            <a href="<?= url('assets?status=tersedia') ?>" class="small-box-footer"><?= t('view_details') ?> <i class="fas fa-arrow-circle-right"></i></a>
         </div>
     </div>
     <div class="col-lg-3 col-md-6 col-sm-6">
         <div class="small-box bg-warning">
-            <div class="inner"><h3><?= $s['dipinjam'] ?></h3><p>Dipinjam</p></div>
+            <div class="inner"><h3><?= $s['dipinjam'] ?></h3><p><?= t('borrowed') ?></p></div>
             <div class="icon"><i class="fas fa-hand-paper"></i></div>
-            <a href="<?= url('assets?status=dipinjam') ?>" class="small-box-footer">Lihat detail <i class="fas fa-arrow-circle-right"></i></a>
+            <a href="<?= url('assets?status=dipinjam') ?>" class="small-box-footer"><?= t('view_details') ?> <i class="fas fa-arrow-circle-right"></i></a>
         </div>
     </div>
     <div class="col-lg-3 col-md-6 col-sm-6">
         <div class="small-box bg-danger">
-            <div class="inner"><h3><?= $s['rusak'] ?></h3><p>Rusak</p></div>
+            <div class="inner"><h3><?= $s['rusak'] ?></h3><p><?= t('broken') ?></p></div>
             <div class="icon"><i class="fas fa-tools"></i></div>
-            <a href="<?= url('assets?status=rusak') ?>" class="small-box-footer">Lihat detail <i class="fas fa-arrow-circle-right"></i></a>
+            <a href="<?= url('assets?status=rusak') ?>" class="small-box-footer"><?= t('view_details') ?> <i class="fas fa-arrow-circle-right"></i></a>
         </div>
     </div>
 </div>
@@ -36,13 +36,13 @@ $s = $stats;
 <div class="row">
     <div class="col-md-8">
         <div class="card card-primary">
-            <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-pie mr-1"></i> Distribusi Aset per Kategori</h3></div>
+            <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-pie mr-1"></i> <?= t('asset_distribution') ?></h3></div>
             <div class="card-body"><div id="chart-category" style="min-height:320px"></div></div>
         </div>
     </div>
     <div class="col-md-4">
         <div class="card card-success">
-            <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-pie mr-1"></i> Status Aset</h3></div>
+            <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-pie mr-1"></i> <?= t('asset_status') ?></h3></div>
             <div class="card-body"><div id="chart-status" style="min-height:320px"></div></div>
         </div>
     </div>
@@ -52,7 +52,7 @@ $s = $stats;
     <div class="col-md-6">
         <div class="card card-warning card-outline">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-shield-alt mr-1"></i> Patching (Kuartalan)</h3>
+                <h3 class="card-title"><i class="fas fa-shield-alt mr-1"></i> <?= t('patching_quarterly') ?></h3>
                 <div class="card-tools">
                     <a href="<?= url('patching') ?>" class="btn btn-tool"><i class="fas fa-arrow-right"></i></a>
                 </div>
@@ -61,15 +61,15 @@ $s = $stats;
                 <div class="d-flex mb-2">
                     <div class="text-center mr-4">
                         <h4 class="mb-0 text-warning"><?= $patching['ongoing'] + $patching['draft'] ?></h4>
-                        <small class="text-muted">Jadwal Aktif</small>
+                        <small class="text-muted"><?= t('active_schedules') ?></small>
                     </div>
                     <div class="text-center mr-4">
                         <h4 class="mb-0 text-info"><?= $patching['checklists'] ?></h4>
-                        <small class="text-muted">Total Checklist</small>
+                        <small class="text-muted"><?= t('total_checklists') ?></small>
                     </div>
                     <div class="text-center">
                         <h4 class="mb-0 text-success"><?= $patching['done'] ?></h4>
-                        <small class="text-muted">Selesai</small>
+                        <small class="text-muted"><?= t('completed') ?></small>
                     </div>
                 </div>
                 <?php
@@ -78,21 +78,21 @@ $s = $stats;
                 <div class="progress" style="height:18px">
                     <div class="progress-bar bg-success" style="width:<?= $pPct ?>%"><?= $pPct ?>%</div>
                 </div>
-                <p class="text-muted small mt-2 mb-0">Progress patching semua jadwal (<?= $patching['done'] ?>/<?= $patching['checklists'] ?> aset selesai)</p>
+                <p class="text-muted small mt-2 mb-0"><?= t('patching_progress', ['done' => $patching['done'], 'total' => $patching['checklists']]) ?></p>
             </div>
         </div>
     </div>
     <div class="col-md-6">
         <div class="card card-info">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-box mr-1"></i> Aset Terbaru</h3>
+                <h3 class="card-title"><i class="fas fa-box mr-1"></i> <?= t('recent_assets') ?></h3>
                 <div class="card-tools">
                     <a href="<?= url('assets') ?>" class="btn btn-tool"><i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
             <div class="card-body p-0">
                 <table class="table table-striped table-sm mb-0">
-                    <thead><tr><th>Kode</th><th>Nama</th><th>Status</th></tr></thead>
+                    <thead><tr><th><?= t('asset_code') ?></th><th><?= t('name') ?></th><th><?= t('status') ?></th></tr></thead>
                     <tbody>
                     <?php foreach ($recentAssets as $a): ?>
                         <tr data-href="<?= url('assets/' . $a['id']) ?>">
@@ -109,7 +109,7 @@ $s = $stats;
     <div class="col-md-6">
         <div class="card card-warning">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-history mr-1"></i> Aktivitas Terbaru</h3>
+                <h3 class="card-title"><i class="fas fa-history mr-1"></i> <?= t('recent_activity') ?></h3>
                 <div class="card-tools">
                     <a href="<?= url('logs') ?>" class="btn btn-tool"><i class="fas fa-arrow-right"></i></a>
                 </div>

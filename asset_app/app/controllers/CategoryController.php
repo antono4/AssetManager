@@ -10,7 +10,7 @@ class CategoryController
         Auth::requireAdmin();
         $categories = Category::all();
         View::render('categories/index', [
-            'pageTitle'  => 'Kategori Aset',
+            'pageTitle'  => t('category_list'),
             'categories' => $categories,
         ]);
     }
@@ -21,14 +21,14 @@ class CategoryController
         $name = trim($_POST['name'] ?? '');
         $description = trim($_POST['description'] ?? '');
         if ($name === '') {
-            Flash::set('error', 'Nama kategori wajib diisi.');
+            Flash::set('error', t('category_name_required'));
             Auth::redirect(BASE_URL . '/categories');
         }
         try {
             Category::create($name, $description);
-            Flash::set('success', 'Kategori berhasil ditambahkan.');
+            Flash::set('success', t('category_added'));
         } catch (PDOException $e) {
-            Flash::set('error', 'Gagal: nama kategori sudah ada.');
+            Flash::set('error', t('category_name_exists'));
         }
         Auth::redirect(BASE_URL . '/categories');
     }
@@ -40,14 +40,14 @@ class CategoryController
         $name = trim($_POST['name'] ?? '');
         $description = trim($_POST['description'] ?? '');
         if ($name === '') {
-            Flash::set('error', 'Nama kategori wajib diisi.');
+            Flash::set('error', t('category_name_required'));
             Auth::redirect(BASE_URL . '/categories');
         }
         try {
             Category::update($id, $name, $description);
-            Flash::set('success', 'Kategori berhasil diperbarui.');
+            Flash::set('success', t('category_updated'));
         } catch (PDOException $e) {
-            Flash::set('error', 'Gagal: nama kategori sudah dipakai.');
+            Flash::set('error', t('category_name_exists'));
         }
         Auth::redirect(BASE_URL . '/categories');
     }
@@ -58,9 +58,9 @@ class CategoryController
         $id = (int)$p['id'];
         $ok = Category::delete($id);
         if ($ok) {
-            Flash::set('success', 'Kategori berhasil dihapus.');
+            Flash::set('success', t('category_deleted'));
         } else {
-            Flash::set('error', 'Kategori tidak bisa dihapus karena masih dipakai aset.');
+            Flash::set('error', t('category_not_deletable'));
         }
         Auth::redirect(BASE_URL . '/categories');
     }

@@ -3,17 +3,17 @@ $a = $asset;
 $isEdit = $action === 'edit';
 ?>
 <div class="card card-primary">
-    <div class="card-header"><h3 class="card-title"><i class="fas fa-<?= $isEdit?'edit':'plus' ?> mr-1"></i> <?= $isEdit ? 'Edit Aset' : 'Tambah Aset Baru' ?></h3></div>
+    <div class="card-header"><h3 class="card-title"><i class="fas fa-<?= $isEdit?'edit':'plus' ?> mr-1"></i> <?= $isEdit ? t('edit_asset') : t('add_new_asset') ?></h3></div>
     <form method="post" action="<?= $isEdit ? url('assets/' . $a['id']) : url('assets') ?>">
         <div class="card-body">
             <?php if (!$isEdit): ?>
             <div class="form-group">
-                <label>Kode Aset <small class="text-muted">(otomatis)</small></label>
+                <label><?= t('asset_code') ?> <small class="text-muted">({<?= t('auto') ?>})</small></label>
                 <input type="text" class="form-control" value="<?= e(Asset::generateCode()) ?>" disabled>
             </div>
             <?php else: ?>
             <div class="form-group">
-                <label>Kode Aset</label>
+                <label><?= t('asset_code') ?></label>
                 <input type="text" class="form-control" value="<?= e($a['asset_code']) ?>" disabled>
             </div>
             <?php endif; ?>
@@ -21,13 +21,13 @@ $isEdit = $action === 'edit';
             <div class="row">
                 <div class="col-md-8">
                     <div class="form-group">
-                        <label>Nama Aset <span class="text-danger">*</span></label>
+                        <label><?= t('name') ?> <span class="text-danger">*</span></label>
                         <input type="text" name="name" class="form-control" required value="<?= e($a['name'] ?? '') ?>">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label>Kategori <span class="text-danger">*</span></label>
+                        <label><?= t('category') ?> <span class="text-danger">*</span></label>
                         <select name="category_id" class="form-control" required>
                             <?php foreach ($categories as $c): ?>
                                 <option value="<?= $c['id'] ?>" <?= $a && (string)$a['category_id']===(string)$c['id']?'selected':'' ?>><?= e($c['name']) ?></option>
@@ -38,24 +38,24 @@ $isEdit = $action === 'edit';
             </div>
 
             <div class="form-group">
-                <label>Brand / Spesifikasi</label>
+                <label><?= t('brand_spec') ?></label>
                 <input type="text" name="brand_spec" class="form-control" value="<?= e($a['brand_spec'] ?? '') ?>" placeholder="Mis: Dell OptiPlex 7090 / i7 / 16GB">
             </div>
 
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>Lokasi</label>
+                        <label><?= t('location') ?></label>
                         <input type="text" name="location" class="form-control" value="<?= e($a['location'] ?? '') ?>">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>Status</label>
+                        <label><?= t('status') ?></label>
                         <select name="status" class="form-control">
-                            <option value="tersedia" <?= ($a['status'] ?? '')==='tersedia'?'selected':'' ?>>Tersedia</option>
-                            <option value="dipinjam" <?= ($a['status'] ?? '')==='dipinjam'?'selected':'' ?>>Dipinjam</option>
-                            <option value="rusak"    <?= ($a['status'] ?? '')==='rusak'?'selected':'' ?>>Rusak</option>
+                            <option value="tersedia" <?= ($a['status'] ?? '')==='tersedia'?'selected':'' ?>><?= t('status_tersedia') ?></option>
+                            <option value="dipinjam" <?= ($a['status'] ?? '')==='dipinjam'?'selected':'' ?>><?= t('status_dipinjam') ?></option>
+                            <option value="rusak"    <?= ($a['status'] ?? '')==='rusak'?'selected':'' ?>><?= t('status_rusak') ?></option>
                         </select>
                     </div>
                 </div>
@@ -64,13 +64,13 @@ $isEdit = $action === 'edit';
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>Tanggal Pembelian</label>
+                        <label><?= t('purchase_date') ?></label>
                         <input type="date" name="purchase_date" class="form-control" value="<?= e($a['purchase_date'] ?? '') ?>">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>Harga (Rp)</label>
+                        <label><?= t('price') ?> (Rp)</label>
                         <div class="input-group">
                             <div class="input-group-prepend"><span class="input-group-text">Rp</span></div>
                             <input type="number" name="price" class="form-control" min="0" step="1000" value="<?= e($a['price'] ?? '0') ?>">
@@ -80,8 +80,8 @@ $isEdit = $action === 'edit';
             </div>
         </div>
         <div class="card-footer">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button>
-            <a href="<?= $isEdit ? url('assets/' . $a['id']) : url('assets') ?>" class="btn btn-default">Batal</a>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> <?= t('save') ?></button>
+            <a href="<?= $isEdit ? url('assets/' . $a['id']) : url('assets') ?>" class="btn btn-default"><?= t('cancel') ?></a>
         </div>
     </form>
 </div>

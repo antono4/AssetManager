@@ -1,29 +1,28 @@
 <?php /** Daftar Jadwal Patching */ ?>
 <div class="card card-primary card-outline">
     <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-shield-alt mr-1"></i> Jadwal Patching (Kuartalan / 3 Bulan)</h3>
+        <h3 class="card-title"><i class="fas fa-shield-alt mr-1"></i> <?= t('patch_schedule') ?> (<?= t('quarter') ?> / 3 <?= t('data') ?>)</h3>
         <?php if (Auth::isAdmin()): ?>
         <div class="card-tools">
-            <a href="<?= url('patching/create') ?>" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Buat Jadwal</a>
+            <a href="<?= url('patching/create') ?>" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> <?= t('create_schedule') ?></a>
         </div>
         <?php endif; ?>
     </div>
     <div class="card-body">
         <p class="text-muted small">
-            <i class="fas fa-info-circle"></i> Jadwal patching &amp; maintenance aset IT dilakukan setiap 3 bulan (per kuartal).
-            Setiap jadwal berisi checklist patching per aset dengan item standar (update OS, antivirus, backup, dll).
+            <i class="fas fa-info-circle"></i> <?= t('patching_quarterly_desc') ?>
         </p>
         <?php if (empty($schedules)): ?>
             <div class="empty-state">
                 <i class="fas fa-shield-alt"></i>
-                <p class="mt-3">Belum ada jadwal patching. <?= Auth::isAdmin() ? 'Klik "Buat Jadwal" untuk memulai.' : '' ?></p>
+                <p class="mt-3"><?= t('no_schedules') ?> <?= Auth::isAdmin() ? t('create_schedule') . '.' : '' ?></p>
             </div>
         <?php else: ?>
         <div class="table-responsive">
             <table class="table table-hover">
                 <thead><tr>
-                    <th>Nama Jadwal</th><th>Periode</th><th>Tanggal</th>
-                    <th>Status</th><th class="text-center">Progress</th><th class="text-center">Aksi</th>
+                    <th><?= t('schedule_name') ?></th><th><?= t('period') ?></th><th><?= t('date_range') ?></th>
+                    <th><?= t('status') ?></th><th class="text-center"><?= t('progress') ?></th><th class="text-center"><?= t('action') ?></th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ($schedules as $s):

@@ -78,7 +78,7 @@ class Auth
     public static function requireLogin(): void
     {
         if (!self::check()) {
-            Flash::set('error', 'Silakan login terlebih dahulu.');
+            Flash::set('error', t('login_required'));
             self::redirect(BASE_URL . '/login');
         }
     }
@@ -87,7 +87,7 @@ class Auth
     {
         self::requireLogin();
         if (!self::isAdmin()) {
-            Flash::set('error', 'Akses ditolak. Halaman khusus admin.');
+            Flash::set('error', t('access_denied'));
             self::redirect(BASE_URL . '/dashboard');
         }
     }

@@ -35,6 +35,6 @@ class Router
             }
         }
         http_response_code(404);
-        View::render('error', ['pageTitle' => '404 - Tidak Ditemukan', 'code' => 404, 'message' => 'Halaman yang Anda cari tidak ditemukan.']);
+        View::render('error', ['pageTitle' => t('page_not_found'), 'code' => 404, 'message' => t('not_found_message')]);
     }
 }

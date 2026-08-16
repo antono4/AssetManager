@@ -24,6 +24,8 @@ $role = $u['role'] ?? 'guest';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <!-- Flag Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icon-css@3.5.0/css/flag-icon.min.css">
     <!-- Google Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700">
     <!-- Custom CSS -->
@@ -39,21 +41,37 @@ $role = $u['role'] ?? 'guest';
                 <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
             </li>
             <li class="nav-item d-none d-sm-inline-block">
-                <a class="nav-link" href="<?= url('dashboard') ?>">Home</a>
+                <a class="nav-link" href="<?= url('dashboard') ?>"><?= t('home') ?></a>
             </li>
             <li class="nav-item d-none d-sm-inline-block">
-                <a class="nav-link" href="<?= url('assets') ?>">Aset</a>
+                <a class="nav-link" href="<?= url('assets') ?>"><?= t('assets') ?></a>
             </li>
         </ul>
 
         <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-toggle="dropdown" href="#" title="<?= t('language') ?>">
+                    <i class="fas fa-language"></i>
+                    <span class="d-none d-md-inline"><?= Lang::current() === 'en' ? 'EN' : 'ID' ?></span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a href="<?= url('language/set?lang=en') ?>" class="dropdown-item <?= Lang::is('en')?'active':'' ?>">
+                        <i class="flag-icon flag-icon-us mr-2"></i> English
+                        <?php if (Lang::is('en')): ?><i class="fas fa-check float-right"></i><?php endif; ?>
+                    </a>
+                    <a href="<?= url('language/set?lang=id') ?>" class="dropdown-item <?= Lang::is('id')?'active':'' ?>">
+                        <i class="flag-icon flag-icon-id mr-2"></i> Bahasa Indonesia
+                        <?php if (Lang::is('id')): ?><i class="fas fa-check float-right"></i><?php endif; ?>
+                    </a>
+                </div>
+            </li>
             <li class="nav-item">
-                <a class="nav-link" href="<?= url('profile') ?>" title="Profil">
+                <a class="nav-link" href="<?= url('profile') ?>" title="<?= t('profile') ?>">
                     <i class="fas fa-user-circle"></i>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="<?= url('logout') ?>" title="Logout" onclick="return confirm('Keluar dari aplikasi?')">
+                <a class="nav-link" href="<?= url('logout') ?>" title="<?= t('logout') ?>" onclick="return confirm('<?= t('logout_confirm') ?>')">
                     <i class="fas fa-sign-out-alt"></i>
                 </a>
             </li>
@@ -84,45 +102,45 @@ $role = $u['role'] ?? 'guest';
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                     <li class="nav-item">
-                        <a href="<?= url('dashboard') ?>" class="nav-link <?= ($pageTitle === 'Dashboard') ? 'active' : '' ?>">
-                            <i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p>
+                        <a href="<?= url('dashboard') ?>" class="nav-link <?= ($pageTitle === t('dashboard')) ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-tachometer-alt"></i><p><?= t('dashboard') ?></p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="<?= url('assets') ?>" class="nav-link <?= str_starts_with($pageTitle, 'Daftar Aset') ? 'active' : '' ?>">
-                            <i class="nav-icon fas fa-box"></i><p>Aset</p>
+                        <a href="<?= url('assets') ?>" class="nav-link <?= str_starts_with($pageTitle, t('asset_list')) ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-box"></i><p><?= t('assets') ?></p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="<?= url('logs') ?>" class="nav-link <?= $pageTitle === 'Riwayat Aktivitas' ? 'active' : '' ?>">
-                            <i class="nav-icon fas fa-history"></i><p>Riwayat</p>
+                        <a href="<?= url('logs') ?>" class="nav-link <?= $pageTitle === t('activity_log') ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-history"></i><p><?= t('history') ?></p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="<?= url('reports') ?>" class="nav-link <?= $pageTitle === 'Laporan Aset' ? 'active' : '' ?>">
-                            <i class="nav-icon fas fa-file-alt"></i><p>Laporan</p>
+                        <a href="<?= url('reports') ?>" class="nav-link <?= $pageTitle === t('asset_report') ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-file-alt"></i><p><?= t('reports') ?></p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="<?= url('patching') ?>" class="nav-link <?= (str_starts_with($pageTitle, 'Jadwal') || str_starts_with($pageTitle, 'Checklist') || str_starts_with($pageTitle, 'Buat Jadwal') || str_starts_with($pageTitle, 'Edit Jadwal')) ? 'active' : '' ?>">
-                            <i class="nav-icon fas fa-shield-alt"></i><p>Patching</p>
+                        <a href="<?= url('patching') ?>" class="nav-link <?= (str_starts_with($pageTitle, t('patch_schedule')) || str_starts_with($pageTitle, t('checklist')) || str_starts_with($pageTitle, t('add_schedule')) || str_starts_with($pageTitle, t('edit_schedule'))) ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-shield-alt"></i><p><?= t('patching') ?></p>
                         </a>
                     </li>
                     <?php if ($role === 'admin'): ?>
-                    <li class="nav-header">ADMINISTRASI</li>
+                    <li class="nav-header"><?= t('administration') ?></li>
                     <li class="nav-item">
-                        <a href="<?= url('categories') ?>" class="nav-link <?= $pageTitle === 'Kategori Aset' ? 'active' : '' ?>">
-                            <i class="nav-icon fas fa-tags"></i><p>Kategori</p>
+                        <a href="<?= url('categories') ?>" class="nav-link <?= $pageTitle === t('category_list') ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-tags"></i><p><?= t('categories') ?></p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="<?= url('users') ?>" class="nav-link <?= $pageTitle === 'Manajemen User' ? 'active' : '' ?>">
-                            <i class="nav-icon fas fa-users"></i><p>Manajemen User</p>
+                        <a href="<?= url('users') ?>" class="nav-link <?= $pageTitle === t('user_list') ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-users"></i><p><?= t('user_management') ?></p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="<?= url('setup') ?>" class="nav-link">
-                            <i class="nav-icon fas fa-wrench"></i><p>Setup Password</p>
+                            <i class="nav-icon fas fa-wrench"></i><p><?= t('setup_password') ?></p>
                         </a>
                     </li>
                     <?php endif; ?>
@@ -139,7 +157,7 @@ $role = $u['role'] ?? 'guest';
                     <div class="col-sm-6"><h1><?= e($pageTitle) ?></h1></div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="<?= url('dashboard') ?>">Home</a></li>
+                            <li class="breadcrumb-item"><a href="<?= url('dashboard') ?>"><?= t('home') ?></a></li>
                             <li class="breadcrumb-item active"><?= e($pageTitle) ?></li>
                         </ol>
                     </div>
@@ -158,9 +176,9 @@ $role = $u['role'] ?? 'guest';
     <!-- Footer -->
     <footer class="main-footer">
         <strong>&copy; <?= date('Y') ?> <?= APP_NAME ?> v<?= APP_VERSION ?>.</strong>
-        Dibuat dengan PHP Native &amp; AdminLTE 3.
+        <?= t('built_with') ?>
         <div class="float-right d-none d-sm-inline-block">
-            <b>Database:</b> <?= Database::driver() === 'mysql' ? 'MySQL' : 'SQLite (Demo)' ?>
+            <b><?= t('database') ?>:</b> <?= Database::driver() === 'mysql' ? 'MySQL' : 'SQLite' ?>
         </div>
     </footer>
 </div>

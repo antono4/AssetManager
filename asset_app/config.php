@@ -77,3 +77,6 @@ spl_autoload_register(function ($class) {
         }
     }
 });
+
+// --- Inisialisasi bahasa (default English) ---
+Lang::init();

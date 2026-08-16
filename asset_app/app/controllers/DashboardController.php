@@ -30,7 +30,7 @@ class DashboardController
         }
 
         View::render('dashboard', [
-            'pageTitle'    => 'Dashboard',
+            'pageTitle'    => t('dashboard'),
             'stats'        => $stats,
             'byCategory'   => $byCategory,
             'statusChart'  => $statusChart,

@@ -10,7 +10,7 @@ class AuthController
         if (Auth::check()) {
             Auth::redirect(BASE_URL . '/dashboard');
         }
-        View::render('login', ['pageTitle' => 'Login', 'layout' => 'blank']);
+        View::render('login', ['pageTitle' => t('login'), 'layout' => 'blank']);
     }
 
     public function login()
@@ -19,15 +19,15 @@ class AuthController
         $password = $_POST['password'] ?? '';
 
         if ($username === '' || $password === '') {
-            Flash::set('error', 'Username dan password wajib diisi.');
+            Flash::set('error', t('username_password_required'));
             Auth::redirect(BASE_URL . '/login');
         }
 
         if (Auth::attempt($username, $password)) {
-            Flash::set('success', 'Selamat datang kembali, ' . Auth::user()['name'] . '!');
+            Flash::set('success', t('login_success', ['name' => Auth::user()['name']]));
             Auth::redirect(BASE_URL . '/dashboard');
         }
-        Flash::set('error', 'Username atau password salah.');
+        Flash::set('error', t('login_failed'));
         Auth::redirect(BASE_URL . '/login');
     }
 

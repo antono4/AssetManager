@@ -11,6 +11,12 @@ class View
         $data['flashes'] = Flash::all();
         $data['pageTitle'] = $data['pageTitle'] ?? ucfirst($view);
 
+        // Layout bisa diberikan via key 'layout' di data (untuk login/setup)
+        if (isset($data['layout']) && is_string($data['layout'])) {
+            $layout = $data['layout'];
+            unset($data['layout']);
+        }
+
         // Pakai prefix underscore untuk nama view & layout agar tidak tertimpa
         // oleh key data bernama sama (mis. 'page' untuk pagination, 'layout').
         $_viewName  = $view;

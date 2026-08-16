@@ -10,7 +10,7 @@ class UserController
         Auth::requireAdmin();
         $users = User::all();
         View::render('users/index', [
-            'pageTitle' => 'Manajemen User',
+            'pageTitle' => t('user_list'),
             'users'     => $users,
         ]);
     }
@@ -20,14 +20,14 @@ class UserController
         Auth::requireAdmin();
         $d = $_POST;
         if (empty($d['name']) || empty($d['username']) || empty($d['password'])) {
-            Flash::set('error', 'Nama, username, dan password wajib diisi.');
+            Flash::set('error', t('user_name_username_required'));
             Auth::redirect(BASE_URL . '/users');
         }
         try {
             User::create($d);
-            Flash::set('success', 'User berhasil ditambahkan.');
+            Flash::set('success', t('user_added'));
         } catch (PDOException $e) {
-            Flash::set('error', 'Gagal: username sudah dipakai.');
+            Flash::set('error', t('user_username_exists'));
         }
         Auth::redirect(BASE_URL . '/users');
     }
@@ -38,15 +38,15 @@ class UserController
         $id = (int)$p['id'];
         $d = $_POST;
         if (empty($d['name']) || empty($d['username'])) {
-            Flash::set('error', 'Nama dan username wajib diisi.');
+            Flash::set('error', t('user_name_username_required'));
             Auth::redirect(BASE_URL . '/users');
         }
         $changePw = !empty($d['password']);
         try {
             User::update($id, $d, $changePw);
-            Flash::set('success', 'User berhasil diperbarui.');
+            Flash::set('success', t('user_updated'));
         } catch (PDOException $e) {
-            Flash::set('error', 'Gagal: username sudah dipakai.');
+            Flash::set('error', t('user_username_exists'));
         }
         Auth::redirect(BASE_URL . '/users');
     }
@@ -57,9 +57,9 @@ class UserController
         $id = (int)$p['id'];
         $ok = User::delete($id);
         if ($ok) {
-            Flash::set('success', 'User berhasil dihapus.');
+            Flash::set('success', t('user_deleted'));
         } else {
-            Flash::set('error', 'User tidak bisa dihapus (akun sendiri).');
+            Flash::set('error', t('user_not_deletable'));
         }
         Auth::redirect(BASE_URL . '/users');
     }
@@ -69,7 +69,7 @@ class UserController
         Auth::requireLogin();
         $user = User::find(Auth::id());
         View::render('users/profile', [
-            'pageTitle' => 'Profil Saya',
+            'pageTitle' => t('my_profile'),
             'user'      => $user,
         ]);
     }
@@ -79,7 +79,7 @@ class UserController
         Auth::requireLogin();
         $d = $_POST;
         if (empty($d['name'])) {
-            Flash::set('error', 'Nama wajib diisi.');
+            Flash::set('error', t('user_name_username_required'));
             Auth::redirect(BASE_URL . '/profile');
         }
         $id = Auth::id();
@@ -90,12 +90,11 @@ class UserController
         $changePw = !empty($d['password']);
         try {
             User::update($id, $d, $changePw);
-            // refresh session
             $_SESSION['user']['name'] = $d['name'];
             $_SESSION['user']['email'] = $d['email'];
-            Flash::set('success', 'Profil berhasil diperbarui.');
+            Flash::set('success', t('profile_updated'));
         } catch (PDOException $e) {
-            Flash::set('error', 'Gagal memperbarui profil.');
+            Flash::set('error', t('profile_update_failed'));
         }
         Auth::redirect(BASE_URL . '/profile');
     }

@@ -2,12 +2,12 @@
 <div class="error-page">
     <h2 class="headline text-warning"><?= e($code ?? 404) ?></h2>
     <div class="error-content">
-        <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops!</h3>
-        <p><?= e($message ?? 'Terjadi kesalahan.') ?></p>
+        <h3><i class="fas fa-exclamation-triangle text-warning"></i> <?= t('oops') ?></h3>
+        <p><?= e($message ?? t('not_found_message')) ?></p>
         <p>
-            Anda bisa kembali ke
-            <a href="<?= url('dashboard') ?>">Dashboard</a>
-            atau mencoba halaman lain.
+            <?= t('you_can_go') ?>
+            <a href="<?= url('dashboard') ?>"><?= t('go_dashboard') ?></a>
+            <?= t('or_try_other') ?>
         </p>
     </div>
 </div>

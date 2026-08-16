@@ -14,7 +14,7 @@ class ReportController
         $tab = $_GET['tab'] ?? 'summary';
 
         $data = [
-            'pageTitle'    => 'Laporan Aset',
+            'pageTitle'    => t('asset_report'),
             'filters'      => $filters,
             'tab'          => $tab,
             'categories'   => Category::options(),
@@ -41,7 +41,7 @@ class ReportController
         $tab = $_GET['tab'] ?? 'summary';
 
         View::render('reports/print', [
-            'pageTitle'    => 'Laporan Aset',
+            'pageTitle'    => t('asset_report'),
             'filters'      => $filters,
             'tab'          => $tab,
             'summary'      => Asset::summaryForReport($filters),

@@ -20,7 +20,7 @@ class AssetController
         $totalPages = max(1, (int)ceil($total / $perPage));
 
         View::render('assets/index', [
-            'pageTitle'  => 'Daftar Aset',
+            'pageTitle'  => t('asset_list'),
             'assets'     => $assets,
             'categories' => $categories,
             'search'     => $search,
@@ -38,12 +38,12 @@ class AssetController
         $id = (int)$p['id'];
         $asset = Asset::find($id);
         if (!$asset) {
-            Flash::set('error', 'Aset tidak ditemukan.');
+            Flash::set('error', t('asset_not_found'));
             Auth::redirect(BASE_URL . '/assets');
         }
         $logs = AssetLog::all(50, 0, $id);
         View::render('assets/show', [
-            'pageTitle' => 'Detail Aset: ' . $asset['asset_code'],
+            'pageTitle' => t('asset_detail') . ': ' . $asset['asset_code'],
             'asset'     => $asset,
             'logs'      => $logs,
         ]);
@@ -54,7 +54,7 @@ class AssetController
         Auth::requireAdmin();
         $categories = Category::options();
         View::render('assets/form', [
-            'pageTitle'  => 'Tambah Aset',
+            'pageTitle'  => t('add_asset'),
             'categories' => $categories,
             'action'     => 'create',
             'asset'      => null,
@@ -66,11 +66,11 @@ class AssetController
         Auth::requireAdmin();
         $d = $_POST;
         if (empty($d['name']) || empty($d['category_id'])) {
-            Flash::set('error', 'Nama dan kategori wajib diisi.');
+            Flash::set('error', t('name_category_required'));
             Auth::redirect(BASE_URL . '/assets/create');
         }
         Asset::create($d);
-        Flash::set('success', 'Aset berhasil ditambahkan.');
+        Flash::set('success', t('asset_added'));
         Auth::redirect(BASE_URL . '/assets');
     }
 
@@ -80,12 +80,12 @@ class AssetController
         $id = (int)$p['id'];
         $asset = Asset::find($id);
         if (!$asset) {
-            Flash::set('error', 'Aset tidak ditemukan.');
+            Flash::set('error', t('asset_not_found'));
             Auth::redirect(BASE_URL . '/assets');
         }
         $categories = Category::options();
         View::render('assets/form', [
-            'pageTitle'  => 'Edit Aset: ' . $asset['asset_code'],
+            'pageTitle'  => t('edit_asset') . ': ' . $asset['asset_code'],
             'categories' => $categories,
             'action'     => 'edit',
             'asset'      => $asset,
@@ -98,11 +98,11 @@ class AssetController
         $id = (int)$p['id'];
         $d = $_POST;
         if (empty($d['name']) || empty($d['category_id'])) {
-            Flash::set('error', 'Nama dan kategori wajib diisi.');
+            Flash::set('error', t('name_category_required'));
             Auth::redirect(BASE_URL . '/assets/' . $id . '/edit');
         }
         Asset::update($id, $d);
-        Flash::set('success', 'Aset berhasil diperbarui.');
+        Flash::set('success', t('asset_updated'));
         Auth::redirect(BASE_URL . '/assets/' . $id);
     }
 
@@ -111,7 +111,7 @@ class AssetController
         Auth::requireAdmin();
         $id = (int)$p['id'];
         Asset::delete($id);
-        Flash::set('success', 'Aset berhasil dihapus.');
+        Flash::set('success', t('asset_deleted'));
         Auth::redirect(BASE_URL . '/assets');
     }
 
@@ -123,11 +123,11 @@ class AssetController
         $status = $_POST['status'] ?? '';
         $note = trim($_POST['note'] ?? '');
         if (!in_array($status, ['tersedia', 'dipinjam', 'rusak'], true)) {
-            Flash::set('error', 'Status tidak valid.');
+            Flash::set('error', t('status_invalid'));
             Auth::redirect(BASE_URL . '/assets/' . $id);
         }
         Asset::setStatus($id, $status, $note);
-        Flash::set('success', 'Status aset berhasil diubah.');
+        Flash::set('success', t('status_changed'));
         Auth::redirect(BASE_URL . '/assets/' . $id);
     }
 }

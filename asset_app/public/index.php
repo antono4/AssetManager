@@ -65,6 +65,14 @@ Router::post('/login', fn() => $auth->login());
 Router::get('/logout', fn() => $auth->logout());
 Router::get('/setup',  fn() => $auth->setup());
 
+// Language switcher
+Router::get('/language/set', function () {
+    $lang = $_GET['lang'] ?? 'en';
+    Lang::set($lang);
+    $back = $_SERVER['HTTP_REFERER'] ?? BASE_URL . '/dashboard';
+    Auth::redirect($back);
+});
+
 // Dashboard
 Router::get('/',         fn() => $dash->index());
 Router::get('/dashboard', fn() => $dash->index());

@@ -15,7 +15,7 @@ class LogController
         $totalPages = max(1, (int)ceil($total / $perPage));
 
         View::render('logs/index', [
-            'pageTitle'  => 'Riwayat Aktivitas',
+            'pageTitle'  => t('activity_log'),
             'logs'       => $logs,
             'page'       => $page,
             'totalPages' => $totalPages,

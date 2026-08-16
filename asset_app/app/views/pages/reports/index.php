@@ -105,7 +105,7 @@ $(function () {
     new ApexCharts(document.querySelector('#rep-chart-category'), {
         chart: { type: 'bar', height: 300, toolbar: { show: false }, fontFamily: 'Source Sans Pro' },
         plotOptions: { bar: { borderRadius: 6 } },
-        series: [{ name: 'Jumlah', data: <?= $catTot ?> }],
+        series: [{ name: '<?= t('total') ?>', data: <?= $catTot ?> }],
         colors: ['#3c5184'],
         xaxis: { categories: <?= $catLab ?> },
         dataLabels: { enabled: true },
