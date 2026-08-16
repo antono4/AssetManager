@@ -1,18 +1,37 @@
 # AssetManager — HTML Version
 
-Versi statis (HTML/JS murni) dari aplikasi [AssetManager](../README.md) PHP. Tidak butuh server-side — semua data disimpan di **localStorage** browser. Mengkloning UI dan fitur aplikasi PHP asli (AdminLTE 3, dashboard, manajemen aset, patching kuartalan, laporan, peminjaman, RBAC, dark mode, multi-bahasa).
+Versi statis (HTML/JS murni) dari aplikasi [AssetManager](../README.md) PHP. Mendukung dua mode: **Live** (backend API Python, data persisten di server, shared antar sesi) atau **Statis** (fallback localStorage per-browser). Mengkloning UI dan fitur aplikasi PHP asli (AdminLTE 3, dashboard, manajemen aset, patching kuartalan, laporan, peminjaman, RBAC, dark mode, multi-bahasa).
 
 ## Menjalankan
 
-Karena pakai modul hash-routing, cukup buka lewat web server statis (jangan `file://`).
+### Mode Live (backend API, data persisten di server)
+
+Direkomendasikan — semua perubahan tersimpan di server dan terlihat oleh semua
+sesi/browser.
+
+```bash
+cd html_version
+PORT=12001 python3 api/server.py
+# buka http://localhost:12001/index.html
+```
+
+Backend `api/server.py` (Python stdlib, tanpa dependency) menyajikan file
+statis + REST API (`/api/db`, `/api/login`, `/api/reset`, `/api/assets`).
+Data persisten di `database/live_db.json` (di-seed dari `assets_app.sql`).
+Footer menampilkan **"Database: Live API"** bila backend tersedia.
+
+### Mode Statis (localStorage, tanpa server)
+
+Bila backend API tidak tersedia, aplikasi otomatis fallback ke localStorage
+(per-browser). Cukup buka `index.html` via server statis mana pun.
 
 ```bash
 cd html_version
 python3 -m http.server 8080
-# buka http://localhost:8080/index.html
+# buka http://localhost:8080/index.html  -> footer "Database: LocalStorage"
 ```
 
-Atau hosting statis mana pun (GitHub Pages, Netlify, nginx, Apache — tanpa PHP).
+> Penting: jangan buka via `file://` (modul fetch/CDN diblok); pakai server statis.
 
 ## Akun Default
 

@@ -1,6 +1,9 @@
 /* ============================================================================
-   AssetManager HTML Version — Store (localStorage-backed data layer)
-   Mensimulasikan backend PHP (Database + Models) di sisi klien.
+   AssetManager HTML Version — Store (data layer)
+   Mode LIVE: data dimuat dari backend API (/api/db) dan disinkronkan ke server
+              (POST /api/db) — perubahan terlihat oleh semua sesi/browser.
+   Mode STATIS (fallback): bila API tidak tersedia, pakai localStorage lokal.
+   Seed mengikuti database/assets_app.sql.
    ========================================================================== */
 (function (global) {
     'use strict';
@@ -10,10 +13,20 @@
     const SESSION = NS + ':session';
     const PREFS = NS + ':prefs'; // dark_mode, lang
 
-    // ---- Seed data (mengikuti database/assets_app.sql) ----
+    // API base: relatif terhadap host yang menyajikan index.html
+    const API = {
+        db: 'api/db',
+        login: 'api/login',
+        reset: 'api/reset',
+    };
+
+    let _cache = null;       // in-memory DB snapshot
+    let _liveMode = false;   // true jika backend API tersedia
+
+    // ---- Seed (mengikuti database/assets_app.sql) ----
     function seed() {
         const now = new Date().toISOString();
-        const db = {
+        return {
             categories: [
                 { id: 1, name: 'Komputer',  description: 'PC desktop dan workstation', created_at: now },
                 { id: 2, name: 'Laptop',    description: 'Laptop dan notebook', created_at: now },
@@ -26,16 +39,16 @@
                 { id: 2, name: 'Staff Satu',    username: 'staff', email: 'staff@asset.app', password: 'staff123', role: 'staff', is_active: 1, created_at: now, updated_at: now },
             ],
             assets: [
-                { id: 1, asset_code: 'AST-0001', name: 'PC Desktop Dev 01', category_id: 1, brand_spec: 'Dell OptiPlex 7090 / i7-11700 / 16GB / SSD 512GB', location: 'Ruang Server',      status: 'tersedia', purchase_date: '2023-02-10', price: 12500000, photo: '', deleted_at: null, created_at: now, updated_at: now },
-                { id: 2, asset_code: 'AST-0002', name: 'PC Desktop Dev 02', category_id: 1, brand_spec: 'HP EliteDesk 800 G6 / i5-10500 / 8GB / SSD 256GB',  location: 'Ruang Developer', status: 'tersedia', purchase_date: '2023-03-15', price: 9800000,  photo: '', deleted_at: null, created_at: now, updated_at: now },
-                { id: 3, asset_code: 'AST-0003', name: 'Laptop Marketing',   category_id: 2, brand_spec: 'Lenovo ThinkPad E14 / Ryzen 5 / 8GB / SSD 512GB',  location: 'Ruang Marketing', status: 'dipinjam',  purchase_date: '2023-05-20', price: 11000000, photo: '', deleted_at: null, created_at: now, updated_at: now },
-                { id: 4, asset_code: 'AST-0004', name: 'Laptop Direksi',     category_id: 2, brand_spec: 'MacBook Air M2 / 8GB / SSD 256GB',                location: 'Ruang Direksi',   status: 'dipinjam',  purchase_date: '2023-06-01', price: 18000000, photo: '', deleted_at: null, created_at: now, updated_at: now },
-                { id: 5, asset_code: 'AST-0005', name: 'Printer Laser HR',   category_id: 3, brand_spec: 'Brother HL-L2375DW',                              location: 'Ruang HRD',       status: 'tersedia', purchase_date: '2022-11-12', price: 2500000,  photo: '', deleted_at: null, created_at: now, updated_at: now },
-                { id: 6, asset_code: 'AST-0006', name: 'Printer Inkjet',     category_id: 3, brand_spec: 'Epson EcoTank L3210',                            location: 'Ruang Operasional', status: 'rusak',    purchase_date: '2021-09-08', price: 2300000,  photo: '', deleted_at: null, created_at: now, updated_at: now },
-                { id: 7, asset_code: 'AST-0007', name: 'Switch Core',       category_id: 4, brand_spec: 'Cisco Catalyst 2960 24-Port',                     location: 'Ruang Server',      status: 'tersedia', purchase_date: '2022-07-30', price: 15000000, photo: '', deleted_at: null, created_at: now, updated_at: now },
-                { id: 8, asset_code: 'AST-0008', name: 'Access Point',      category_id: 4, brand_spec: 'TP-Link EAP670 AX3000',                          location: 'Lobi Utama',       status: 'tersedia', purchase_date: '2023-08-22', price: 1800000,  photo: '', deleted_at: null, created_at: now, updated_at: now },
-                { id: 9, asset_code: 'AST-0009', name: 'AC Split 1 PK',      category_id: 5, brand_spec: 'Daikin R32 inverter',                             location: 'Ruang Server',      status: 'tersedia', purchase_date: '2022-04-18', price: 4200000,  photo: '', deleted_at: null, created_at: now, updated_at: now },
-                { id: 10, asset_code: 'AST-0010', name: 'Proyektor',         category_id: 5, brand_spec: 'Epson EB-X51 2700 lumen',                        location: 'Ruang Rapat',       status: 'rusak',    purchase_date: '2020-10-05', price: 6500000,  photo: '', deleted_at: null, created_at: now, updated_at: now },
+                { id: 1, asset_code: 'AST-0001', name: 'PC Desktop Dev 01', category_id: 1, brand_spec: 'Dell OptiPlex 7090 / i7-11700 / 16GB / SSD 512GB', location: 'Ruang Server',      status: 'tersedia', purchase_date: '2023-02-10', price: 12500000, photo: '', deleted_at: null, currency: 'IDR', created_at: now, updated_at: now },
+                { id: 2, asset_code: 'AST-0002', name: 'PC Desktop Dev 02', category_id: 1, brand_spec: 'HP EliteDesk 800 G6 / i5-10500 / 8GB / SSD 256GB',  location: 'Ruang Developer', status: 'tersedia', purchase_date: '2023-03-15', price: 9800000,  photo: '', deleted_at: null, currency: 'IDR', created_at: now, updated_at: now },
+                { id: 3, asset_code: 'AST-0003', name: 'Laptop Marketing',   category_id: 2, brand_spec: 'Lenovo ThinkPad E14 / Ryzen 5 / 8GB / SSD 512GB',  location: 'Ruang Marketing', status: 'dipinjam',  purchase_date: '2023-05-20', price: 11000000, photo: '', deleted_at: null, currency: 'IDR', created_at: now, updated_at: now },
+                { id: 4, asset_code: 'AST-0004', name: 'Laptop Direksi',     category_id: 2, brand_spec: 'MacBook Air M2 / 8GB / SSD 256GB',                location: 'Ruang Direksi',   status: 'dipinjam',  purchase_date: '2023-06-01', price: 18000000, photo: '', deleted_at: null, currency: 'IDR', created_at: now, updated_at: now },
+                { id: 5, asset_code: 'AST-0005', name: 'Printer Laser HR',   category_id: 3, brand_spec: 'Brother HL-L2375DW',                              location: 'Ruang HRD',       status: 'tersedia', purchase_date: '2022-11-12', price: 2500000,  photo: '', deleted_at: null, currency: 'IDR', created_at: now, updated_at: now },
+                { id: 6, asset_code: 'AST-0006', name: 'Printer Inkjet',     category_id: 3, brand_spec: 'Epson EcoTank L3210',                            location: 'Ruang Operasional', status: 'rusak',    purchase_date: '2021-09-08', price: 2300000,  photo: '', deleted_at: null, currency: 'IDR', created_at: now, updated_at: now },
+                { id: 7, asset_code: 'AST-0007', name: 'Switch Core',       category_id: 4, brand_spec: 'Cisco Catalyst 2960 24-Port',                     location: 'Ruang Server',      status: 'tersedia', purchase_date: '2022-07-30', price: 15000000, photo: '', deleted_at: null, currency: 'IDR', created_at: now, updated_at: now },
+                { id: 8, asset_code: 'AST-0008', name: 'Access Point',      category_id: 4, brand_spec: 'TP-Link EAP670 AX3000',                          location: 'Lobi Utama',       status: 'tersedia', purchase_date: '2023-08-22', price: 1800000,  photo: '', deleted_at: null, currency: 'IDR', created_at: now, updated_at: now },
+                { id: 9, asset_code: 'AST-0009', name: 'AC Split 1 PK',      category_id: 5, brand_spec: 'Daikin R32 inverter',                             location: 'Ruang Server',      status: 'tersedia', purchase_date: '2022-04-18', price: 4200000,  photo: '', deleted_at: null, currency: 'IDR', created_at: now, updated_at: now },
+                { id: 10, asset_code: 'AST-0010', name: 'Proyektor',         category_id: 5, brand_spec: 'Epson EB-X51 2700 lumen',                        location: 'Ruang Rapat',       status: 'rusak',    purchase_date: '2020-10-05', price: 6500000,  photo: '', deleted_at: null, currency: 'IDR', created_at: now, updated_at: now },
             ],
             asset_logs: [
                 { id: 1, asset_id: 3,  user_id: 2, action: 'dipinjam',        note: 'Dipinjam oleh tim marketing untuk presentasi klien', created_at: now },
@@ -64,35 +77,30 @@
                 { id: 5, schedule_id: 1, asset_id: 8, status: 'skipped',       patched_by: null, patched_at: null, notes: 'AP non-kritis, skip', created_at: now, updated_at: now },
             ],
             patch_checklist_items: [
-                // checklist 1 (AST-0001) in_progress: 4/6
                 { id: 1,  checklist_id: 1, item_id: 1, is_checked: 1, checked_by: 2, checked_at: now, notes: '', patch_code: 'KB5079473' },
                 { id: 2,  checklist_id: 1, item_id: 2, is_checked: 1, checked_by: 2, checked_at: now, notes: '', patch_code: 'Av-Def-2026.08' },
                 { id: 3,  checklist_id: 1, item_id: 3, is_checked: 1, checked_by: 2, checked_at: now, notes: '', patch_code: '' },
                 { id: 4,  checklist_id: 1, item_id: 4, is_checked: 1, checked_by: 2, checked_at: now, notes: '', patch_code: '' },
                 { id: 5,  checklist_id: 1, item_id: 5, is_checked: 0, checked_by: null, checked_at: null, notes: '', patch_code: '' },
                 { id: 6,  checklist_id: 1, item_id: 6, is_checked: 0, checked_by: null, checked_at: null, notes: '', patch_code: '' },
-                // checklist 2 (AST-0002) pending: 0/6
                 { id: 7,  checklist_id: 2, item_id: 1, is_checked: 0, checked_by: null, checked_at: null, notes: '', patch_code: '' },
                 { id: 8,  checklist_id: 2, item_id: 2, is_checked: 0, checked_by: null, checked_at: null, notes: '', patch_code: '' },
                 { id: 9,  checklist_id: 2, item_id: 3, is_checked: 0, checked_by: null, checked_at: null, notes: '', patch_code: '' },
                 { id: 10, checklist_id: 2, item_id: 4, is_checked: 0, checked_by: null, checked_at: null, notes: '', patch_code: '' },
                 { id: 11, checklist_id: 2, item_id: 5, is_checked: 0, checked_by: null, checked_at: null, notes: '', patch_code: '' },
                 { id: 12, checklist_id: 2, item_id: 6, is_checked: 0, checked_by: null, checked_at: null, notes: '', patch_code: '' },
-                // checklist 3 (AST-0003) completed: 6/6
                 { id: 13, checklist_id: 3, item_id: 1, is_checked: 1, checked_by: 2, checked_at: now, notes: '', patch_code: 'KB5079473' },
                 { id: 14, checklist_id: 3, item_id: 2, is_checked: 1, checked_by: 2, checked_at: now, notes: '', patch_code: 'Av-Def-2026.08' },
                 { id: 15, checklist_id: 3, item_id: 3, is_checked: 1, checked_by: 2, checked_at: now, notes: '', patch_code: '' },
                 { id: 16, checklist_id: 3, item_id: 4, is_checked: 1, checked_by: 2, checked_at: now, notes: '', patch_code: '' },
                 { id: 17, checklist_id: 3, item_id: 5, is_checked: 1, checked_by: 2, checked_at: now, notes: '', patch_code: '' },
                 { id: 18, checklist_id: 3, item_id: 6, is_checked: 1, checked_by: 2, checked_at: now, notes: '', patch_code: '' },
-                // checklist 4 (AST-0007) completed: 6/6
                 { id: 19, checklist_id: 4, item_id: 1, is_checked: 1, checked_by: 1, checked_at: now, notes: '', patch_code: 'IOS-15.2' },
                 { id: 20, checklist_id: 4, item_id: 2, is_checked: 1, checked_by: 1, checked_at: now, notes: '', patch_code: '' },
                 { id: 21, checklist_id: 4, item_id: 3, is_checked: 1, checked_by: 1, checked_at: now, notes: '', patch_code: '' },
                 { id: 22, checklist_id: 4, item_id: 4, is_checked: 1, checked_by: 1, checked_at: now, notes: '', patch_code: '' },
                 { id: 23, checklist_id: 4, item_id: 5, is_checked: 1, checked_by: 1, checked_at: now, notes: '', patch_code: '' },
                 { id: 24, checklist_id: 4, item_id: 6, is_checked: 1, checked_by: 1, checked_at: now, notes: '', patch_code: '' },
-                // checklist 5 (AST-0008) skipped: 0/6
                 { id: 25, checklist_id: 5, item_id: 1, is_checked: 0, checked_by: null, checked_at: null, notes: '', patch_code: '' },
                 { id: 26, checklist_id: 5, item_id: 2, is_checked: 0, checked_by: null, checked_at: null, notes: '', patch_code: '' },
                 { id: 27, checklist_id: 5, item_id: 3, is_checked: 0, checked_by: null, checked_at: null, notes: '', patch_code: '' },
@@ -124,35 +132,61 @@
                 { setting_key: 'company_email',   setting_value: 'info@asset.app', updated_at: now },
             ],
         };
-        return db;
     }
 
+    // ---- LocalStorage helpers (fallback / cache) ----
+    function lsGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+    function lsSet(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
+    function lsRemove(key) { try { localStorage.removeItem(key); } catch (e) {} }
+
     const Store = {
+        // TRUE bila backend API live tersedia
+        isLive() { return _liveMode; },
+
+        // Ambil DB dari cache in-memory (sync). Cache diisi oleh hydrate().
         load() {
-            let raw = localStorage.getItem(KEY);
-            if (!raw) {
-                const db = seed();
-                localStorage.setItem(KEY, JSON.stringify(db));
-                return db;
-            }
-            try { return JSON.parse(raw); } catch (e) {
-                const db = seed(); localStorage.setItem(KEY, JSON.stringify(db)); return db;
+            if (_cache) return _cache;
+            // fallback: localStorage
+            let raw = lsGet(KEY);
+            if (!raw) { const db = seed(); lsSet(KEY, JSON.stringify(db)); _cache = db; return db; }
+            try { _cache = JSON.parse(raw); } catch (e) { _cache = seed(); lsSet(KEY, JSON.stringify(_cache)); }
+            return _cache;
+        },
+        save(db) {
+            _cache = db;
+            if (_liveMode) {
+                // push ke server (fire-and-forget)
+                try {
+                    fetch(API.db, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(db),
+                    }).catch(function () {});
+                } catch (e) {}
+            } else {
+                lsSet(KEY, JSON.stringify(db));
             }
         },
-        save(db) { localStorage.setItem(KEY, JSON.stringify(db)); },
         reset() {
             const db = seed();
-            localStorage.setItem(KEY, JSON.stringify(db));
-            localStorage.removeItem(SESSION);
+            _cache = db;
+            if (_liveMode) {
+                try { fetch(API.reset, { method: 'POST' }).catch(function () {}); } catch (e) {}
+            }
+            lsRemove(KEY);
+            lsRemove(SESSION);
+        },
+        // Inisialisasi async: coba fetch DB live; bila gagal, pakai localStorage.
+        hydrate() {
+            return fetch(API.db, { cache: 'no-store' })
+                .then(function (r) { if (!r.ok) throw new Error('api ' + r.status); return r.json(); })
+                .then(function (db) { _liveMode = true; _cache = db; return db; })
+                .catch(function () { _liveMode = false; return Store.load(); });
         },
         // generic table accessors
         get(table) { return this.load()[table] || []; },
-        set(table, rows) {
-            const db = this.load(); db[table] = rows; this.save(db);
-        },
+        set(table, rows) { const db = this.load(); db[table] = rows; this.save(db); },
         insert(table, row) {
-            const db = this.load();
-            const rows = db[table] || [];
+            const db = this.load(); const rows = db[table] || [];
             const ids = rows.map(r => Number(r.id) || 0);
             row.id = ids.length ? Math.max(...ids) + 1 : 1;
             if (!row.created_at) row.created_at = new Date().toISOString();
@@ -160,14 +194,9 @@
             return row;
         },
         update(table, id, patch) {
-            const db = this.load();
-            const rows = db[table] || [];
+            const db = this.load(); const rows = db[table] || [];
             const i = rows.findIndex(r => Number(r.id) === Number(id));
-            if (i >= 0) {
-                Object.assign(rows[i], patch, { updated_at: new Date().toISOString() });
-                db[table] = rows; this.save(db);
-                return rows[i];
-            }
+            if (i >= 0) { Object.assign(rows[i], patch, { updated_at: new Date().toISOString() }); db[table] = rows; this.save(db); return rows[i]; }
             return null;
         },
         remove(table, id) {
@@ -175,25 +204,19 @@
             db[table] = (db[table] || []).filter(r => Number(r.id) !== Number(id));
             this.save(db);
         },
-        // --- session ---
-        setSession(user) { localStorage.setItem(SESSION, JSON.stringify({ user_id: user.id, name: user.name, role: user.role, username: user.username })); },
-        clearSession() { localStorage.removeItem(SESSION); },
-        session() { try { return JSON.parse(localStorage.getItem(SESSION)); } catch (e) { return null; } },
-        // --- prefs ---
-        getPref(key, def) { try { const p = JSON.parse(localStorage.getItem(PREFS) || '{}'); return p[key] !== undefined ? p[key] : def; } catch (e) { return def; } },
-        setPref(key, val) { let p = {}; try { p = JSON.parse(localStorage.getItem(PREFS) || '{}'); } catch (e) {} p[key] = val; localStorage.setItem(PREFS, JSON.stringify(p)); },
+        // --- session (always local per-browser) ---
+        setSession(user) { lsSet(SESSION, JSON.stringify({ user_id: user.id, name: user.name, role: user.role, username: user.username })); },
+        clearSession() { lsRemove(SESSION); },
+        session() { try { return JSON.parse(lsGet(SESSION)); } catch (e) { return null; } },
+        // --- prefs (always local per-browser) ---
+        getPref(key, def) { try { const p = JSON.parse(lsGet(PREFS) || '{}'); return p[key] !== undefined ? p[key] : def; } catch (e) { return def; } },
+        setPref(key, val) { let p = {}; try { p = JSON.parse(lsGet(PREFS) || '{}'); } catch (e) {} p[key] = val; lsSet(PREFS, JSON.stringify(p)); },
     };
 
-    // ---- Sequence helpers (next id per table) ----
     Store.nextSeq = function (table, prefix, pad) {
         const rows = this.get(table);
         let max = 0;
-        rows.forEach(r => {
-            if (r.asset_code) {
-                const m = String(r.asset_code).match(/(\d+)\s*$/);
-                if (m) max = Math.max(max, parseInt(m[1], 10));
-            }
-        });
+        rows.forEach(r => { if (r.asset_code) { const m = String(r.asset_code).match(/(\d+)\s*$/); if (m) max = Math.max(max, parseInt(m[1], 10)); } });
         return prefix + String(max + 1).padStart(pad, '0');
     };
 
