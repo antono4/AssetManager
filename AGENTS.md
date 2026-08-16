@@ -57,3 +57,12 @@ PHP native asset management app with AdminLTE 3 UI. Located at `/workspace/proje
 - Routes: /patching, /patching/create, /patching/{id}, /patching/checklist/{id}, toggle via AJAX
 - RBAC: admin=full CRUD+generate; staff=view+centang+skip (no create/edit/delete/generate)
 - Patch completion logged to asset_logs with action='patching'
+
+## HTML Version (Static Clone)
+- Lokasi: `html_version/` — jalankan via `python3 -m http.server` di folder tsb, buka `index.html` (jangan via file://).
+- Port statis HTML/JS dari app PHP: tidak butuh server-side; data di localStorage (key `asset_manager_html_v1:*`), seed otomatis mengikuti database/assets_app.sql.
+- Routing: hash-based (#/assets, #/patching/1, #/reports?tab=category). Router di assets/js/router.js — handler tanpa path-param menerima `query` sebagai arg pertama; handler dengan {id} menerima (params, query).
+- Struktur JS: store.js (data+seed), i18n.js (EN/ID, port lang/*.php), helpers.js (e/rp/tgl/Auth/Setting), router.js, views.js (layout shell/blank/print, render ke #app-root via innerHTML), pages.js/pages2.js/pages3.js (semua halaman), app.js (register routes + hashchange).
+- Library dimuat sekali di index.html (jQuery, Bootstrap 4, AdminLTE 3, ApexCharts CDN). Views render ke #app-root innerHTML; script per-halaman (chart) dieksekusi via new Function() di Views.runPendingScripts.
+- Akun default: admin/admin123, staff/staff123 (password plain di localStorage — demo only). Reset: hapus key `asset_manager_html_v1:*` di localStorage atau buka #setup.
+- Foto aset disimpan base64 di localStorage. REST API (#/api/assets) mengembalikan JSON statis (token tidak diverifikasi).
