@@ -4,21 +4,43 @@ Versi statis (HTML/JS murni) dari aplikasi [AssetManager](../README.md) PHP. Men
 
 ## Menjalankan
 
-### Mode Live (backend API, data persisten di server)
+### Mode Live MySQL (koneksi langsung ke database `assets_app`)
 
-Direkomendasikan — semua perubahan tersimpan di server dan terlihat oleh semua
-sesi/browser.
+Backend `api/server_mysql.py` (PyMySQL) membaca/menulis langsung ke database
+MySQL `assets_app` (kompatibel dengan schema `assets_app.sql`). Data persisten
+di MySQL, shared antar sesi, dan bisa dilihat di phpMyAdmin.
 
 ```bash
+# 1. Install MariaDB/MySQL + PyMySQL
+pip install pymysql
+
+# 2. Buat database & import schema
+mysql -u root -p -e "CREATE DATABASE assets_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p assets_app < asset_app/database/assets_app.sql
+mysql -u root -p assets_app < html_version/api/setup_mysql.sql   # tabel + seed tambahan
+mysql -u root -p assets_app < html_version/api/alter_mysql.sql   # kolom tambahan
+
+# 3. Buat user API
+mysql -u root -p -e "CREATE USER 'asset_app'@'%' IDENTIFIED BY 'asset_secret'; GRANT ALL ON assets_app.* TO 'asset_app'@'%'; FLUSH PRIVILEGES;"
+
+# 4. Jalankan backend
 cd html_version
-PORT=12001 python3 api/server.py
-# buka http://localhost:12001/index.html
+MYSQL_HOST=127.0.0.1 MYSQL_USER=asset_app MYSQL_PASSWORD=asset_secret MYSQL_DB=assets_app \
+  PORT=12001 python3 api/server_mysql.py
+# buka http://localhost:12001/index.html  -> footer "Database: Live API"
 ```
 
-Backend `api/server.py` (Python stdlib, tanpa dependency) menyajikan file
-statis + REST API (`/api/db`, `/api/login`, `/api/reset`, `/api/assets`).
-Data persisten di `database/live_db.json` (di-seed dari `assets_app.sql`).
-Footer menampilkan **"Database: Live API"** bila backend tersedia.
+Reset DB ke seed awal: `curl -X POST http://localhost:12001/api/reset`
+(atau hapus data manual via phpMyAdmin, lalu re-import SQL setup).
+
+### Mode Live JSON (backend file, tanpa MySQL)
+
+Backend `api/server.py` (Python stdlib) — data persisten ke
+`database/live_db.json`. Cocok bila tidak ada MySQL.
+
+```bash
+cd html_version && PORT=12001 python3 api/server.py
+```
 
 ### Mode Statis (localStorage, tanpa server)
 
