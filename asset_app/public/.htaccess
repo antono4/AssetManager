@@ -1,11 +1,18 @@
 # Redirect semua request ke index.php (Apache + mod_rewrite)
 RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
+
+# Izinkan akses langsung ke file static yang ada (CSS, JS, gambar, uploads)
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Redirect semua request lain ke index.php
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [L]
 
-# Keamanan dasar
-Options -Indexes
+# Keamanan: block akses file sensitif
 <FilesMatch "\.(sql|sqlite|md|log)$">
     Require all denied
 </FilesMatch>
+
+# Block directory listing
+Options -Indexes
