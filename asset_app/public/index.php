@@ -46,6 +46,10 @@ $base = BASE_URL;
 if ($base !== '' && strpos($path, $base) === 0) {
     $path = substr($path, strlen($base));
 }
+// Jika path masih punya prefix base (double), strip lagi (XAMPP edge case)
+if ($base !== '' && strpos($path, $base) === 0) {
+    $path = substr($path, strlen($base));
+}
 $path = '/' . ltrim($path, '/');
 if ($path === '/index.php') {
     $path = '/';
