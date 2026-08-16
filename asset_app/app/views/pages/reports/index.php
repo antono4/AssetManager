@@ -94,32 +94,38 @@ $qs = http_build_query(array_filter(array_merge($f, ['tab' => $tab])));
 </div>
 
 <?php
-// Script grafik hanya untuk tab ringkasan
+// Script grafik hanya untuk tab ringkasan — tampung ke $scripts agar
+// dirender layout SETELAH library ApexCharts di-load.
 if ($tab === 'summary'):
     $catLab = json_encode($chartCategory['labels']);
     $catTot = json_encode($chartCategory['totals']);
     $catVal = json_encode($chartCategory['nilai']);
-?>
+    $statusLab = json_encode([t('status_tersedia'), t('status_dipinjam'), t('status_rusak')]);
+    $totalLabel = t('total');
+    $chartStatusJson = json_encode($chartStatus);
+    $scripts = <<<JS
 <script>
-$(function () {
+\$(function () {
     new ApexCharts(document.querySelector('#rep-chart-category'), {
         chart: { type: 'bar', height: 300, toolbar: { show: false }, fontFamily: 'Source Sans Pro' },
         plotOptions: { bar: { borderRadius: 6 } },
-        series: [{ name: '<?= t('total') ?>', data: <?= $catTot ?> }],
+        series: [{ name: '{$totalLabel}', data: {$catTot} }],
         colors: ['#3c5184'],
-        xaxis: { categories: <?= $catLab ?> },
+        xaxis: { categories: {$catLab} },
         dataLabels: { enabled: true },
-        tooltip: { y: { formatter: v => v + ' aset' } }
+        tooltip: { y: { formatter: function(v){ return v + ' '; } } }
     }).render();
 
     new ApexCharts(document.querySelector('#rep-chart-status'), {
         chart: { type: 'donut', height: 300, fontFamily: 'Source Sans Pro' },
-        series: <?= json_encode($chartStatus) ?>,
-        labels: ['Tersedia', 'Dipinjam', 'Rusak'],
+        series: {$chartStatusJson},
+        labels: {$statusLab},
         colors: ['#28a745', '#ffc107', '#dc3545'],
         legend: { position: 'bottom' },
         plotOptions: { pie: { donut: { size: '62%' } } }
     }).render();
 });
 </script>
-<?php endif; ?>
+JS;
+endif;
+?>

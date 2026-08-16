@@ -140,32 +140,37 @@ $s = $stats;
 $catLabels = json_encode(array_map(fn($c) => $c['name'], $byCategory));
 $catTotals = json_encode(array_map(fn($c) => (int)$c['total'], $byCategory));
 $catValues = json_encode(array_map(fn($c) => (float)$c['nilai'], $byCategory));
-?>
+$statusLabels = json_encode([t('status_tersedia'), t('status_dipinjam'), t('status_rusak')]);
+$totalAssetsLabel = t('total_assets');
+// Tampung script ke variabel; dirender layout SETELAH library ApexCharts di-load
+$scripts = <<<JS
 <script>
 $(function () {
     // Chart kategori (bar)
-    var catLabels = <?= $catLabels ?>;
-    var catTotals = <?= $catTotals ?>;
+    var catLabels = {$catLabels};
+    var catTotals = {$catTotals};
     new ApexCharts(document.querySelector('#chart-category'), {
         chart: { type: 'bar', height: 320, toolbar: { show: false }, fontFamily: 'Source Sans Pro' },
         plotOptions: { bar: { borderRadius: 6, distributed: true } },
-        series: [{ name: 'Jumlah Aset', data: catTotals }],
+        series: [{ name: '{$totalAssetsLabel}', data: catTotals }],
         colors: ['#3c5184','#2b3a55','#5b7cfa','#7b8b9f','#a3b1cc','#c2cbe0'],
         xaxis: { categories: catLabels },
         dataLabels: { enabled: true },
         legend: { show: false },
-        tooltip: { y: { formatter: v => v + ' aset' } }
+        tooltip: { y: { formatter: function(v){ return v + ' '; } } }
     }).render();
 
     // Chart status (donut)
     new ApexCharts(document.querySelector('#chart-status'), {
         chart: { type: 'donut', height: 320, fontFamily: 'Source Sans Pro' },
-        series: [<?= $statusChart['tersedia'] ?>, <?= $statusChart['dipinjam'] ?>, <?= $statusChart['rusak'] ?>],
-        labels: ['Tersedia', 'Dipinjam', 'Rusak'],
+        series: [{$statusChart['tersedia']}, {$statusChart['dipinjam']}, {$statusChart['rusak']}],
+        labels: {$statusLabels},
         colors: ['#28a745', '#ffc107', '#dc3545'],
         legend: { position: 'bottom' },
-        dataLabels: { formatter: (v) => v.toFixed(0) },
+        dataLabels: { formatter: function(v){ return v.toFixed(0); } },
         plotOptions: { pie: { donut: { size: '62%' } } }
     }).render();
 });
 </script>
+JS;
+?>
