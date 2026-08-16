@@ -30,6 +30,7 @@ $role = $u['role'] ?? 'guest';
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?= asset_url('css/app.css') ?>">
+    <link rel="stylesheet" href="<?= asset_url('css/dashboard.css') ?>">
 </head>
 <body class="hold-transition sidebar-mini layout-navbar-fixed">
 <div class="wrapper">

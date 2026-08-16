@@ -1,0 +1,243 @@
+/* ============================================================================
+   DASHBOARD - Modern UI
+   ========================================================================== */
+
+/* Welcome header */
+.dash-welcome {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1.25rem;
+    border-radius: 16px;
+    background: linear-gradient(120deg, #1e3a5f 0%, #2b4575 50%, #1a2b4a 100%);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(30,58,95,.25);
+}
+.dash-welcome::before {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(79,124,255,.35), transparent 70%);
+    top: -120px; right: -60px;
+    pointer-events: none;
+}
+.dash-welcome::after {
+    content: '';
+    position: absolute;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,212,168,.25), transparent 70%);
+    bottom: -100px; left: 20%;
+    pointer-events: none;
+}
+.dash-welcome > * { position: relative; z-index: 1; }
+.dash-welcome h1 {
+    margin: 0;
+    font-size: 1.7rem;
+    font-weight: 700;
+}
+.dash-welcome h1 .wave { display: inline-block; animation: wave 2.5s ease-in-out infinite; transform-origin: 70% 70%; }
+@keyframes wave { 0%,100%{transform:rotate(0);} 20%{transform:rotate(18deg);} 40%{transform:rotate(-8deg);} 60%{transform:rotate(14deg);} 80%{transform:rotate(-4deg);} }
+.dash-welcome .sub { color: rgba(255,255,255,.7); font-size: .95rem; margin-top: .25rem; }
+.dash-welcome .date-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .6rem 1.1rem;
+    border-radius: 50px;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(6px);
+    font-size: .88rem;
+    font-weight: 600;
+}
+
+/* Stat cards — modern gradient glass */
+.stat-card {
+    position: relative;
+    border-radius: 16px;
+    padding: 1.4rem 1.5rem;
+    color: #fff;
+    overflow: hidden;
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    transition: transform .25s, box-shadow .25s;
+    text-decoration: none;
+}
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(0,0,0,.2);
+    color: #fff;
+}
+.stat-card .sc-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+.stat-card .sc-bg::after {
+    content: '';
+    position: absolute;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.12);
+    top: -50px; right: -40px;
+}
+.stat-card.sc-info    .sc-bg { background: linear-gradient(135deg, #3a6bdb, #2b4575); }
+.stat-card.sc-success .sc-bg { background: linear-gradient(135deg, #1ea87a, #137a5a); }
+.stat-card.sc-warning .sc-bg { background: linear-gradient(135deg, #f0a020, #c97a10); }
+.stat-card.sc-danger  .sc-bg { background: linear-gradient(135deg, #e5484d, #b5363a); }
+.stat-card.sc-info    .sc-bg::after { background: rgba(111,156,255,.25); }
+.stat-card.sc-success .sc-bg::after { background: rgba(45,224,176,.25); }
+.stat-card.sc-warning .sc-bg::after { background: rgba(255,196,64,.25); }
+.stat-card.sc-danger  .sc-bg::after { background: rgba(255,107,107,.25); }
+
+.stat-card .sc-body { position: relative; z-index: 1; }
+.stat-card .sc-icon {
+    position: absolute;
+    top: 1.1rem; right: 1.2rem;
+    z-index: 1;
+    font-size: 3.2rem;
+    opacity: .22;
+}
+.stat-card .sc-num {
+    font-size: 2.3rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: .15rem;
+}
+.stat-card .sc-num small { font-size: .9rem; font-weight: 600; opacity: .8; }
+.stat-card .sc-label { font-size: .92rem; opacity: .85; font-weight: 500; }
+.stat-card .sc-foot {
+    position: relative; z-index: 1;
+    margin-top: .65rem;
+    font-size: .78rem;
+    opacity: .7;
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+}
+
+/* Dashboard card (generic) */
+.dash-card {
+    border-radius: 14px;
+    border: none;
+    box-shadow: 0 4px 18px rgba(0,0,0,.07);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+}
+.dash-card .card-header {
+    background: #fff;
+    border-bottom: 1px solid #eef1f6;
+    padding: .9rem 1.25rem;
+}
+.dash-card .card-header .card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2b3a55;
+    margin: 0;
+}
+.dash-card .card-header .card-title i { color: #4f7cff; }
+.dash-card .card-body { padding: 1.25rem; }
+
+/* Patching widget */
+.patch-widget { padding: 1.25rem; }
+.patch-stats { display: flex; gap: 1rem; margin-bottom: 1rem; }
+.patch-stat {
+    flex: 1;
+    text-align: center;
+    padding: .75rem .5rem;
+    border-radius: 10px;
+    background: #f7f9fc;
+}
+.patch-stat .ps-num { font-size: 1.5rem; font-weight: 800; line-height: 1; }
+.patch-stat .ps-lbl { font-size: .76rem; color: #6c757d; margin-top: .2rem; }
+.patch-stat.ps-warn .ps-num { color: #f0a020; }
+.patch-stat.ps-info .ps-num { color: #3a6bdb; }
+.patch-stat.ps-ok   .ps-num { color: #1ea87a; }
+.patch-progress-wrap { margin-top: .5rem; }
+.patch-progress-wrap .pp-head {
+    display: flex; justify-content: space-between;
+    font-size: .82rem; color: #6c757d; margin-bottom: .3rem;
+}
+.patch-progress {
+    height: 10px; border-radius: 50px;
+    background: #eef1f6; overflow: hidden;
+}
+.patch-progress .bar {
+    height: 100%; border-radius: 50px;
+    background: linear-gradient(90deg, #1ea87a, #2fe0b0);
+    transition: width .8s ease;
+}
+
+/* Recent assets table */
+.recent-table { margin: 0; }
+.recent-table thead th {
+    font-size: .74rem; text-transform: uppercase; letter-spacing: .5px;
+    color: #8898aa; border-bottom: 1px solid #eef1f6; border-top: none;
+}
+.recent-table tbody tr { border-bottom: 1px solid #f4f6f9; cursor: pointer; transition: background .15s; }
+.recent-table tbody tr:hover { background: #f7f9fc; }
+.recent-table tbody tr:last-child { border-bottom: none; }
+.recent-table td { padding: .65rem .5rem; vertical-align: middle; font-size: .9rem; }
+.recent-table .asset-code { font-family: 'SFMono-Regular', Consolas, monospace; font-weight: 600; color: #4f7cff; }
+
+/* Activity timeline (modern) */
+.act-timeline { list-style: none; padding: 0; margin: 0; }
+.act-timeline li {
+    display: flex; gap: .85rem;
+    padding: .7rem 0;
+    border-bottom: 1px solid #f4f6f9;
+}
+.act-timeline li:last-child { border-bottom: none; }
+.act-timeline .act-dot {
+    flex: 0 0 auto;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: .8rem; color: #fff;
+}
+.act-dot.dot-warn { background: linear-gradient(135deg,#f0a020,#e08c10); }
+.act-dot.dot-ok   { background: linear-gradient(135deg,#1ea87a,#178a65); }
+.act-dot.dot-bad  { background: linear-gradient(135deg,#e5484d,#c93b40); }
+.act-dot.dot-info { background: linear-gradient(135deg,#3a6bdb,#2b5dbb); }
+.act-dot.dot-mut  { background: linear-gradient(135deg,#8898aa,#6c7a8c); }
+.act-timeline .act-body { flex: 1; min-width: 0; }
+.act-timeline .act-top { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
+.act-timeline .act-user { font-weight: 700; font-size: .88rem; color: #2b3a55; }
+.act-timeline .act-badge {
+    font-size: .68rem; padding: .15rem .45rem; border-radius: 50px; font-weight: 600;
+}
+.act-timeline .act-time { font-size: .76rem; color: #9aa5b5; }
+.act-timeline .act-asset { font-size: .82rem; color: #6c757d; }
+.act-timeline .act-note { font-size: .8rem; color: #8898aa; font-style: italic; margin-top: .15rem; }
+
+/* Quick links */
+.quick-links { display: flex; flex-wrap: wrap; gap: .6rem; }
+.quick-link {
+    display: inline-flex; align-items: center; gap: .45rem;
+    padding: .55rem .9rem;
+    border-radius: 10px;
+    background: #f7f9fc;
+    border: 1px solid #eef1f6;
+    color: #2b3a55; font-size: .85rem; font-weight: 600;
+    text-decoration: none;
+    transition: all .2s;
+}
+.quick-link:hover { background: #eef3ff; border-color: #c5d4f5; color: #3a6bdb; transform: translateY(-2px); }
+.quick-link i { color: #4f7cff; }
+
+/* Responsive tweaks */
+@media (max-width: 575.98px) {
+    .stat-card .sc-num { font-size: 1.8rem; }
+    .stat-card .sc-icon { font-size: 2.4rem; }
+    .dash-welcome h1 { font-size: 1.3rem; }
+}
