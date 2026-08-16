@@ -38,7 +38,7 @@ class PatchController
         $d = $_POST;
         if (empty($d['name']) || empty($d['quarter']) || empty($d['year'])) {
             Flash::set('error', t('name_category_required'));
-            Auth::redirect(BASE_URL . '/patching/create');
+            Auth::redirect(url('/patching/create'));
         }
         // Auto-fill tanggal bila kosong
         if (empty($d['start_date']) || empty($d['due_date'])) {
@@ -48,7 +48,7 @@ class PatchController
         }
         $id = PatchSchedule::create($d);
         Flash::set('success', t('schedule_added'));
-        Auth::redirect(BASE_URL . '/patching/' . $id);
+        Auth::redirect(url('/patching/' . $id));
     }
 
     // Detail jadwal + daftar checklist aset
@@ -59,7 +59,7 @@ class PatchController
         $schedule = PatchSchedule::findWithStats($id);
         if (!$schedule) {
             Flash::set('error', t('schedule_not_found'));
-            Auth::redirect(BASE_URL . '/patching');
+            Auth::redirect(url('/patching'));
         }
         $checklists = PatchChecklist::forSchedule($id);
         $existingIds = array_column($checklists, 'asset_id');
@@ -81,7 +81,7 @@ class PatchController
         $schedule = PatchSchedule::find($id);
         if (!$schedule) {
             Flash::set('error', t('schedule_not_found'));
-            Auth::redirect(BASE_URL . '/patching');
+            Auth::redirect(url('/patching'));
         }
         View::render('patch/form', [
             'pageTitle'   => t('edit_schedule'),
@@ -99,7 +99,7 @@ class PatchController
         $d = $_POST;
         if (empty($d['name']) || empty($d['quarter']) || empty($d['year'])) {
             Flash::set('error', t('name_category_required'));
-            Auth::redirect(BASE_URL . '/patching/' . $id . '/edit');
+            Auth::redirect(url('/patching/' . $id . '/edit'));
         }
         if (empty($d['start_date']) || empty($d['due_date'])) {
             $dates = PatchSchedule::quarterDates((int)$d['quarter'], (int)$d['year']);
@@ -108,7 +108,7 @@ class PatchController
         }
         PatchSchedule::update($id, $d);
         Flash::set('success', t('schedule_updated'));
-        Auth::redirect(BASE_URL . '/patching/' . $id);
+        Auth::redirect(url('/patching/' . $id));
     }
 
     public function delete(array $p)
@@ -117,7 +117,7 @@ class PatchController
         $id = (int)$p['id'];
         PatchSchedule::delete($id);
         Flash::set('success', t('schedule_deleted'));
-        Auth::redirect(BASE_URL . '/patching');
+        Auth::redirect(url('/patching'));
     }
 
     // Generate checklist untuk aset terpilih
@@ -128,11 +128,11 @@ class PatchController
         $assetIds = $_POST['asset_ids'] ?? [];
         if (empty($assetIds)) {
             Flash::set('error', t('select_one_asset'));
-            Auth::redirect(BASE_URL . '/patching/' . $id);
+            Auth::redirect(url('/patching/' . $id));
         }
         $count = PatchChecklist::generateForSchedule($id, $assetIds);
         Flash::set('success', t('checklists_generated', ['count' => $count]));
-        Auth::redirect(BASE_URL . '/patching/' . $id);
+        Auth::redirect(url('/patching/' . $id));
     }
 
     // Generate semua aset IT sekaligus
@@ -145,11 +145,11 @@ class PatchController
         $ids = array_column($assets, 'id');
         if (empty($ids)) {
             Flash::set('warning', t('no_new_it_assets'));
-            Auth::redirect(BASE_URL . '/patching/' . $id);
+            Auth::redirect(url('/patching/' . $id));
         }
         $count = PatchChecklist::generateForSchedule($id, $ids);
         Flash::set('success', t('it_checklists_generated', ['count' => $count]));
-        Auth::redirect(BASE_URL . '/patching/' . $id);
+        Auth::redirect(url('/patching/' . $id));
     }
 
     // Detail checklist satu aset (centang item)
@@ -160,7 +160,7 @@ class PatchController
         $checklist = PatchChecklist::find($cid);
         if (!$checklist) {
             Flash::set('error', t('schedule_not_found'));
-            Auth::redirect(BASE_URL . '/patching');
+            Auth::redirect(url('/patching'));
         }
         $items = PatchChecklist::items($cid);
         $schedule = PatchSchedule::find($checklist['schedule_id']);
@@ -203,7 +203,7 @@ class PatchController
             return;
         }
         Flash::set('success', t('item_updated'));
-        Auth::redirect(BASE_URL . '/patching/checklist/' . $cid);
+        Auth::redirect(url('/patching/checklist/' . $cid));
     }
 
     // Simpan kode patching untuk satu item (AJAX)
@@ -225,7 +225,7 @@ class PatchController
             return;
         }
         Flash::set('success', t('patch_code_saved'));
-        Auth::redirect(BASE_URL . '/patching/checklist/' . $cid);
+        Auth::redirect(url('/patching/checklist/' . $cid));
     }
 
     // Daftar komputer beserta kode patching untuk sebuah jadwal
@@ -236,7 +236,7 @@ class PatchController
         $schedule = PatchSchedule::findWithStats($id);
         if (!$schedule) {
             Flash::set('error', t('schedule_not_found'));
-            Auth::redirect(BASE_URL . '/patching');
+            Auth::redirect(url('/patching'));
         }
         $computers = PatchChecklist::computersWithPatchCodes($id);
         $items = PatchChecklist::activeItems();
@@ -258,11 +258,11 @@ class PatchController
         $note = trim($_POST['note'] ?? '');
         if (!in_array($status, ['skipped', 'pending'], true)) {
             Flash::set('error', t('status_invalid'));
-            Auth::redirect(BASE_URL . '/patching/checklist/' . $cid);
+            Auth::redirect(url('/patching/checklist/' . $cid));
         }
         PatchChecklist::setStatus($cid, $status, $note);
         Flash::set('success', t('checklist_status_updated'));
-        Auth::redirect(BASE_URL . '/patching/checklist/' . $cid);
+        Auth::redirect(url('/patching/checklist/' . $cid));
     }
 
     // Hapus checklist satu aset dari jadwal
@@ -274,7 +274,7 @@ class PatchController
         $schedId = $cl['schedule_id'] ?? 0;
         PatchChecklist::delete($cid);
         Flash::set('success', t('checklist_deleted'));
-        Auth::redirect(BASE_URL . '/patching/' . $schedId);
+        Auth::redirect(url('/patching/' . $schedId));
     }
 
     // Aset IT yang tersedia untuk generate (kategori non-"Umum")

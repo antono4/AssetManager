@@ -8,7 +8,7 @@ class AuthController
     public function loginForm()
     {
         if (Auth::check()) {
-            Auth::redirect(BASE_URL . '/dashboard');
+            Auth::redirect(url('/dashboard'));
         }
         View::render('login', ['pageTitle' => t('login'), 'layout' => 'blank']);
     }
@@ -20,26 +20,26 @@ class AuthController
 
         if ($username === '' || $password === '') {
             Flash::set('error', t('username_password_required'));
-            Auth::redirect(BASE_URL . '/login');
+            Auth::redirect(url('/login'));
         }
 
         if (Auth::loginLocked($username)) {
             Flash::set('error', t('login_locked'));
-            Auth::redirect(BASE_URL . '/login');
+            Auth::redirect(url('/login'));
         }
 
         if (Auth::attempt($username, $password)) {
             Flash::set('success', t('login_success', ['name' => Auth::user()['name']]));
-            Auth::redirect(BASE_URL . '/dashboard');
+            Auth::redirect(url('/dashboard'));
         }
         Flash::set('error', t('login_failed'));
-        Auth::redirect(BASE_URL . '/login');
+        Auth::redirect(url('/login'));
     }
 
     public function logout()
     {
         Auth::logout();
-        Auth::redirect(BASE_URL . '/login');
+        Auth::redirect(url('/login'));
     }
 
     // Route /setup - perbarui password default ke hash bcrypt yang valid

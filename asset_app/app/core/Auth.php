@@ -121,7 +121,7 @@ class Auth
     {
         if (!self::check()) {
             Flash::set('error', t('login_required'));
-            self::redirect(BASE_URL . '/login');
+            self::redirect(BASE_URL . '/index.php?r=login');
         }
     }
 
@@ -130,7 +130,7 @@ class Auth
         self::requireLogin();
         if (!self::isAdmin()) {
             Flash::set('error', t('access_denied'));
-            self::redirect(BASE_URL . '/dashboard');
+            self::redirect(BASE_URL . '/index.php?r=dashboard');
         }
     }
 

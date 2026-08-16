@@ -39,7 +39,7 @@ class AssetController
         $asset = Asset::find($id);
         if (!$asset) {
             Flash::set('error', t('asset_not_found'));
-            Auth::redirect(BASE_URL . '/assets');
+            Auth::redirect(url('/assets'));
         }
         $logs = AssetLog::all(50, 0, $id);
         View::render('assets/show', [
@@ -67,11 +67,11 @@ class AssetController
         $d = $_POST;
         if (empty($d['name']) || empty($d['category_id'])) {
             Flash::set('error', t('name_category_required'));
-            Auth::redirect(BASE_URL . '/assets/create');
+            Auth::redirect(url('/assets/create'));
         }
         Asset::create($d);
         Flash::set('success', t('asset_added'));
-        Auth::redirect(BASE_URL . '/assets');
+        Auth::redirect(url('/assets'));
     }
 
     public function edit(array $p)
@@ -81,7 +81,7 @@ class AssetController
         $asset = Asset::find($id);
         if (!$asset) {
             Flash::set('error', t('asset_not_found'));
-            Auth::redirect(BASE_URL . '/assets');
+            Auth::redirect(url('/assets'));
         }
         $categories = Category::options();
         View::render('assets/form', [
@@ -99,11 +99,11 @@ class AssetController
         $d = $_POST;
         if (empty($d['name']) || empty($d['category_id'])) {
             Flash::set('error', t('name_category_required'));
-            Auth::redirect(BASE_URL . '/assets/' . $id . '/edit');
+            Auth::redirect(url('/assets/' . $id . '/edit'));
         }
         Asset::update($id, $d);
         Flash::set('success', t('asset_updated'));
-        Auth::redirect(BASE_URL . '/assets/' . $id);
+        Auth::redirect(url('/assets/' . $id));
     }
 
     public function delete(array $p)
@@ -112,7 +112,7 @@ class AssetController
         $id = (int)$p['id'];
         Asset::delete($id);
         Flash::set('success', t('asset_deleted'));
-        Auth::redirect(BASE_URL . '/assets');
+        Auth::redirect(url('/assets'));
     }
 
     // Ubah status cepat (dipinjam/kembali/rusak)
@@ -124,11 +124,11 @@ class AssetController
         $note = trim($_POST['note'] ?? '');
         if (!in_array($status, ['tersedia', 'dipinjam', 'rusak'], true)) {
             Flash::set('error', t('status_invalid'));
-            Auth::redirect(BASE_URL . '/assets/' . $id);
+            Auth::redirect(url('/assets/' . $id));
         }
         Asset::setStatus($id, $status, $note);
         Flash::set('success', t('status_changed'));
-        Auth::redirect(BASE_URL . '/assets/' . $id);
+        Auth::redirect(url('/assets/' . $id));
     }
 
     // Hapus foto aset
@@ -138,6 +138,6 @@ class AssetController
         $id = (int)$p['id'];
         Asset::removePhoto($id);
         Flash::set('success', t('photo_removed'));
-        Auth::redirect(BASE_URL . '/assets/' . $id . '/edit');
+        Auth::redirect(url('/assets/' . $id . '/edit'));
     }
 }

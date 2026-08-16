@@ -68,7 +68,12 @@ function asset_url(string $path = ''): string
 
 function url(string $path = ''): string
 {
-    return BASE_URL . '/' . ltrim($path, '/');
+    $path = ltrim($path, '/');
+    // Gunakan index.php?r= format (compat tanpa mod_rewrite, XAMPP, Apache, Nginx)
+    if ($path === '') {
+        return BASE_URL . '/index.php';
+    }
+    return BASE_URL . '/index.php?r=' . $path;
 }
 
 function rp($value): string

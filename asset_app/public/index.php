@@ -84,7 +84,7 @@ Router::get('/setup',  fn() => $auth->setup());
 Router::get('/language/set', function () {
     $lang = $_GET['lang'] ?? 'en';
     Lang::set($lang);
-    $back = $_SERVER['HTTP_REFERER'] ?? BASE_URL . '/dashboard';
+    $back = $_SERVER['HTTP_REFERER'] ?? url('/dashboard');
     Auth::redirect($back);
 });
 

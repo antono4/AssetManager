@@ -21,7 +21,7 @@ class UserController
         $d = $_POST;
         if (empty($d['name']) || empty($d['username']) || empty($d['password'])) {
             Flash::set('error', t('user_name_username_required'));
-            Auth::redirect(BASE_URL . '/users');
+            Auth::redirect(url('/users'));
         }
         try {
             User::create($d);
@@ -29,7 +29,7 @@ class UserController
         } catch (PDOException $e) {
             Flash::set('error', t('user_username_exists'));
         }
-        Auth::redirect(BASE_URL . '/users');
+        Auth::redirect(url('/users'));
     }
 
     public function update(array $p)
@@ -39,7 +39,7 @@ class UserController
         $d = $_POST;
         if (empty($d['name']) || empty($d['username'])) {
             Flash::set('error', t('user_name_username_required'));
-            Auth::redirect(BASE_URL . '/users');
+            Auth::redirect(url('/users'));
         }
         $changePw = !empty($d['password']);
         try {
@@ -48,7 +48,7 @@ class UserController
         } catch (PDOException $e) {
             Flash::set('error', t('user_username_exists'));
         }
-        Auth::redirect(BASE_URL . '/users');
+        Auth::redirect(url('/users'));
     }
 
     public function delete(array $p)
@@ -61,7 +61,7 @@ class UserController
         } else {
             Flash::set('error', t('user_not_deletable'));
         }
-        Auth::redirect(BASE_URL . '/users');
+        Auth::redirect(url('/users'));
     }
 
     public function profile()
@@ -80,7 +80,7 @@ class UserController
         $d = $_POST;
         if (empty($d['name'])) {
             Flash::set('error', t('user_name_username_required'));
-            Auth::redirect(BASE_URL . '/profile');
+            Auth::redirect(url('/profile'));
         }
         $id = Auth::id();
         $currentUser = User::find($id);
@@ -96,6 +96,6 @@ class UserController
         } catch (PDOException $e) {
             Flash::set('error', t('profile_update_failed'));
         }
-        Auth::redirect(BASE_URL . '/profile');
+        Auth::redirect(url('/profile'));
     }
 }

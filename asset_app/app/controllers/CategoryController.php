@@ -22,7 +22,7 @@ class CategoryController
         $description = trim($_POST['description'] ?? '');
         if ($name === '') {
             Flash::set('error', t('category_name_required'));
-            Auth::redirect(BASE_URL . '/categories');
+            Auth::redirect(url('/categories'));
         }
         try {
             Category::create($name, $description);
@@ -30,7 +30,7 @@ class CategoryController
         } catch (PDOException $e) {
             Flash::set('error', t('category_name_exists'));
         }
-        Auth::redirect(BASE_URL . '/categories');
+        Auth::redirect(url('/categories'));
     }
 
     public function update(array $p)
@@ -41,7 +41,7 @@ class CategoryController
         $description = trim($_POST['description'] ?? '');
         if ($name === '') {
             Flash::set('error', t('category_name_required'));
-            Auth::redirect(BASE_URL . '/categories');
+            Auth::redirect(url('/categories'));
         }
         try {
             Category::update($id, $name, $description);
@@ -49,7 +49,7 @@ class CategoryController
         } catch (PDOException $e) {
             Flash::set('error', t('category_name_exists'));
         }
-        Auth::redirect(BASE_URL . '/categories');
+        Auth::redirect(url('/categories'));
     }
 
     public function delete(array $p)
@@ -62,6 +62,6 @@ class CategoryController
         } else {
             Flash::set('error', t('category_not_deletable'));
         }
-        Auth::redirect(BASE_URL . '/categories');
+        Auth::redirect(url('/categories'));
     }
 }

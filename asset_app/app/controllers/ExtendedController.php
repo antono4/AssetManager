@@ -43,12 +43,12 @@ class ExtendedController
         Auth::requireAdmin();
         if (empty($_FILES['csv_file']['name']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
             Flash::set('error', t('import_failed', ['error' => 'No file uploaded']));
-            Auth::redirect(BASE_URL . '/assets/import');
+            Auth::redirect(url('/assets/import'));
         }
         $content = file_get_contents($_FILES['csv_file']['tmp_name']);
         $count = Asset::importCsv($content);
         Flash::set('success', t('import_success', ['count' => $count]));
-        Auth::redirect(BASE_URL . '/assets');
+        Auth::redirect(url('/assets'));
     }
 
     // === Trash (soft delete) ===
@@ -65,7 +65,7 @@ class ExtendedController
         $id = (int)$p['id'];
         Asset::restore($id);
         Flash::set('success', t('restored'));
-        Auth::redirect(BASE_URL . '/assets/trash');
+        Auth::redirect(url('/assets/trash'));
     }
 
     public function forceDelete(array $p)
@@ -74,7 +74,7 @@ class ExtendedController
         $id = (int)$p['id'];
         Asset::forceDelete($id);
         Flash::set('success', t('asset_deleted'));
-        Auth::redirect(BASE_URL . '/assets/trash');
+        Auth::redirect(url('/assets/trash'));
     }
 
     // === Global Search ===
@@ -125,7 +125,7 @@ class ExtendedController
         $name = trim($_POST['name'] ?? '');
         $token = ApiToken::create(Auth::id(), $name);
         Flash::set('success', t('token_generated') . ': <code>' . e($token) . '</code>');
-        Auth::redirect(BASE_URL . '/api-tokens');
+        Auth::redirect(url('/api-tokens'));
     }
 
     public function deleteToken(array $p)
@@ -133,7 +133,7 @@ class ExtendedController
         Auth::requireAdmin();
         ApiToken::delete((int)$p['id']);
         Flash::set('success', t('token_deleted'));
-        Auth::redirect(BASE_URL . '/api-tokens');
+        Auth::redirect(url('/api-tokens'));
     }
 
     // === API endpoint (JSON) ===
@@ -181,7 +181,7 @@ class ExtendedController
     {
         Auth::requireLogin();
         Notification::markRead((int)$p['id']);
-        Auth::redirect(BASE_URL . '/notifications');
+        Auth::redirect(url('/notifications'));
     }
 
     public function markAllNotifRead()
@@ -189,7 +189,7 @@ class ExtendedController
         Auth::requireLogin();
         Notification::markAllRead(Auth::id());
         Flash::set('success', 'All notifications marked as read.');
-        Auth::redirect(BASE_URL . '/notifications');
+        Auth::redirect(url('/notifications'));
     }
 
     // === Borrowing ===
@@ -210,7 +210,7 @@ class ExtendedController
         $asset = Asset::find($id);
         if (!$asset) {
             Flash::set('error', t('asset_not_found'));
-            Auth::redirect(BASE_URL . '/assets');
+            Auth::redirect(url('/assets'));
         }
         View::render('borrowings/form', [
             'pageTitle' => t('borrow') . ': ' . $asset['asset_code'],
@@ -225,11 +225,11 @@ class ExtendedController
         $asset = Asset::find($id);
         if (!$asset) {
             Flash::set('error', t('asset_not_found'));
-            Auth::redirect(BASE_URL . '/assets');
+            Auth::redirect(url('/assets'));
         }
         Borrowing::create($id, $_POST);
         Flash::set('success', t('asset_borrowed'));
-        Auth::redirect(BASE_URL . '/assets/' . $id);
+        Auth::redirect(url('/assets/' . $id));
     }
 
     public function returnAsset(array $p)
@@ -238,7 +238,7 @@ class ExtendedController
         $bid = (int)$p['id'];
         Borrowing::returnAsset($bid);
         Flash::set('success', t('asset_returned'));
-        Auth::redirect(BASE_URL . '/borrowings');
+        Auth::redirect(url('/borrowings'));
     }
 
     // === Activity by user ===
@@ -249,7 +249,7 @@ class ExtendedController
         $user = User::find($id);
         if (!$user) {
             Flash::set('error', 'User not found.');
-            Auth::redirect(BASE_URL . '/users');
+            Auth::redirect(url('/users'));
         }
         $activities = AuditTrail::byUser($id, 30);
         View::render('users/activity', [
