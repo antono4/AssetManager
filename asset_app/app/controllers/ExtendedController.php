@@ -209,9 +209,20 @@ class ExtendedController
         Auth::requireLogin();
         $page = max(1, (int)($_GET['page'] ?? 1));
         $perPage = 20;
-        $total = Borrowing::count();
+        $status = trim($_GET['status'] ?? '');
+        $search = trim($_GET['search'] ?? '');
+
+        $total = Borrowing::count($status, $search);
         $totalPages = max(1, (int)ceil($total / $perPage));
-        $borrowings = Borrowing::all($perPage, ($page - 1) * $perPage);
+        if ($page > $totalPages) {
+            $page = $totalPages;
+        }
+        $borrowings = Borrowing::all($perPage, ($page - 1) * $perPage, $status, $search);
+
+        // Query string untuk pagination (pertahankan filter)
+        $qs = http_build_query(array_filter(['status' => $status, 'search' => $search]));
+        $base = url('borrowings') . ($qs !== '' ? '&' . $qs . '&' : '&');
+
         View::render('borrowings/index', [
             'pageTitle'   => t('borrowing'),
             'borrowings'  => $borrowings,
@@ -219,6 +230,10 @@ class ExtendedController
             'perPage'     => $perPage,
             'total'       => $total,
             'totalPages'  => $totalPages,
+            'status'      => $status,
+            'search'      => $search,
+            'base'        => $base,
+            'stats'       => Borrowing::stats(),
         ]);
     }
 
