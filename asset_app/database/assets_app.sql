@@ -40,6 +40,7 @@ CREATE TABLE `users` (
   `password`   VARCHAR(255) NOT NULL,
   `role`       ENUM('admin','staff') NOT NULL DEFAULT 'staff',
   `is_active`  TINYINT(1)   NOT NULL DEFAULT 1,
+  `photo`      VARCHAR(255) DEFAULT NULL,
   `created_at` DATETIME     DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

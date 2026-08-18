@@ -157,8 +157,10 @@ Router::get('/users',          fn() => $userCtl->index());
 Router::post('/users',         fn() => $userCtl->store());
 Router::post('/users/{id}',    fn($p) => $userCtl->update($p));
 Router::post('/users/{id}/delete', fn($p) => $userCtl->delete($p));
+Router::post('/users/{id}/remove-photo', fn($p) => $userCtl->removePhoto($p));
 Router::get('/profile',        fn() => $userCtl->profile());
 Router::post('/profile',       fn() => $userCtl->updateProfile());
+Router::post('/profile/remove-photo', fn() => $userCtl->removeProfilePhoto());
 
 // Logs
 Router::get('/logs',           fn() => $logCtl->index());
