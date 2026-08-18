@@ -5,7 +5,7 @@ $detPage = $detailPage ?? 1;
 $detTotalPages = $detailTotalPages ?? 1;
 // Base URL untuk pagination detail (pertahankan filter + tab)
 $detQs = http_build_query(array_filter(array_merge($filters, ['tab' => 'detail'])));
-$realBase = url('reports?') . ($detQs ? $detQs . '&' : '');
+$realBase = url('reports') . '&' . ($detQs ? $detQs . '&' : '');
 ?>
 <div class="card card-outline card-primary">
     <div class="card-header"><h6 class="card-title">Daftar Detail Aset <small class="text-muted">(<?= number_format($detTotal) ?> data)</small></h6></div>

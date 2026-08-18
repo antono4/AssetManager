@@ -4,6 +4,7 @@
         <h3 class="card-title"><i class="fas fa-clipboard-list mr-1"></i> <?= t('audit_trail') ?> (<?= $total ?>)</h3>
         <div class="card-tools">
             <form method="get" class="d-inline">
+                <input type="hidden" name="r" value="audit">
                 <select name="module" class="form-control form-control-sm d-inline" style="width:140px" onchange="this.form.submit()">
                     <option value="">All <?= t('module') ?></option>
                     <?php foreach ($modules as $m): ?>
@@ -33,7 +34,7 @@
         </div>
     </div>
     <?php
-    $auditBase = url('audit?') . ($module ? 'module=' . urlencode($module) . '&' : '');
+    $auditBase = url('audit') . '&' . ($module ? 'module=' . urlencode($module) . '&' : '');
     $auditPerPage = 30;
     ?>
     <?= pagination($page, $totalPages, $auditBase, $total, $auditPerPage) ?>

@@ -1,25 +1,28 @@
 <?php /** Daftar Aset + filter/search + pagination */
 $q = http_build_query(array_filter(['search'=>$search,'status'=>$status,'category'=>$category]));
-$base = url('assets') . ($q ? '?' . $q . '&' : '?');
+// url('assets') sudah berbentuk "index.php?r=assets", jadi parameter tambahan
+// (filter & page) HARUS pakai "&" — bukan "?" lagi (menyebabkan "?r=assets?page=5").
+$base = url('assets') . ($q !== '' ? '&' . $q . '&' : '&');
 ?>
 <div class="card card-primary card-outline">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-box mr-1"></i> <?= t('asset_list') ?> <small class="text-muted">(<?= $total ?> <?= t('data') ?>)</small></h3>
         <?php if (Auth::isAdmin()): ?>
         <div class="card-tools">
-            <a href="<?= url('assets/export?' . http_build_query(array_filter(['search'=>$search,'status'=>$status,'category'=>$category]))) ?>" class="btn btn-success btn-sm" title="<?= t('export_csv') ?>"><i class="fas fa-file-csv"></i> CSV</a>
+            <a href="<?= url('assets/export') . ($q !== '' ? '&' . $q : '') ?>" class="btn btn-success btn-sm" title="<?= t('export_csv') ?>"><i class="fas fa-file-csv"></i> CSV</a>
             <a href="<?= url('assets/create') ?>" class="btn btn-primary btn-sm">
                 <i class="fas fa-plus"></i> <?= t('add_asset') ?>
             </a>
         </div>
         <?php else: ?>
         <div class="card-tools">
-            <a href="<?= url('assets/export?' . http_build_query(array_filter(['search'=>$search,'status'=>$status,'category'=>$category]))) ?>" class="btn btn-success btn-sm" title="<?= t('export_csv') ?>"><i class="fas fa-file-csv"></i> CSV</a>
+            <a href="<?= url('assets/export') . ($q !== '' ? '&' . $q : '') ?>" class="btn btn-success btn-sm" title="<?= t('export_csv') ?>"><i class="fas fa-file-csv"></i> CSV</a>
         </div>
         <?php endif; ?>
     </div>
     <div class="card-body">
         <form method="get" class="search-bar mb-3">
+            <input type="hidden" name="r" value="assets">
             <div class="row">
                 <div class="col-md-5">
                     <div class="input-group">
