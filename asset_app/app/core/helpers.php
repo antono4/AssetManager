@@ -81,6 +81,29 @@ function role_badge(string $role): string
     return '<span class="badge bg-' . $cls . '">' . ucfirst($role) . '</span>';
 }
 
+// --- Foto user (profil) ---
+// Path foto disimpan relatif (mis. 'uploads/users/user_xxx.jpg').
+
+function user_photo_url(?string $photo): ?string
+{
+    if (!$photo) {
+        return null;
+    }
+    return BASE_URL . '/' . $photo;
+}
+
+// Avatar user: bila ada foto tampilkan <img>, bila tidak lingkaran inisial.
+function user_photo_img(?string $photo, ?string $name = '', int $size = 40, string $cls = ''): string
+{
+    $url = user_photo_url($photo);
+    $s = $size;
+    if ($url) {
+        return '<img src="' . e($url) . '" alt="avatar" class="' . e($cls) . '" style="width:' . $s . 'px;height:' . $s . 'px;object-fit:cover;border-radius:50%">';
+    }
+    $initial = strtoupper(mb_substr($name ?: '?', 0, 1));
+    return '<div class="' . e($cls) . '" style="width:' . $s . 'px;height:' . $s . 'px;border-radius:50%;background:#3a8;padding:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:' . round($s * 0.45) . 'px">' . e($initial) . '</div>';
+}
+
 function patch_status_badge(string $status): string
 {
     $map = [

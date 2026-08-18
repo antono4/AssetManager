@@ -4,6 +4,8 @@ asset_app/database/*.sqlite
 # Uploads (jangan commit file foto user, tapi keep folder)
 asset_app/public/uploads/assets/*
 !asset_app/public/uploads/assets/.gitkeep
+asset_app/public/uploads/users/*
+!asset_app/public/uploads/users/.gitkeep
 
 # Log
 *.log

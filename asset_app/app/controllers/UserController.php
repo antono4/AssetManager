@@ -90,12 +90,35 @@ class UserController
         $changePw = !empty($d['password']);
         try {
             User::update($id, $d, $changePw);
-            $_SESSION['user']['name'] = $d['name'];
-            $_SESSION['user']['email'] = $d['email'];
+            $refreshed = User::find($id);
+            $_SESSION['user']['name'] = $refreshed['name'];
+            $_SESSION['user']['email'] = $refreshed['email'];
+            $_SESSION['user']['photo'] = $refreshed['photo'];
             Flash::set('success', t('profile_updated'));
         } catch (PDOException $e) {
             Flash::set('error', t('profile_update_failed'));
         }
+        Auth::redirect(url('/profile'));
+    }
+
+    // Admin: hapus foto user
+    public function removePhoto(array $p)
+    {
+        Auth::requireAdmin();
+        $id = (int)$p['id'];
+        User::removePhoto($id);
+        Flash::set('success', t('photo_removed'));
+        Auth::redirect(url('/users'));
+    }
+
+    // User sendiri: hapus foto profil
+    public function removeProfilePhoto()
+    {
+        Auth::requireLogin();
+        $id = Auth::id();
+        User::removePhoto($id);
+        $_SESSION['user']['photo'] = null;
+        Flash::set('success', t('photo_removed'));
         Auth::redirect(url('/profile'));
     }
 }

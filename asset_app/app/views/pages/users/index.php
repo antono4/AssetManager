@@ -9,10 +9,11 @@
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
-                <thead><tr><th>#</th><th>Nama</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Dibuat</th><th class="text-center">Aksi</th></tr></thead>
+                <thead><tr><th>Foto</th><th>#</th><th>Nama</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Dibuat</th><th class="text-center">Aksi</th></tr></thead>
                 <tbody>
                 <?php foreach ($users as $u): ?>
                     <tr>
+                        <td><?= user_photo_img($u['photo'] ?? null, $u['name'], 36) ?></td>
                         <td><?= $u['id'] ?></td>
                         <td><strong><?= e($u['name']) ?></strong></td>
                         <td><code><?= e($u['username']) ?></code></td>
@@ -28,6 +29,11 @@
                         <td><?= tgl($u['created_at']) ?></td>
                         <td class="text-center">
                             <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modal-edit-<?= $u['id'] ?>"><i class="fas fa-edit"></i></button>
+                            <?php if (!empty($u['photo'])): ?>
+                            <form action="<?= url('users/' . $u['id'] . '/remove-photo') ?>" method="post" class="d-inline">
+                                <button class="btn btn-secondary btn-sm" title="<?= t('remove_photo') ?>" data-confirm="Hapus foto <?= e($u['username']) ?>?"><i class="fas fa-image"></i></button>
+                            </form>
+                            <?php endif; ?>
                             <?php if ($u['id'] !== Auth::id()): ?>
                             <form action="<?= url('users/' . $u['id'] . '/delete') ?>" method="post" class="d-inline">
                                 <button class="btn btn-danger btn-sm btn-delete" data-confirm="Hapus user <?= e($u['username']) ?>?"><i class="fas fa-trash"></i></button>
@@ -44,7 +50,7 @@
 
 <!-- Modal Tambah -->
 <div class="modal fade" id="modal-add"><div class="modal-dialog"><div class="modal-content">
-    <form method="post" action="<?= url('users') ?>">
+    <form method="post" action="<?= url('users') ?>" enctype="multipart/form-data">
         <div class="modal-header"><h5 class="modal-title"><i class="fas fa-user-plus mr-1"></i> Tambah User</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div>
         <div class="modal-body">
             <div class="form-group"><label>Nama <span class="text-danger">*</span></label><input type="text" name="name" class="form-control" required></div>
@@ -56,6 +62,11 @@
                 <div class="col-md-6"><div class="form-group"><label>Password <span class="text-danger">*</span></label><input type="password" name="password" class="form-control" required></div></div>
                 <div class="col-md-6"><div class="form-group"><label>Role</label><select name="role" class="form-control"><option value="staff">Staff</option><option value="admin">Admin</option></select></div></div>
             </div>
+            <div class="form-group">
+                <label><?= t('photo') ?></label>
+                <input type="file" name="photo" accept="image/jpeg,image/png,image/gif,image/webp" class="form-control-file">
+                <small class="text-muted"><?= t('photo_hint') ?></small>
+            </div>
             <div class="form-group"><div class="icheck-primary"><input type="checkbox" name="is_active" value="1" checked id="new_active"><label for="new_active">Aktif</label></div></div>
         </div>
         <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button></div>
@@ -65,9 +76,15 @@
 <!-- Modal Edit -->
 <?php foreach ($users as $u): ?>
 <div class="modal fade" id="modal-edit-<?= $u['id'] ?>"><div class="modal-dialog"><div class="modal-content">
-    <form method="post" action="<?= url('users/' . $u['id']) ?>">
+    <form method="post" action="<?= url('users/' . $u['id']) ?>" enctype="multipart/form-data">
         <div class="modal-header"><h5 class="modal-title"><i class="fas fa-user-edit mr-1"></i> Edit User</h5><button type="button" class="close" data-dismiss="modal">&times;</button></div>
         <div class="modal-body">
+            <div class="form-group">
+                <label><?= t('photo') ?></label>
+                <div class="mb-2"><?= user_photo_img($u['photo'] ?? null, $u['name'], 64) ?></div>
+                <input type="file" name="photo" accept="image/jpeg,image/png,image/gif,image/webp" class="form-control-file">
+                <small class="text-muted"><?= t('photo_hint') ?></small>
+            </div>
             <div class="form-group"><label>Nama <span class="text-danger">*</span></label><input type="text" name="name" class="form-control" required value="<?= e($u['name']) ?>"></div>
             <div class="form-group"><label>Username <span class="text-danger">*</span></label><input type="text" name="username" class="form-control" required value="<?= e($u['username']) ?>"></div>
             <div class="form-group"><label>Email</label><input type="email" name="email" class="form-control" value="<?= e($u['email']) ?>"></div>

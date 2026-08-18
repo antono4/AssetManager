@@ -79,6 +79,7 @@ class Auth
             'username' => $user['username'],
             'email'    => $user['email'],
             'role'     => $user['role'],
+            'photo'    => $user['photo'] ?? null,
         ];
     }
 

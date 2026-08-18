@@ -242,6 +242,17 @@ class Database
         if (!$db->query("SHOW COLUMNS FROM assets LIKE 'useful_life'")->fetch()) {
             $db->exec("ALTER TABLE assets ADD COLUMN useful_life INT DEFAULT 5");
         }
+
+        // Kolom photo pada users (foto profil user)
+        if (!$db->query("SHOW COLUMNS FROM users LIKE 'photo'")->fetch()) {
+            $db->exec("ALTER TABLE users ADD COLUMN photo VARCHAR(255) DEFAULT NULL AFTER is_active");
+        }
+
+        // Pastikan folder uploads/users ada
+        $userUploadDir = PUBLIC_PATH . '/uploads/users';
+        if (!is_dir($userUploadDir)) {
+            @mkdir($userUploadDir, 0777, true);
+        }
     }
 
 

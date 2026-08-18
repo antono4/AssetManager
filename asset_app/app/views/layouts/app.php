@@ -117,7 +117,7 @@ $role = $u['role'] ?? 'guest';
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="<?= url('profile') ?>" title="<?= t('profile') ?>">
-                    <i class="fas fa-user-circle"></i>
+                    <?= user_photo_img($u['photo'] ?? null, $u['name'] ?? '', 20) ?>
                 </a>
             </li>
             <li class="nav-item">
@@ -138,10 +138,7 @@ $role = $u['role'] ?? 'guest';
         <div class="sidebar">
             <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                 <div class="image">
-                    <span class="brand-image img-circle elevation-2 d-flex align-items-center justify-content-center"
-                          style="width:34px;height:34px;background:#fff;color:#343a40;font-weight:700">
-                        <?= strtoupper(substr($u['name'] ?? '?', 0, 1)) ?>
-                    </span>
+                    <?= user_photo_img($u['photo'] ?? null, $u['name'] ?? '?', 34) ?>
                 </div>
                 <div class="info">
                     <a href="<?= url('profile') ?>" class="d-block"><?= e($u['name'] ?? 'Guest') ?></a>
