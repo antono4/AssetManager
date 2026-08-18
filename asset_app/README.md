@@ -6,7 +6,7 @@
 
 ![PHP](https://img.shields.io/badge/PHP-8.0%2B-777BB4?logo=php&logoColor=white)
 ![AdminLTE](https://img.shields.io/badge/AdminLTE-3.2-2b3a55)
-![Database](https://img.shields.io/badge/DB-MySQL%20%7C%20SQLite-4479A1?logo=mysql&logoColor=white)
+![Database](https://img.shields.io/badge/DB-MySQL-4479A1?logo=mysql&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-Installable-5A0FC8?logo=pwa&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
@@ -114,7 +114,7 @@
 | Komponen | Teknologi |
 |----------|-----------|
 | Backend | PHP 8.0+ (native, tanpa framework) |
-| Database | MySQL 5.7+ / MariaDB 10+ **atau** SQLite (demo) |
+| Database | MySQL 5.7+ / MariaDB 10+ |
 | UI | AdminLTE 3.2 + Bootstrap 4.6 |
 | Icon | Font Awesome 6, Bootstrap Icons, Flag Icons |
 | Chart | ApexCharts 3.49 |
@@ -122,20 +122,23 @@
 | PWA | manifest.json + Service Worker |
 | Font | Source Sans Pro |
 
+> Aplikasi hanya mendukung MySQL. Koneksi demo SQLite sudah dihapus.
+
 ---
 
 ## 📁 Struktur Proyek
 
 ```
 asset_app/
-├── config.php                      # Konfigurasi & autoload
+├── config.php                      # Konfigurasi & autoload (baca .env)
+├── .env.example                    # Template konfigurasi DB
 ├── README.md                       # File ini
 ├── INSTALL.md                      # Panduan instalasi detail
 ├── USER_GUIDE.md                   # Panduan penggunaan detail
 ├── LICENSE                         # MIT License
 ├── database/
 │   ├── assets_app.sql              # Skema MySQL + data dummy
-│   └── asset_db.sqlite             # Auto-generated (demo SQLite)
+│   └── seed_1000_rows.sql          # 1000 data dummy aset (INSERT)
 ├── public/
 │   ├── index.php                   # Entry point + routing
 │   ├── .htaccess                   # Apache rewrite
@@ -161,29 +164,22 @@ asset_app/
 
 ---
 
-## ⚡ Instalasi Cepat
-
-### Mode Demo (SQLite — tanpa MySQL)
+## ⚡ Instalasi Cepat (MySQL)
 
 ```bash
 cd asset_app
+
+# 1. Buat database
+mysql -u root -p -e "CREATE DATABASE assets_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+# 2. Konfigurasi via .env (paling mudah)
+cp .env.example .env   # default: mysql / assets_app / root / (password kosong)
+
+# 3. Jalankan (skema & data dummy otomatis diimpor bila DB kosong)
 php -S 0.0.0.0:8080 -t public public/index.php
 ```
 
-Buka `http://localhost:8080` → login `admin` / `admin123`.
-
-> Database & data dummy otomatis dibuat. Semua tabel baru (audit, borrow, notif, token) auto-migrate.
-
-### Mode Produksi (MySQL)
-
-```bash
-mysql -u root -p -e "CREATE DATABASE asset_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-mysql -u root -p asset_db < database/assets_app.sql
-DB_DRIVER=mysql DB_HOST=127.0.0.1 DB_NAME=asset_db DB_USER=root DB_PASS=secret \
-  php -S 0.0.0.0:8080 -t public public/index.php
-```
-
-Akses `http://localhost:8080/setup` sekali untuk reset password.
+Akses `http://localhost:8080/setup` sekali untuk reset password, lalu login `admin` / `admin123`.
 
 > 📖 Detail lengkap: **[INSTALL.md](INSTALL.md)** (Apache, Nginx, Docker, dll)
 
@@ -291,29 +287,29 @@ Akses `http://localhost:8080/setup` sekali untuk reset password.
 
 | Masalah | Solusi |
 |---------|--------|
-| `unable to open database file` (SQLite) | Folder `database/` tidak writable oleh web server. Jalankan: `chmod -R 775 database` (atau `chown` ke user web server `daemon`/`nobody`/`www-data`). Versi terbaru sudah auto-`chmod`, tapi bila web server tidak punya izin ubah izin folder, lakukan manual. |
+| Could not connect MySQL | Cek MySQL berjalan & kredensial di `.env`/env var |
 | Grafik kosong | Cek koneksi internet (CDN ApexCharts) |
 | Login gagal/locked | Rate limit: tunggu 15 menit atau `/setup` |
+| Login gagal (hash invalid) | Buka `/setup` sekali untuk reset password bcrypt |
 | Foto tidak upload | Folder `public/uploads/assets` writable (775) |
 | 404 semua halaman | Jalankan via `php -S ... public/index.php` |
 | Dark mode tidak persist | Clear cookie, toggle ulang |
 | API 401 | Sertakan token: `?token=YOUR_TOKEN` |
 
-> 📌 **Folder yang harus writable** (mode SQLite demo & produksi):
-> - `database/` — file SQLite `asset_db.sqlite` dibuat di sini
+> 📌 **Folder yang harus writable** (produksi):
 > - `public/uploads/assets/` — upload foto aset
 >
-> Bila deploy di XAMPP/Apache/Nginx, pastikan user web server (`daemon`, `nobody`, `www-data`) bisa menulis ke kedua folder di atas.
+> Bila deploy di XAMPP/Apache/Nginx, pastikan user web server (`daemon`, `nobody`, `www-data`) bisa menulis ke folder di atas.
 
 ---
 
 ## ❓ FAQ
 
-**Q: Bisakah pakai tanpa MySQL?** A: Ya, mode SQLite otomatis.
+**Q: Apakah butuh MySQL?** A: Ya, aplikasi hanya mendukung MySQL (SQLite demo dihapus).
 
 **Q: Cara deploy?** A: Lihat [INSTALL.md](INSTALL.md) — Apache, Nginx, Docker.
 
-**Q: Cara backup?** A: MySQL: `mysqldump`. SQLite: copy `.sqlite`. Foto: `public/uploads/`.
+**Q: Cara backup?** A: MySQL: `mysqldump -u root -p assets_app > backup.sql`. Foto: `public/uploads/`.
 
 **Q: Cara tambah bahasa?** A: Tambah file `app/lang/xx.php` + daftar di `Lang::SUPPORTED`.
 

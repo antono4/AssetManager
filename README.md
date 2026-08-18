@@ -4,11 +4,11 @@
 
 ### Aplikasi Manajemen Aset IT & Umum
 
-**PHP Native · AdminLTE 3 · MySQL/SQLite · Multi-Bahasa · PWA · 20+ Fitur**
+**PHP Native · AdminLTE 3 · MySQL · Multi-Bahasa · PWA · 20+ Fitur**
 
 [![PHP](https://img.shields.io/badge/PHP-8.0%2B-777BB4?logo=php&logoColor=white)](https://php.net)
 [![AdminLTE](https://img.shields.io/badge/AdminLTE-3.2-2b3a55)](https://adminlte.io)
-[![Database](https://img.shields.io/badge/DB-MySQL%20%7C%20SQLite-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
+[![Database](https://img.shields.io/badge/DB-MySQL-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![PWA](https://img.shields.io/badge/PWA-Installable-5A0FC8?logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
@@ -20,7 +20,7 @@
 
 ## 📋 Tentang Aplikasi
 
-**AssetManager** adalah aplikasi web untuk mengelola aset IT & umum secara komprehensif. Dibangun dengan PHP Native (tanpa framework), UI AdminLTE 3, dan mendukung database MySQL (produksi) maupun SQLite (demo). Aplikasi ini dilengkapi dengan 20+ fitur mulai dari manajemen aset, patching kuartalan, laporan, peminjaman, hingga REST API.
+**AssetManager** adalah aplikasi web untuk mengelola aset IT & umum secara komprehensif. Dibangun dengan PHP Native (tanpa framework), UI AdminLTE 3, dan menggunakan database MySQL. Aplikasi ini dilengkapi dengan 20+ fitur mulai dari manajemen aset, patching kuartalan, laporan, peminjaman, hingga REST API.
 
 ---
 
@@ -105,7 +105,7 @@
 | Komponen | Teknologi |
 |----------|-----------|
 | Backend | PHP 8.0+ (native, tanpa framework) |
-| Database | MySQL 5.7+ / MariaDB 10+ atau SQLite (demo) |
+| Database | MySQL 5.7+ / MariaDB 10+ |
 | UI Framework | AdminLTE 3.2 + Bootstrap 4.6 |
 | Icon | Font Awesome 6, Bootstrap Icons, Flag Icons |
 | Chart | ApexCharts 3.49 |
@@ -123,7 +123,8 @@ AssetManager/
 ├── LICENSE                          # MIT License
 ├── index.html                       # GitHub Pages landing page
 ├── asset_app/
-│   ├── config.php                   # Konfigurasi & autoload
+│   ├── config.php                   # Konfigurasi & autoload (baca .env)
+│   ├── .env.example                  # Template konfigurasi DB
 │   ├── README.md                    # Dokumentasi teknis
 │   ├── INSTALL.md                   # Panduan instalasi detail
 │   ├── USER_GUIDE.md                # Panduan penggunaan detail
@@ -131,7 +132,7 @@ AssetManager/
 │   ├── LICENSE                      # MIT License (copy)
 │   ├── database/
 │   │   ├── assets_app.sql           # Skema MySQL + data dummy
-│   │   └── asset_db.sqlite          # Auto-generated (demo SQLite)
+│   │   └── seed_1000_rows.sql       # 1000 data dummy aset (INSERT)
 │   ├── public/
 │   │   ├── index.php                # Entry point + routing
 │   │   ├── .htaccess                # Apache rewrite
@@ -163,34 +164,26 @@ AssetManager/
 
 ## 🚀 Quick Start
 
-### Mode Demo (SQLite — tanpa MySQL, langsung jalan)
+### Mode Produksi (MySQL)
 
 ```bash
 git clone https://github.com/antono4/AssetManager.git
 cd AssetManager/asset_app
-php -S 0.0.0.0:8080 -t public public/index.php
-```
 
-Buka `http://localhost:8080` → login `admin` / `admin123`.
-
-> ✅ Database SQLite & semua tabel + data dummy **otomatis dibuat** saat pertama dijalankan.
-
-### Mode Produksi (MySQL)
-
-```bash
 # 1. Buat database
-mysql -u root -p -e "CREATE DATABASE asset_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p -e "CREATE DATABASE assets_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
-# 2. Import skema
-mysql -u root -p asset_db < database/assets_app.sql
+# 2. Konfigurasi via .env (paling mudah)
+cp .env.example .env   # default: mysql / assets_app / root / (password kosong)
 
-# 3. Jalankan
-DB_DRIVER=mysql DB_HOST=127.0.0.1 DB_NAME=asset_db DB_USER=root DB_PASS=secret \
-  php -S 0.0.0.0:8080 -t public public/index.php
+# 3. Jalankan (skema & data dummy otomatis diimpor bila DB kosong)
+php -S 0.0.0.0:8080 -t public public/index.php
 
 # 4. Setup password (buka di browser)
 # http://localhost:8080/setup
 ```
+
+Buka `http://localhost:8080` → login `admin` / `admin123`.
 
 ### Install di XAMPP
 
@@ -200,14 +193,16 @@ Ringkasan:
 
 1. Install XAMPP → start Apache & MySQL
 2. Copy folder `asset_app` ke `C:\xampp\htdocs\`
-3. Buat database `asset_db` via phpMyAdmin → import `assets_app.sql`
-4. **Set permission folder** (penting!):
-   ```bash
-   # Linux/macOS XAMPP — biar Apache (user daemon) bisa tulis
-   chmod -R 775 asset_app/database asset_app/public/uploads/assets
-   chown -R daemon:daemon asset_app/database asset_app/public/uploads/assets
+3. Buat database `assets_app` via phpMyAdmin (import `assets_app.sql` opsional — app auto-import bila DB kosong)
+4. Buat file `.env` di folder `asset_app` (salin dari `.env.example`):
+   ```ini
+   DB_DRIVER=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_NAME=assets_app
+   DB_USER=root
+   DB_PASS=
    ```
-   Pada Windows XAMPP, izin file mengikuti user Windows dan biasanya tidak perlu diatur manual.
 5. Akses `http://localhost/asset_app/public/setup` → reset password
 6. Login `admin` / `admin123`
 
@@ -218,7 +213,7 @@ Ringkasan:
 | File | Deskripsi |
 |------|-----------|
 | [asset_app/README.md](asset_app/README.md) | Dokumentasi teknis lengkap (fitur, struktur, route, RBAC) |
-| [asset_app/INSTALL.md](asset_app/INSTALL.md) | Panduan instalasi detail (SQLite, MySQL, Apache, Nginx, Docker) |
+| [asset_app/INSTALL.md](asset_app/INSTALL.md) | Panduan instalasi detail (MySQL, Apache, Nginx, Docker) |
 | [asset_app/USER_GUIDE.md](asset_app/USER_GUIDE.md) | Panduan penggunaan semua fitur |
 | [asset_app/XAMPP_Installation_Guide.pdf](asset_app/XAMPP_Installation_Guide.pdf) | Panduan instalasi XAMPP dalam format PDF |
 | [LICENSE](LICENSE) | MIT License |
@@ -232,17 +227,16 @@ Ringkasan:
 | Komponen | Versi |
 |----------|-------|
 | PHP | 8.0+ |
-| PDO SQLite | (bundled, untuk demo) |
-| PDO MySQL | (extension, untuk produksi) |
+| PDO MySQL | (extension) |
+| MySQL / MariaDB | 5.7+ / 10.3+ |
 | Browser | Chrome / Firefox / Edge |
 
 ### Opsi Deploy
 
 | Opsi | Deskripsi |
 |------|-----------|
-| **SQLite Demo** | `php -S 0.0.0.0:8080 -t public public/index.php` — tanpa MySQL |
-| **MySQL** | Import SQL + set env var → jalankan PHP server |
-| **XAMPP** | Copy ke htdocs + phpMyAdmin import → akses via browser |
+| **MySQL** | Buat DB + `.env` (atau env var) → jalankan PHP server |
+| **XAMPP** | Copy ke htdocs + `.env` + phpMyAdmin → akses via browser |
 | **Apache** | VirtualHost + .htaccess (sudah disediakan) |
 | **Nginx** | PHP-FPM + try_files config |
 | **Docker** | Dockerfile + docker run |
@@ -253,14 +247,14 @@ Ringkasan:
 
 ## ⚙️ Konfigurasi
 
-Via environment variable atau edit `asset_app/config.php`:
+Via file `.env` (disalin dari `.env.example`) atau environment variable:
 
 | Variable | Default | Keterangan |
 |----------|---------|-----------|
-| `DB_DRIVER` | `sqlite` | `sqlite` (demo) atau `mysql` (produksi) |
+| `DB_DRIVER` | `mysql` | Hanya `mysql` (SQLite demo dihapus) |
 | `DB_HOST` | `127.0.0.1` | Host MySQL |
 | `DB_PORT` | `3306` | Port MySQL |
-| `DB_NAME` | `asset_db` | Nama database |
+| `DB_NAME` | `assets_app` | Nama database |
 | `DB_USER` | `root` | User database |
 | `DB_PASS` | (kosong) | Password database |
 
@@ -343,41 +337,40 @@ GET /api/assets?token=YOUR_TOKEN
 
 | Masalah | Solusi |
 |---------|--------|
-| `unable to open database file` (SQLite) | Folder `database/` tidak writable oleh web server. Jalankan: `chmod -R 775 asset_app/database` (atau `chown` ke user web server `daemon`/`nobody`/`www-data`). Versi terbaru sudah auto-`chmod`, tapi bila web server tidak punya izin ubah izin folder, lakukan manual. |
+| Could not connect MySQL | Cek MySQL berjalan & kredensial di `.env`/env var |
 | Grafik kosong | Cek koneksi internet (CDN ApexCharts) |
 | Login gagal/locked | Rate limit: tunggu 15 menit atau `/setup` |
+| Login gagal (hash invalid) | Buka `http://localhost:8080/setup` sekali untuk reset password bcrypt |
 | Foto tidak upload | Folder `public/uploads/assets` writable (775) |
 | 404 semua halaman | Akses via `php -S ... public/index.php` |
 | API 401 | Sertakan token: `?token=YOUR_TOKEN` |
 | ERR_FAILED login | Clear browser cache/service worker |
 
-> 📌 **Folder yang harus writable** (mode SQLite demo & produksi):
-> - `asset_app/database/` — file SQLite `asset_db.sqlite` dibuat di sini
+> 📌 **Folder yang harus writable** (produksi):
 > - `asset_app/public/uploads/assets/` — upload foto aset
 >
-> Bila deploy di XAMPP/Apache/Nginx, pastikan user web server (`daemon`, `nobody`, `www-data`) bisa menulis ke kedua folder di atas.
+> Bila deploy di XAMPP/Apache/Nginx, pastikan user web server (`daemon`, `nobody`, `www-data`) bisa menulis ke folder di atas.
 
 ---
 
 ## ❓ FAQ
 
 <details>
-<summary><b>Bisakah pakai tanpa MySQL?</b></summary>
+<summary><b>Apakah butuh MySQL?</b></summary>
 
-Ya, mode SQLite otomatis. Jalankan `php -S 0.0.0.0:8080 -t public public/index.php` — database & data dummy otomatis dibuat.
+Ya, aplikasi hanya mendukung MySQL (koneksi demo SQLite sudah dihapus). Buat database `assets_app`, set konfigurasi di `.env`, lalu jalankan. Skema & data dummy otomatis diimpor bila database kosong.
 </details>
 
 <details>
 <summary><b>Cara deploy ke server produksi?</b></summary>
 
-Lihat [INSTALL.md](asset_app/INSTALL.md) — 5 opsi: SQLite, MySQL, Apache, Nginx, Docker.
+Lihat [INSTALL.md](asset_app/INSTALL.md) — opsi: MySQL (PHP built-in server), Apache, Nginx, Docker.
 </details>
 
 <details>
 <summary><b>Cara backup data?</b></summary>
 
-MySQL: `mysqldump -u root -p asset_db > backup.sql`  
-SQLite: copy `database/asset_db.sqlite`  
+MySQL: `mysqldump -u root -p assets_app > backup.sql`  
 Foto: `tar -czf photos.tar.gz public/uploads/assets/`
 </details>
 

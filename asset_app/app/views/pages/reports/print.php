@@ -119,5 +119,5 @@ $filterDesc = ReportController::describeFilters($f);
 
 <div class="report-footer">
     <span><?= APP_NAME ?> v<?= APP_VERSION ?></span>
-    <span>Database: <?= Database::driver() === 'mysql' ? 'MySQL' : 'SQLite' ?></span>
+    <span>Database: MySQL</span>
 </div>

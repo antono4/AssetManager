@@ -258,7 +258,7 @@ $role = $u['role'] ?? 'guest';
         <strong>&copy; <?= date('Y') ?> <?= APP_NAME ?> v<?= APP_VERSION ?>.</strong>
         <?= t('built_with') ?>
         <div class="float-right d-none d-sm-inline-block">
-            <b><?= t('database') ?>:</b> <?= Database::driver() === 'mysql' ? 'MySQL' : 'SQLite' ?>
+            <b><?= t('database') ?>:</b> MySQL
         </div>
     </footer>
 </div>

@@ -25,20 +25,46 @@ if (preg_match('#/index\.php$#', $_scriptName)) {
 $_base = rtrim($_base, '/');
 define('BASE_URL', getenv('APP_BASE_URL') !== false ? getenv('APP_BASE_URL') : $_base);
 
+// --- Loader .env sederhana (tanpa dependency) ---
+// Bila ada file .env di root app, muat ke getenv() agar konfigurasi DB (dan
+// APP_BASE_URL) bisa diatur lewat file alih-alih env var OS. Berguna untuk
+// XAMPP/Apache di Windows di mana set env var merepotkan. Env var OS yang
+// sudah ada tetap dipakai (prioritas: OS env > .env file > default).
+$__envFile = __DIR__ . '/.env';
+if (is_file($__envFile)) {
+    foreach (file($__envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $__line) {
+        $__line = trim($__line);
+        if ($__line === '' || $__line[0] === '#') {
+            continue;
+        }
+        if (!str_contains($__line, '=')) {
+            continue;
+        }
+        [$__k, $__v] = explode('=', $__line, 2);
+        $__k = trim($__k);
+        $__v = trim($__v);
+        // Buang tanda kutip pembungkus ("..." atau '...')
+        if (strlen($__v) >= 2 && $__v[0] === $__v[-1] && ($__v[0] === '"' || $__v[0] === "'")) {
+            $__v = substr($__v, 1, -1);
+        }
+        if (getenv($__k) === false) {
+            putenv("$__k=$__v");
+            $_ENV[$__k] = $__v;
+        }
+    }
+}
+
 // --- Pilihan Database ---
-// Mode: 'mysql' (produksi) atau 'sqlite' (demo/offline otomatis)
-define('DB_DRIVER', getenv('DB_DRIVER') ?: 'sqlite');
+// Aplikasi hanya mendukung MySQL (koneksi demo SQLite sudah dihapus).
+define('DB_DRIVER', getenv('DB_DRIVER') ?: 'mysql');
 
 // Konfigurasi MySQL
 define('DB_HOST', getenv('DB_HOST') ?: '127.0.0.1');
 define('DB_PORT', getenv('DB_PORT') ?: '3306');
-define('DB_NAME', getenv('DB_NAME') ?: 'asset_db');
+define('DB_NAME', getenv('DB_NAME') ?: 'assets_app');
 define('DB_USER', getenv('DB_USER') ?: 'root');
 define('DB_PASS', getenv('DB_PASS') ?: '');
 define('DB_CHARSET', 'utf8mb4');
-
-// File SQLite (demo)
-define('SQLITE_PATH', __DIR__ . '/database/asset_db.sqlite');
 
 // --- Sesi & Keamanan ---
 define('SESSION_NAME', 'asset_app_session');
