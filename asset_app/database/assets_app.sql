@@ -119,10 +119,10 @@ INSERT INTO `categories` (`name`,`description`) VALUES
 -- lalu update kolom password.
 INSERT INTO `users` (`name`,`username`,`email`,`password`,`role`) VALUES
 ('Administrator', 'admin', 'admin@asset.app',
- '$2y$10$e0nPp9mZg3wQvLxK1o2Jp.dummyhashadmin123abcdefgHIJKLmnOPQRSTUVwx',
+ '$2y$10$SHqlrxf3gC/om48iCrUpz.YEmCV4Fp92cCq7dVm2TXMNrSAgy0.rK',
  'admin'),
 ('Staff Satu',    'staff', 'staff@asset.app',
- '$2y$10$e0nPp9mZg3wQvLxK1o2Jp.dummyhashstaff123abcdefgHIJKLmnOPQRSTUVwx',
+ '$2y$10$tvhC7arbAtOhIXos5jISX.OBWZNhd8NVJZLRkM8pVT00mitUcvAXe',
  'staff');
 
 
