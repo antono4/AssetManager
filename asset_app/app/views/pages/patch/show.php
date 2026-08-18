@@ -158,7 +158,7 @@ $pct = $s['total_aset'] > 0 ? round(($s['done_aset'] / $s['total_aset']) * 100) 
                 </tbody>
             </table>
         </div>
-        <?= pagination($page ?? 1, $totalPages ?? 1, url('patching/' . $s['id']) . '?', $totalChecklists ?? count($checklists), $perPage ?? 20) ?>
+        <?= pagination($page ?? 1, $totalPages ?? 1, url('patching/' . $s['id']) . '&', $totalChecklists ?? count($checklists), $perPage ?? 20) ?>
         <?php endif; ?>
     </div>
 </div>

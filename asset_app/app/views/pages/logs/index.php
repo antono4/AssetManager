@@ -35,5 +35,5 @@
         <?php endif; ?>
     </div>
 
-    <?= pagination($page, $totalPages, url('logs?'), $total, 20) ?>
+    <?= pagination($page, $totalPages, url('logs') . '&', $total, 20) ?>
 </div>

@@ -21,7 +21,14 @@ function url(string $path = ''): string
     if ($path === '') {
         return BASE_URL . '/index.php';
     }
-    return BASE_URL . '/index.php?r=' . $path;
+    // Pisahkan query string (setelah '?') bila ada, agar tidak terbentuk dua '?'
+    // (mis. url('assets?page=5') -> index.php?r=assets&page=5, bukan ?r=assets?page=5).
+    $query = '';
+    if (($qpos = strpos($path, '?')) !== false) {
+        $query = '&' . substr($path, $qpos + 1);
+        $path = substr($path, 0, $qpos);
+    }
+    return BASE_URL . '/index.php?r=' . $path . $query;
 }
 
 function rp($value): string
