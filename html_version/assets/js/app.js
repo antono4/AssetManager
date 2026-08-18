@@ -71,8 +71,16 @@
     function init() {
         registerRoutes();
         window.addEventListener('hashchange', function () { Router.dispatch(); });
-        // Initial dispatch
-        Router.dispatch();
+        // Hydrate data from live API first (falls back to localStorage if unavailable),
+        // then dispatch the initial route.
+        if (typeof Store.hydrate === 'function') {
+            Store.hydrate().then(function () {
+                // Show a small live-mode indicator badge in the footer after render
+                Router.dispatch();
+            }).catch(function () { Router.dispatch(); });
+        } else {
+            Router.dispatch();
+        }
     }
 
     if (document.readyState === 'loading') {

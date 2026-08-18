@@ -114,7 +114,7 @@
             + '</div></div></section>'
             + '<section class="content"><div class="container-fluid">' + H.flashMessages() + innerHtml + '</div></section></div>'
             + '<footer class="main-footer"><strong>&copy; ' + new Date().getFullYear() + ' ' + Lang.t('app_name') + ' v1.0.0 (HTML).</strong> ' + Lang.t('built_with')
-            + '<div class="float-right d-none d-sm-inline-block"><b>' + Lang.t('database') + ':</b> LocalStorage</div></footer>'
+            + '<div class="float-right d-none d-sm-inline-block"><b>' + Lang.t('database') + ':</b> ' + (Store.isLive && Store.isLive() ? 'Live API' : 'LocalStorage') + '</div></footer>'
             + '</div>';
 
         const root = getRoot();

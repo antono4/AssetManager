@@ -1,18 +1,59 @@
 # AssetManager — HTML Version
 
-Versi statis (HTML/JS murni) dari aplikasi [AssetManager](../README.md) PHP. Tidak butuh server-side — semua data disimpan di **localStorage** browser. Mengkloning UI dan fitur aplikasi PHP asli (AdminLTE 3, dashboard, manajemen aset, patching kuartalan, laporan, peminjaman, RBAC, dark mode, multi-bahasa).
+Versi statis (HTML/JS murni) dari aplikasi [AssetManager](../README.md) PHP. Mendukung dua mode: **Live** (backend API Python, data persisten di server, shared antar sesi) atau **Statis** (fallback localStorage per-browser). Mengkloning UI dan fitur aplikasi PHP asli (AdminLTE 3, dashboard, manajemen aset, patching kuartalan, laporan, peminjaman, RBAC, dark mode, multi-bahasa).
 
 ## Menjalankan
 
-Karena pakai modul hash-routing, cukup buka lewat web server statis (jangan `file://`).
+### Mode Live MySQL (koneksi langsung ke database `assets_app`)
+
+Backend `api/server_mysql.py` (PyMySQL) membaca/menulis langsung ke database
+MySQL `assets_app` (kompatibel dengan schema `assets_app.sql`). Data persisten
+di MySQL, shared antar sesi, dan bisa dilihat di phpMyAdmin.
+
+```bash
+# 1. Install MariaDB/MySQL + PyMySQL
+pip install pymysql
+
+# 2. Buat database & import schema
+mysql -u root -p -e "CREATE DATABASE assets_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p assets_app < asset_app/database/assets_app.sql
+mysql -u root -p assets_app < html_version/api/setup_mysql.sql   # tabel + seed tambahan
+mysql -u root -p assets_app < html_version/api/alter_mysql.sql   # kolom tambahan
+
+# 3. Buat user API
+mysql -u root -p -e "CREATE USER 'asset_app'@'%' IDENTIFIED BY 'asset_secret'; GRANT ALL ON assets_app.* TO 'asset_app'@'%'; FLUSH PRIVILEGES;"
+
+# 4. Jalankan backend
+cd html_version
+MYSQL_HOST=127.0.0.1 MYSQL_USER=asset_app MYSQL_PASSWORD=asset_secret MYSQL_DB=assets_app \
+  PORT=12001 python3 api/server_mysql.py
+# buka http://localhost:12001/index.html  -> footer "Database: Live API"
+```
+
+Reset DB ke seed awal: `curl -X POST http://localhost:12001/api/reset`
+(atau hapus data manual via phpMyAdmin, lalu re-import SQL setup).
+
+### Mode Live JSON (backend file, tanpa MySQL)
+
+Backend `api/server.py` (Python stdlib) — data persisten ke
+`database/live_db.json`. Cocok bila tidak ada MySQL.
+
+```bash
+cd html_version && PORT=12001 python3 api/server.py
+```
+
+### Mode Statis (localStorage, tanpa server)
+
+Bila backend API tidak tersedia, aplikasi otomatis fallback ke localStorage
+(per-browser). Cukup buka `index.html` via server statis mana pun.
 
 ```bash
 cd html_version
 python3 -m http.server 8080
-# buka http://localhost:8080/index.html
+# buka http://localhost:8080/index.html  -> footer "Database: LocalStorage"
 ```
 
-Atau hosting statis mana pun (GitHub Pages, Netlify, nginx, Apache — tanpa PHP).
+> Penting: jangan buka via `file://` (modul fetch/CDN diblok); pakai server statis.
 
 ## Akun Default
 
