@@ -37,5 +37,5 @@ $trashTotal = $total ?? count($assets);
         </div>
         <?php endif; ?>
     </div>
-    <?= pagination($page ?? 1, $totalPages ?? 1, url('assets/trash?'), $trashTotal, $perPage ?? 20) ?>
+    <?= pagination($page ?? 1, $totalPages ?? 1, url('assets/trash') . '&', $trashTotal, $perPage ?? 20) ?>
 </div>

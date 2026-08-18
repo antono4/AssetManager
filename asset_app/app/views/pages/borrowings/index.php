@@ -45,5 +45,5 @@ $borTotal = $total ?? count($borrowings);
         </div>
         <?php endif; ?>
     </div>
-    <?= pagination($page ?? 1, $totalPages ?? 1, url('borrowings?'), $borTotal, $perPage ?? 20) ?>
+    <?= pagination($page ?? 1, $totalPages ?? 1, url('borrowings') . '&', $borTotal, $perPage ?? 20) ?>
 </div>

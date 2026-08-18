@@ -123,5 +123,5 @@ $compTotal = $total ?? count($computers);
         </div>
         <?php endif; ?>
     </div>
-    <?= pagination($page ?? 1, $totalPages ?? 1, url('patching/' . $sch['id'] . '/computers?'), $compTotal, $perPage ?? 20) ?>
+    <?= pagination($page ?? 1, $totalPages ?? 1, url('patching/' . $sch['id'] . '/computers') . '&', $compTotal, $perPage ?? 20) ?>
 </div>

@@ -19,6 +19,7 @@ $qs = http_build_query(array_filter(array_merge($f, ['tab' => $tab])));
     <div class="card-body">
         <!-- Filter -->
         <form method="get" class="search-bar mb-3">
+            <input type="hidden" name="r" value="reports">
             <input type="hidden" name="tab" value="<?= e($tab) ?>">
             <div class="row">
                 <div class="col-md-3">
