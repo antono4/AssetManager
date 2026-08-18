@@ -100,7 +100,9 @@ function user_photo_img(?string $photo, ?string $name = '', int $size = 40, stri
     if ($url) {
         return '<img src="' . e($url) . '" alt="avatar" class="' . e($cls) . '" style="width:' . $s . 'px;height:' . $s . 'px;object-fit:cover;border-radius:50%">';
     }
-    $initial = strtoupper(mb_substr($name ?: '?', 0, 1));
+    // Ambil inisial pertama (support multibyte bila mbstring tersedia)
+    $substr = function_exists('mb_substr') ? 'mb_substr' : 'substr';
+    $initial = strtoupper($substr($name ?: '?', 0, 1));
     return '<div class="' . e($cls) . '" style="width:' . $s . 'px;height:' . $s . 'px;border-radius:50%;background:#3a8;padding:0;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:' . round($s * 0.45) . 'px">' . e($initial) . '</div>';
 }
 
