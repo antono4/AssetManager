@@ -1,0 +1,19 @@
+label,avg_ms,min_ms,max_ms
+"Asset::stats() (5x COUNT/SUM)",33.067,32.811,33.543
+"Asset::countByCategory() GROUP BY",93.376,92.219,94.341
+"Asset::countByStatus() GROUP BY",8.713,8.666,8.796
+Asset::recent(5),14.745,14.582,14.962
+"Asset::count() tanpa filter",10.778,10.329,11.666
+"Asset::count() filter status=dipinjam",13.696,13.473,13.912
+"Asset::count() filter kategori=1",13.229,13.175,13.332
+"Asset::all() halaman 1 (10 baris)",15.069,14.774,15.513
+"Asset::all() deep offset=99980",144.199,142.741,145.774
+"Asset::all() search ""AST-D0005%"" (LIKE)",96.253,96.116,96.387
+"Asset::all() search ""Laptop"" (LIKE name)",79.509,78.731,79.948
+"Asset::count() search ""Ruang Server"" (LIKE location)",81.225,80.664,81.522
+"Asset::globalSearch(""AST-D0010"")",1.16,1.05,1.283
+Asset::find(first),0.181,0.156,0.227
+Asset::find(mid),0.165,0.15,0.19
+Asset::find(last),0.159,0.153,0.17
+"Asset::all() SEMUA (tanpa limit) — exportCsv path",359.33,359.33,359.33
+"Asset::exportCsv() generate string",512.701,512.701,512.701

@@ -144,7 +144,6 @@ $t2 = microtime(true);
 echo "\n=== SELESAI ===\n";
 echo "Total waktu: " . sprintf("%.2fs\n", $t2 - $t0);
 echo "Total aset di DB: " . number_format($finalCount) . "\n";
-echo "DB size: " . round(filesize(SQLITE_PATH) / 1024 / 1024, 2) . " MB\n";
 
 echo "\nDistribusi status:\n";
 foreach (Database::fetchAll("SELECT status, COUNT(*) AS cnt FROM assets GROUP BY status ORDER BY cnt DESC") as $r) {
