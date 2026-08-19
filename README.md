@@ -49,7 +49,7 @@
 - **Harga hanya tampil untuk admin**
 
 ### 🛡 Modul Patching (Kuartalan / per 3 Bulan)
-- Jadwal patching per kuartal (Q1-Q4) dengan auto-fill tanggal
+- Jadwal patching per kuartal — dropdown **Q1-Q4** + **periode/tahun** via date input, auto-fill tanggal
 - Generate checklist per aset IT (exclude kategori "Umum")
 - 6 item checklist standar (Update OS, Antivirus, Backup, Cek Log, Restart, Verifikasi)
 - **Input kode patching** per item per komputer (mis: KB5079473)
@@ -122,9 +122,9 @@ AssetManager/
 ├── README.md                        # File ini
 ├── LICENSE                          # MIT License
 ├── index.html                       # GitHub Pages landing page
-├── asset_app/
+├── asset_app/                       # Aplikasi utama (PHP + MySQL)
 │   ├── config.php                   # Konfigurasi & autoload (baca .env)
-│   ├── .env.example                  # Template konfigurasi DB
+│   ├── .env.example                 # Template konfigurasi DB
 │   ├── README.md                    # Dokumentasi teknis
 │   ├── INSTALL.md                   # Panduan instalasi detail
 │   ├── USER_GUIDE.md                # Panduan penggunaan detail
@@ -132,7 +132,8 @@ AssetManager/
 │   ├── LICENSE                      # MIT License (copy)
 │   ├── database/
 │   │   ├── assets_app.sql           # Skema MySQL + data dummy
-│   │   └── seed_1000_rows.sql       # 1000 data dummy aset (INSERT)
+│   │   ├── seed_1000.sql            # 1000 data dummy (stored procedure)
+│   │   └── seed_1000_rows.sql       # 1000 data dummy aset (INSERT murni)
 │   ├── public/
 │   │   ├── index.php                # Entry point + routing
 │   │   ├── .htaccess                # Apache rewrite
@@ -142,20 +143,29 @@ AssetManager/
 │   │       ├── css/ (app, dashboard, login, print, darkmode)
 │   │       ├── js/app.js
 │   │       └── uploads/assets/      # Foto aset
-│   └── app/
-│       ├── core/ (Database, Auth, Flash, Lang, View, Router)
-│       ├── models/ (Asset, Category, AssetLog, User,
-│       │            PatchSchedule, PatchChecklist,
-│       │            AuditTrail, Notification, Borrowing, ApiToken)
-│       ├── controllers/ (Auth, Dashboard, Asset, Category, User,
-│       │                  Log, Report, Patch, Extended)
-│       ├── lang/ (en.php, id.php)
-│       └── views/
-│           ├── layouts/ (app, blank, print)
-│           └── pages/ (login, dashboard, assets/, categories/,
-│                       users/, logs/, reports/, patch/,
-│                       borrowings/, notifications/, audit/,
-│                       api/, search, trash, import)
+│   ├── app/
+│   │   ├── core/ (Database, Auth, Flash, Lang, View, Router)
+│   │   ├── models/ (Asset, Category, AssetLog, User, Setting,
+│   │   │            PatchSchedule, PatchChecklist,
+│   │   │            AuditTrail, Notification, Borrowing, ApiToken)
+│   │   ├── controllers/ (Auth, Dashboard, Asset, Category, User,
+│   │   │                  Log, Report, Patch, Setting, Extended)
+│   │   ├── lang/ (en.php, id.php)
+│   │   └── views/
+│   │       ├── layouts/ (app, blank, print)
+│   │       └── pages/ (login, dashboard, assets/, categories/,
+│   │                   users/, logs/, reports/, patch/,
+│   │                   borrowings/, notifications/, audit/,
+│   │                   api/, search, trash, import)
+│   └── tools/
+│       ├── seed_1000.php            # Seeder 1000 data dummy
+│       ├── seed_100000.php          # Seeder 100.000 data (uji performa)
+│       └── benchmark_100000.php     # Benchmark query 100k data
+├── html_version/                    # Versi HTML/JS murni + Live API (Python)
+│   ├── index.html                   # Entry point (hash routing)
+│   ├── api/                         # Backend: server.py (JSON) / server_mysql.py (MySQL)
+│   ├── assets/ (css, js)            # Frontend assets
+│   └── README.md                    # Dokumentasi versi HTML
 └── tools/
     └── generate_xampp_guide.py      # Generator PDF panduan XAMPP
 ```
@@ -206,6 +216,22 @@ Ringkasan:
 5. Akses `http://localhost/asset_app/public/setup` → reset password
 6. Login `admin` / `admin123`
 
+### Versi HTML (Tanpa PHP)
+
+Kloning statis berbasis HTML/JS murni di folder `html_version/` — dua mode:
+
+```bash
+cd html_version
+
+# Mode Live (data shared di server via REST API Python)
+PORT=8000 python3 api/server.py
+
+# Mode Statis (fallback localStorage per-browser)
+python3 -m http.server 8000
+```
+
+> 📖 Detail: [html_version/README.md](html_version/README.md)
+
 ---
 
 ## 📖 Dokumentasi
@@ -216,6 +242,7 @@ Ringkasan:
 | [asset_app/INSTALL.md](asset_app/INSTALL.md) | Panduan instalasi detail (MySQL, Apache, Nginx, Docker) |
 | [asset_app/USER_GUIDE.md](asset_app/USER_GUIDE.md) | Panduan penggunaan semua fitur |
 | [asset_app/XAMPP_Installation_Guide.pdf](asset_app/XAMPP_Installation_Guide.pdf) | Panduan instalasi XAMPP dalam format PDF |
+| [html_version/README.md](html_version/README.md) | Dokumentasi versi HTML (statis + Live API) |
 | [LICENSE](LICENSE) | MIT License |
 
 ---

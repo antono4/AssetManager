@@ -57,7 +57,7 @@
 - **Harga hanya tampil untuk admin**
 
 ### Modul Patching (Kuartalan / per 3 Bulan)
-- Jadwal patching per kuartal (Q1-Q4) dengan auto-fill tanggal
+- Jadwal patching per kuartal — dropdown **Q1-Q4** + **periode/tahun** via date input, auto-fill tanggal
 - Generate checklist per aset IT (exclude kategori "Umum")
 - 6 item checklist standar (Update OS, Antivirus, Backup, Cek Log, Restart, Verifikasi)
 - **Input kode patching** per item per komputer (mis: KB5079473)
@@ -135,10 +135,12 @@ asset_app/
 ├── README.md                       # File ini
 ├── INSTALL.md                      # Panduan instalasi detail
 ├── USER_GUIDE.md                   # Panduan penggunaan detail
+├── XAMPP_Installation_Guide.pdf    # Panduan instalasi XAMPP (PDF)
 ├── LICENSE                         # MIT License
 ├── database/
 │   ├── assets_app.sql              # Skema MySQL + data dummy
-│   └── seed_1000_rows.sql          # 1000 data dummy aset (INSERT)
+│   ├── seed_1000.sql               # 1000 data dummy (stored procedure)
+│   └── seed_1000_rows.sql          # 1000 data dummy aset (INSERT murni)
 ├── public/
 │   ├── index.php                   # Entry point + routing
 │   ├── .htaccess                   # Apache rewrite
@@ -148,12 +150,16 @@ asset_app/
 │       ├── css/ (app, dashboard, login, print, darkmode)
 │       ├── js/app.js
 │       └── uploads/assets/         # Foto aset
+├── tools/
+│   ├── seed_1000.php               # Seeder 1000 data dummy
+│   ├── seed_100000.php             # Seeder 100.000 data (uji performa)
+│   └── benchmark_100000.php        # Benchmark query 100k data
 └── app/
     ├── core/ (Database, Auth, Flash, Lang, View, Router)
-    ├── models/ (Asset, Category, AssetLog, User, PatchSchedule,
+    ├── models/ (Asset, Category, AssetLog, User, Setting, PatchSchedule,
     │            PatchChecklist, AuditTrail, Notification, Borrowing, ApiToken)
     ├── controllers/ (Auth, Dashboard, Asset, Category, User, Log,
-    │                  Report, Patch, Extended)
+    │                  Report, Patch, Setting, Extended)
     ├── lang/ (en.php, id.php)
     └── views/
         ├── layouts/ (app, blank, print)
