@@ -20,13 +20,11 @@ class PatchController
     public function create()
     {
         Auth::requireAdmin();
-        $quarterOpts = PatchSchedule::quarterOptions();
         $cur = PatchSchedule::currentQuarter();
         View::render('patch/form', [
             'pageTitle'   => t('create_schedule'),
             'action'      => 'create',
             'schedule'    => null,
-            'quarterOpts' => $quarterOpts,
             'current'     => $cur,
         ]);
     }
@@ -36,7 +34,8 @@ class PatchController
     {
         Auth::requireAdmin();
         $d = $_POST;
-        if (empty($d['name']) || empty($d['quarter']) || empty($d['year'])) {
+        $d['year'] = PatchSchedule::yearFromPeriod($d['period'] ?? '');
+        if (empty($d['name']) || empty($d['quarter']) || $d['year'] < 1900) {
             Flash::set('error', t('name_category_required'));
             Auth::redirect(url('/patching/create'));
         }
@@ -104,7 +103,6 @@ class PatchController
             'pageTitle'   => t('edit_schedule'),
             'action'      => 'edit',
             'schedule'    => $schedule,
-            'quarterOpts' => PatchSchedule::quarterOptions(),
             'current'     => PatchSchedule::currentQuarter(),
         ]);
     }
@@ -114,7 +112,8 @@ class PatchController
         Auth::requireAdmin();
         $id = (int)$p['id'];
         $d = $_POST;
-        if (empty($d['name']) || empty($d['quarter']) || empty($d['year'])) {
+        $d['year'] = PatchSchedule::yearFromPeriod($d['period'] ?? '');
+        if (empty($d['name']) || empty($d['quarter']) || $d['year'] < 1900) {
             Flash::set('error', t('name_category_required'));
             Auth::redirect(url('/patching/' . $id . '/edit'));
         }

@@ -53,6 +53,7 @@ PHP native asset management app with AdminLTE 3 UI. Located at `/workspace/proje
 ## Patching Module (Jadwal & Checklist per 3 bulan/kuartal)
 - Tables: patch_items (template), patch_schedules (kuartal Q1-Q4), patch_checklists (per aset per jadwal), patch_checklist_items (centangan)
 - Flow: admin buat jadwal (auto-fill tanggal kuartal) → generate checklist aset IT (exclude kategori "Umum") → staff/admin centang item → auto-status: in_progress → completed saat semua item tercentang → schedule auto-refresh status (draft→ongoing→completed)
+- Form jadwal: **Kuartal** = dropdown statis Q1-Q4 (label rentang bulan), **Periode/Tahun** = input `type="date"` (name `period`); tahun diekstrak via `PatchSchedule::yearFromPeriod()` (regex `\d{4}`, fallback tahun berjalan). `quarterOptions()` sudah dihapus. Versi HTML (pages3.js) punya pola yang sama.
 - 6 default items: Update OS/Firmware, Antivirus, Backup, Cek Log, Restart, Verifikasi
 - Routes: /patching, /patching/create, /patching/{id}, /patching/checklist/{id}, toggle via AJAX
 - RBAC: admin=full CRUD+generate; staff=view+centang+skip (no create/edit/delete/generate)

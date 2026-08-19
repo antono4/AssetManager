@@ -3,8 +3,15 @@ $s = $schedule;
 $isEdit = $action === 'edit';
 $cur = $current;
 // Default nilai
-$quarter = $s['quarter'] ?? $cur['quarter'];
-$year = $s['year'] ?? $cur['year'];
+$quarter = (int)($s['quarter'] ?? $cur['quarter']);
+$year = (int)($s['year'] ?? $cur['year']);
+$periodValue = sprintf('%04d-01-01', $year > 0 ? $year : (int)date('Y'));
+$quarterLabels = [
+    1 => 'Q1 (Jan-Mar)',
+    2 => 'Q2 (Apr-Jun)',
+    3 => 'Q3 (Jul-Sep)',
+    4 => 'Q4 (Okt-Des)',
+];
 ?>
 <div class="card card-primary">
     <div class="card-header"><h3 class="card-title"><i class="fas fa-<?= $isEdit?'edit':'plus' ?> mr-1"></i> <?= $isEdit ? 'Edit Jadwal Patching' : 'Buat Jadwal Patching Baru' ?></h3></div>
@@ -20,8 +27,8 @@ $year = $s['year'] ?? $cur['year'];
                     <div class="form-group">
                         <label>Kuartal <span class="text-danger">*</span></label>
                         <select name="quarter" id="sched-quarter" class="form-control" required>
-                            <?php foreach ($quarterOpts as $o): ?>
-                                <option value="<?= $o['quarter'] ?>" <?= (int)$quarter===$o['quarter'] && (int)$year===$o['year']?'selected':'' ?>>Q<?= $o['quarter'] ?> (<?= $o['year'] ?>)</option>
+                            <?php foreach ($quarterLabels as $q => $label): ?>
+                                <option value="<?= $q ?>" <?= $quarter===$q?'selected':'' ?>><?= $label ?></option>
                             <?php endforeach; ?>
                         </select>
                         <small class="text-muted">Periode 3 bulan: Q1=Jan-Mar, Q2=Apr-Jun, dst.</small>
@@ -29,8 +36,9 @@ $year = $s['year'] ?? $cur['year'];
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label>Tahun <span class="text-danger">*</span></label>
-                        <input type="number" name="year" id="sched-year" class="form-control" required min="2020" max="2099" value="<?= e($year) ?>">
+                        <label>Periode / Tahun Patching <span class="text-danger">*</span></label>
+                        <input type="date" name="period" id="sched-period" class="form-control" required value="<?= e($periodValue) ?>">
+                        <small class="text-muted">Pilih tanggal di tahun patching; tahunnya yang dipakai untuk jadwal.</small>
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -72,7 +80,7 @@ $year = $s['year'] ?? $cur['year'];
 // Auto-generate nama & tanggal dari kuartal/tahun bila nama kosong
 (function(){
     var q = document.getElementById('sched-quarter');
-    var y = document.getElementById('sched-year');
+    var p = document.getElementById('sched-period');
     var name = document.getElementById('sched-name');
     var start = document.getElementById('sched-start');
     var due = document.getElementById('sched-due');
@@ -83,8 +91,12 @@ $year = $s['year'] ?? $cur['year'];
         var ed = new Date(year, endMonth, 0).toISOString().slice(0,10);
         return {start: sd, end: ed};
     }
+    function periodYear(){
+        var y = parseInt((p.value || '').substring(0, 4), 10);
+        return y >= 1900 ? y : new Date().getFullYear();
+    }
     function update(){
-        var qq = parseInt(q.value), yy = parseInt(y.value);
+        var qq = parseInt(q.value, 10), yy = periodYear();
         if(!name.value || /^Patching Q[1-4] \d{4}$/.test(name.value)){
             name.value = 'Patching Q' + qq + ' ' + yy;
         }
@@ -95,7 +107,8 @@ $year = $s['year'] ?? $cur['year'];
         }
     }
     q.addEventListener('change', update);
-    y.addEventListener('input', update);
+    p.addEventListener('change', update);
+    p.addEventListener('input', update);
     update();
 })();
 </script>

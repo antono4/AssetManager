@@ -105,22 +105,13 @@ class PatchSchedule
         return ['quarter' => $quarter, 'year' => $year];
     }
 
-    // Kuartal saat ini & berikutnya (untuk default form)
-    public static function quarterOptions(): array
+    // Ambil tahun dari input periode bertipe date ("YYYY-MM-DD" atau "YYYY")
+    public static function yearFromPeriod(string $value): int
     {
-        $cur = self::currentQuarter();
-        $opts = [];
-        // Q saat ini + 2 kuartal ke depan
-        for ($i = 0; $i <= 2; $i++) {
-            $q = $cur['quarter'] + $i;
-            $y = $cur['year'];
-            if ($q > 4) {
-                $q -= 4;
-                $y++;
-            }
-            $opts[] = ['quarter' => $q, 'year' => $y];
+        if (preg_match('/(\d{4})/', $value, $m)) {
+            return (int)$m[1];
         }
-        return $opts;
+        return (int)date('Y');
     }
 
     // Update status schedule otomatis berdasarkan checklist
