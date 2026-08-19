@@ -17,6 +17,12 @@ $role = $u['role'] ?? 'guest';
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title><?= e($pageTitle) ?> &middot; <?= APP_NAME ?></title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="<?= asset_url('img/favicon.svg') ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= asset_url('img/favicon-32.png') ?>">
+    <link rel="shortcut icon" href="<?= asset_url('img/favicon.ico') ?>">
+    <link rel="apple-touch-icon" href="<?= asset_url('img/apple-touch-icon.png') ?>">
+
     <!-- AdminLTE 3 (Bootstrap 4 + tema) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/css/adminlte.min.css">
     <!-- Font Awesome -->
@@ -131,7 +137,7 @@ $role = $u['role'] ?? 'guest';
     <!-- Sidebar -->
     <aside class="main-sidebar sidebar-dark-info elevation-4">
         <a href="<?= url('dashboard') ?>" class="brand-link">
-            <i class="nav-icon fas fa-cubes brand-image ml-3 mt-1" style="font-size:1.6rem;color:#fff;opacity:.9"></i>
+            <img src="<?= asset_url('img/logo.svg') ?>" alt="Logo" class="brand-image ml-2 mr-1" style="width:34px;height:34px;opacity:.95">
             <span class="brand-text font-weight-bold"><?= e(Setting::companyName()) ?></span>
         </a>
 

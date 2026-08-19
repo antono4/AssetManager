@@ -31,6 +31,11 @@ PHP native asset management app with AdminLTE 3 UI. Located at `/workspace/proje
 - BASE_URL auto-computed in config.php (handles built-in server router vs sub-folder deployment)
 - Asset codes auto-generated: AST-#### (zero-padded, sequential)
 
+## Icon & Logo
+- Logo: kubus isometrik putih di atas rounded-square gradient `#4f7cff→#00d4a8` (135deg). Aset di `asset_app/public/assets/img/` & `html_version/assets/img/`: `logo.svg` (gradient+kubus, untuk sidebar/kop laporan), `logo-mark.svg` (kubus saja, untuk container yang sudah punya gradient seperti login hero & boot loader), `favicon.svg`, `favicon.ico` (16/32/48), `favicon-32.png`, `apple-touch-icon.png` (180, full-bleed), plus PWA `icon-192.png`/`icon-512.png`/`icon-512-maskable.png` (hanya di asset_app).
+- Favicon link ada di semua layout: `app.php`, `blank.php`, `print.php`, `html_version/index.html`, dan landing root `index.html` (landing refer path `asset_app/public/assets/img/`). PWA `manifest.json` memakai file PNG (path relatif `assets/img/...`), bukan data-URI lagi.
+- Icon Font Awesome `fa-cubes` lama sudah diganti `<img>` logo di: sidebar brand (app.php/views.js), login hero (blank.php/views.js), boot loader (html_version/index.html), kop laporan print (reports/print.php).
+
 ## Gotchas Learned
 - PHP built-in server with router file: SCRIPT_NAME = request path (not /index.php), so BASE_URL must detect router mode
 - Static files (CSS/JS) need `return false;` in index.php for built-in server to serve them directly

@@ -5,7 +5,7 @@ $s = $summary;
 $filterDesc = ReportController::describeFilters($f);
 ?>
 <div class="report-header">
-    <h2><i class="fas fa-cubes"></i> <?= e(Setting::companyName()) ?> — <?= t('asset_report') ?></h2>
+    <h2><img src="<?= asset_url('img/logo.svg') ?>" alt="" style="width:26px;height:26px;vertical-align:-5px;margin-right:6px;border-radius:6px"> <?= e(Setting::companyName()) ?> — <?= t('asset_report') ?></h2>
     <?php $addr = Setting::companyAddress(); $phone = Setting::companyPhone(); $cemail = Setting::companyEmail(); ?>
     <?php if ($addr !== '' || $phone !== '' || $cemail !== ''): ?>
     <p class="subtitle">

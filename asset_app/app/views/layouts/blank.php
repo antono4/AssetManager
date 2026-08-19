@@ -5,6 +5,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e($pageTitle) ?> &middot; <?= APP_NAME ?></title>
+    <link rel="icon" type="image/svg+xml" href="<?= asset_url('img/favicon.svg') ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= asset_url('img/favicon-32.png') ?>">
+    <link rel="shortcut icon" href="<?= asset_url('img/favicon.ico') ?>">
+    <link rel="apple-touch-icon" href="<?= asset_url('img/apple-touch-icon.png') ?>">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icon-css@3.5.0/css/flag-icon.min.css">
@@ -21,7 +25,7 @@
         <div class="login-particles" id="particles"></div>
         <div class="login-hero-content">
             <a href="<?= url('login') ?>" class="login-hero-logo">
-                <span class="logo-icon"><i class="fas fa-cubes"></i></span>
+                <span class="logo-icon"><img src="<?= asset_url('img/logo-mark.svg') ?>" alt="Logo" style="width:30px;height:30px"></span>
                 <span><?= APP_NAME ?></span>
             </a>
             <h2><?= t('login_hero_title') ?? 'Manage Your Assets with Confidence' ?></h2>
