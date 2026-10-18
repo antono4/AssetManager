@@ -1,1 +1,26 @@
-Last updated: 2026-10-18 11:33:19 WIB
+# AssetManager
+
+
+
+## 📋 Overview
+
+This repository contains **139 files** and is built with the following technologies:
+
+HTML
+
+## 🚀 Quick Start
+
+## ✨ Features
+
+- 📝 Auto-generated documentation
+
+## 🛠️ Technologies
+
+HTML
+
+## 📄 License
+
+MIT License
+
+---
+*Last updated: 2026-10-18 11:59:20 WIB*
